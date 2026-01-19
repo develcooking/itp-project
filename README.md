@@ -1,2 +1,2 @@
-# ITP-Projekt Zwei Ausländer / Ausbildungsprotal
+# ITP-Projekt Zwei Ausländer / Ausbildungsportal
 
