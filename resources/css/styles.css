@@ -1,14 +1,12 @@
 :root {
   --enabled-text: #000;
   --disabled-text: #808080;
-  --background0: #fff;
-  --background1: #ffffff;
-  --background2: #f1f1f1;
-  --background3: #f0f0f0;
-  --background4: #e2e2e2;
-  --background5: #dddddd;
-  --accent-color: #083985;
-  --accent-color-faided: #083a853d;
+  --backgroundWhite: #fff;
+  --backgroundSidebarGrey: #f1f1f1;
+  --backgroundSidebarHoverGrey: #e2e2e2;
+  --backgroundSidebarActiveGrey: #dddddd;
+  --accentColor: #083985;
+  --accentColorFaided: #083a853d;
 }
 
 body {
@@ -20,7 +18,7 @@ body {
 }
 
 .header {
-  background-color: var(--accent-color);
+  background-color: var(--accentColor);
   color: #fff;
   padding: 20px;
   height: 72px;
@@ -62,7 +60,7 @@ button {
 
 .sidebar {
   min-height: 100vh;
-  background-color: var(--background2);
+  background-color: var(--backgroundSidebarGrey);
   overflow-y: auto;
   min-width: 125px;
   width: 15%;
@@ -106,9 +104,6 @@ button {
   z-index: 1000;
 }
 
-.sidebar-item:hover {
-  background-color: #ebebeb;
-}
 
 .sidebar-item:hover,
 .sidebar-item.active,
@@ -118,11 +113,11 @@ button {
 }
 
 .sidebar-item:hover {
-  background-color: var(--background4);
+  background-color: var(--backgroundSidebarHoverGrey);
 }
 
 .sidebar-item.active {
-  background-color: var(--background5);
+  background-color: var(--backgroundSidebarActiveGrey);
 }
 
 .sidebar-item img {
