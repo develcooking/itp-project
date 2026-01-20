@@ -5,7 +5,7 @@ include $homepath . "/views/header.php";
 <div class="login">
     <?php if (!isset($_SESSION['user'])): ?>
         <form method="post" action="../controllers/login.php">
-            <input type="text" name="username" required placeholder="Username">
+            <input type="text" name="email" required placeholder="E-Mail Adress">
             <input type="password" name="password" required placeholder="Password">
             <button class="submitbtn" type="submit" name="login">Log in</button>
         </form>
