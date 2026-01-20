@@ -19,5 +19,3 @@
     </div>
 
 <div class="main-container">
-  <?php include "sidebar.php" ?>
-  <div class="content">
