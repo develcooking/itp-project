@@ -1,7 +1,7 @@
 <?php   
 class User{
     private $conn;
-    private $table = 'users';
+    private $table = 'Benutzer';
     private $id;
     public $name;
     public $vorname;
@@ -21,7 +21,7 @@ class User{
     }
 
     public function getById($id){
-        $query = "SELECT * FROM " . $this->table . " WHERE id = ? LIMIT 1";
+        $query = "SELECT * FROM " . $this->table . " WHERE userid = ? LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -53,6 +53,25 @@ class User{
         
         $stmt->close();
         return false;
+    }
+    
+    private function mapData($row) {
+    $this->id = $row['userid'];
+    $this->name = $row['name'];
+    $this->vorname = $row['vorname'] ?? null;
+    $this->email = $row['email'];
+    $this->passwort = $row['password_hash'];
+    $this->art = $row['art'];
+}
+
+    public function toArray() {
+    return [
+        'id' => $this->id,
+        'name' => $this->name,
+        'vorname' => $this->vorname,
+        'email' => $this->email,
+        'art' => $this->art
+    ];
     }
 }
 ?>
