@@ -5,9 +5,9 @@ ini_set('display_errors', 1);
 
 $site_name = "Pheelix";
 // Setting the default config
-$dbhost = "localhost"; #TODO muss angepasst werden
-$dbuser = "root";
-$dbpwd = "Passwort1234";
+$dbhost = "localhost";
+$dbuser = "user1";
+$dbpwd = "SicheresPasswort123";
 $dbname = "Database";
 
 try {
