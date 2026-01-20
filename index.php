@@ -1,14 +1,17 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-  include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
-  echo '<div>';
-  echo '<h1 style="text-align: center;">You are not allowed to see this side</h1>';
-  echo '<h1 style="text-align: center;">Please log in</h1>';
-  echo '</div>';
-  die();
+    include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
+    ?>
+    <form method="post" action="../controllers/login.php">
+        <input type="text" name="username" required placeholder="Username">
+        <input type="password" name="password" required placeholder="Password">
+        <button class="submitbtn" type="submit" name="login"><?= "Log in" ?></button>
+    </form>
+<?php
+    die();
 } else {
-  header('Location: ' . "/views/startpage.php");
+    header('Location: ' . "/views/startpage.php");
 }
 
 ?>

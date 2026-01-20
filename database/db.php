@@ -6,10 +6,9 @@ ini_set('display_errors', 1);
 $site_name = "Pheelix";
 // Setting the default config
 $dbhost = "localhost"; #TODO muss angepasst werden
-$dbuser = "mysqluser";
-$dbpwd = "mypwd";
-$dbname = "mydatabase";
-$defaultlang = "en_US.UTF-8";
+$dbuser = "root";
+$dbpwd = "Passwort1234";
+$dbname = "Database";
 
 try {
     // Create a new mysqli instance
