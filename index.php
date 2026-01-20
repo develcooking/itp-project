@@ -8,7 +8,7 @@ if (!isset($_SESSION['user'])) {
   echo '</div>';
   die();
 } else {
-  header('Location: ' . "/subpages/record.php");
+    header('Location: ' . "/views/startpage.php");
 }
 
 ?>

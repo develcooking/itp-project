@@ -1,7 +1,6 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'] . "/elements/db.php";
-include $homepath . "/elements/header.php";
-include $homepath . "/elements/isuser.php";
+include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+include $homepath . "/views/header.php";
 
 ?>
-<p> Startpage of AzubiPortal.Net</p>
+<p> Startpage of Ausbildungsportal.Net</p>

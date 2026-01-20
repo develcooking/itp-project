@@ -1,0 +1,75 @@
+:root {
+  --enabled-text: #000;
+  --disabled-text: #808080;
+  --backgroundWhite: #fff;
+  --backgroundSidebarGrey: #f1f1f1;
+  --backgroundSidebarHoverGrey: #e2e2e2;
+  --backgroundSidebarActiveGrey: #dddddd;
+  --accentColor: #083985;
+  --accentColorFaided: #083a853d;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  height: max-content;
+}
+
+.header {
+  background-color: var(--accentColor);
+  color: #fff;
+  padding: 20px;
+  height: 72px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hat {
+  flex: 1;
+  text-align: left;
+  margin: 0;
+  text-decoration: none;
+  color: inherit;
+  margin-right: 20px;
+  h2 {
+    margin-right: 20px;
+  }
+}
+
+#headerspacer {
+  width: 35%;
+}
+
+button {
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.header .login {
+  margin-left: auto;
+}
+
+.main-container {
+  height: 100%;
+  width: 85%;
+  padding: 20px;
+}
+
+button,
+input[type="text"],
+input[type="date"],
+input[type="password"] {
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 10px;
+}
+
+#createAccountForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center
+}
