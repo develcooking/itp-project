@@ -36,10 +36,9 @@ body {
   text-decoration: none;
   color: inherit;
   margin-right: 20px;
-}
-
-.hat h2 {
-  margin-right: 20px;
+  h2 {
+    margin-right: 20px;
+  }
 }
 
 #headerspacer {
