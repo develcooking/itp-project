@@ -17,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $username = $_POST['username'];
         $password = $_POST['password'];
 
-        // 1. Corrected column name and removed trailing comma
         $stmt = $conn->prepare("SELECT passwort_hash, art FROM Benutzer WHERE name = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
