@@ -11,16 +11,7 @@ include $homepath . "/views/header.php";
         </form>
         <br>
         <hr>
-        <form method="post" action="../controllers/createNewUser.php">
-            <p>Have no Account yet? Create one</p>
-            <input type="text" name="username" required placeholder="Username">
-            <input type="text" name="vorname" required placeholder="Vorname">
-            <input type="text" name="nachname" required placeholder="Nachname">
-            <input type="text" name="email" required placeholder="E-Mail address">
-            <input type="password" name="password" required placeholder="Password">
-            <button class="submitbtn" type="submit" name="createAccount">Create Account</button>
-        </form>
-
+        <a href="createAccount.php">Have no Account yet? Create one</a>
         <?php if (isset($error)): ?>
             <p style="color: red;"><?= $error; ?></p>
         <?php endif; ?>

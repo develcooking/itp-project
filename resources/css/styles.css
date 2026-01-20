@@ -67,3 +67,9 @@ input[type="password"] {
   border-radius: 3px;
   padding: 10px;
 }
+
+#createAccountForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center
+}
