@@ -84,19 +84,19 @@ button {
   max-width: none;
 }
 
-.sidebar.collapsed .sidebar-item span {
+.sidebar.collapsed .sidebarItem span {
   display: none;
 }
 
-.sidebar-item.toggle-sidebar img {
+.sidebarItem.toggleSidebar img {
   content: url("../imgs/caret-right.svg");
 }
 
-.sidebar.collapsed .sidebar-item.toggle-sidebar img {
+.sidebar.collapsed .sidebarItem.toggleSidebar img {
   content: url("../imgs/caret-left.svg");
 }
 
-.sidebar-item {
+.sidebarItem {
   display: flex;
   align-items: center;
   padding: 10px;
@@ -105,28 +105,28 @@ button {
 }
 
 
-.sidebar-item:hover,
-.sidebar-item.active,
-.sidebar-item.active:hover {
+.sidebarItem:hover,
+.sidebarItem.active,
+.sidebarItem.active:hover {
   border-radius: 15px;
   transition: 0.3s;
 }
 
-.sidebar-item:hover {
+.sidebarItem:hover {
   background-color: var(--backgroundSidebarHoverGrey);
 }
 
-.sidebar-item.active {
+.sidebarItem.active {
   background-color: var(--backgroundSidebarActiveGrey);
 }
 
-.sidebar-item img {
+.sidebarItem img {
   width: 30px;
   height: 30px;
   margin-right: 10px;
 }
 
-.sidebar-item span {
+.sidebarItem span {
   flex-grow: 1;
   overflow: hidden;
   text-overflow: ellipsis;

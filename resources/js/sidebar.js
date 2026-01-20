@@ -1,6 +1,6 @@
 const sidebar = document.querySelector('.sidebar');
-const toggleSidebarItem = document.querySelector('.toggle-sidebar');
-const sidebarItems = document.querySelectorAll('.sidebar-item');
+const toggleSidebarItem = document.querySelector('.toggleSidebar');
+const sidebarItems = document.querySelectorAll('.sidebarItem');
 const noTransitionClass = 'no-transition';
 
 // Load sidebar state from localStorage
@@ -63,7 +63,7 @@ function updateTabIndex() {
 
         // Add keydown event listener to the sidebar item
         item.addEventListener('keydown', (event) => {
-            if (!item.classList.contains('toggle-sidebar') && (event.key === 'Enter' || event.key === ' ')) {
+            if (!item.classList.contains('toggleSidebar') && (event.key === 'Enter' || event.key === ' ')) {
                 event.preventDefault();
                 window.location.href = item.dataset.content;
             }
@@ -72,7 +72,7 @@ function updateTabIndex() {
 }
 
 function markactivesidebar() {
-    const sidebar_items = document.getElementsByClassName('sidebar-item');
+    const sidebar_items = document.getElementsByClassName('sidebarItem');
     const currentPath = window.location.pathname.split("/")[2];
     
     for (let i = 0; i < sidebar_items.length; i++) {
