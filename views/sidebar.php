@@ -25,4 +25,4 @@
   <?php endif; ?>
 </div>
 
-<script src="../resources/sidebar/sidebar.js"></script>
+<script src="../resources/sidebar.js"></script>
