@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="../resources/imgs/icon.png">
     <title><?=$site_name?></title>
-    <link rel="stylesheet" type="text/css" href="../styles.css" />
+    <link rel="stylesheet" type="text/css" href="../resources/css/styles.css" />
 </head>
 <body>
     <div class="header">

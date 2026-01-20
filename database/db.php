@@ -3,9 +3,9 @@ $homepath = $_SERVER['DOCUMENT_ROOT'];
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$site_name = "Pheelix";
+$site_name = "AusbildungsportalNet";
 // Setting the default config
-$dbhost = "localhost";
+$dbhost = "127.0.0.1";
 $dbuser = "user1";
 $dbpwd = "SicheresPasswort123";
 $dbname = "Database";
