@@ -3,7 +3,7 @@ include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 $errorMessages = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Register
+    // create Account
     if (isset($_POST['createAccount'])) {
         $nachName = $_POST['nachname'];
         $vorName = $_POST['vorname'];
