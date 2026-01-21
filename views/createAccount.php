@@ -12,9 +12,9 @@ include $homepath . "/views/header.php";
             <input type="text" name="email" required placeholder="E-Mail address">
             <input type="password" name="password" required placeholder="Password">
             <select name="art" required>
-                <option value="leher">leher</option>
-                <option value="ausbilder">ausbilder</option>
-                <option value="admin">admin</option>
+                <option value="Lehrer">Lehrer</option>
+                <option value="Ausbilder">Ausbilder</option>
+                <option value="Admin">Admin</option>
             </select>
             <button class="submitbtn" type="submit" name="createAccount">Create Account</button>
         </form>
