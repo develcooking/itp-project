@@ -3,11 +3,11 @@
 class User{
     private $conn;
     private $table = 'Benutzer';
-    private $id;
+    public $id;
     public $name;
     public $vorname;
     public $email;
-    private $passwort;
+    public $passwort;
     public $art;
 
     public function __construct($db){
@@ -22,6 +22,7 @@ class User{
         if($result->num_rows > 0){
             while($row = $result->fetch_assoc()){
                 $users[] = [
+                    
                     'id' => $row['userid'],
                     'name' => $row['name'],
                     'vorname' => $row['vorname'],
@@ -141,7 +142,7 @@ class User{
     public function getByEmail($email){
         $query = "SELECT * FROM " . $this->table . " WHERE email = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("s", $id);
+        $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
         
