@@ -1,59 +1,64 @@
 <?php
 
-include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
 
 if (!isset($_SESSION)) {
     session_start();
 }
 
-// check the logininfo
 $error = '';
-$rolle = ''; // init vars for admin-status
-$email = isset($_SESSION['email']) ? $_SESSION['email'] : null;
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Login
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['login'])) {
-        $email = $_POST['email'];
-        $password = $_POST['password'];
-
-        $stmt = $conn->prepare("SELECT passwort_hash, art FROM Benutzer WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $stmt->store_result();
-        $stmt->bind_result($hashedPassword, $fetchedRole);
-        $stmt->fetch();
-
-        if ($stmt->num_rows > 0 && password_verify($password, $hashedPassword)) {
-            session_regenerate_id(true);
-            $_SESSION['email'] = $email;
-            $_SESSION['rolle'] = $fetchedRole; // Store the role from the 'art' column
-
-            header("Location: " . $_SERVER['PHP_SELF']);
-            exit();
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $password = $_POST['password'] ?? '';
+        
+        if (empty($email) || empty($password)) {
+            http_response_code(400);
+            $error = "Email and password are required";
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            http_response_code(400);
+            $error = "Invalid email format";
         } else {
-            // 2. Use the array that you check at the bottom
-            $errorMessages[] = "Invalid email or password";
+            $user = new User($conn);
+            
+            if ($user->getByEmail($email)) {
+                if (password_verify($password, $user->passwort)) {
+                    session_regenerate_id(true);
+                    //im not sure about userid, if its correct
+                    $_SESSION['user'] = $user->name;
+                    $_SESSION['userid'] = $user->id;
+                    $_SESSION['email'] = $user->email;
+                    //auch unsicher, weil name doppelt abgerufen wird
+                    $_SESSION['name'] = $user->name;
+                    $_SESSION['vorname'] = $user->vorname;
+                    $_SESSION['art'] = $user->art;
+                    $_SESSION['logged_in'] = true;
+                    
+                    header("Location: " . $_SERVER['PHP_SELF']);
+                    exit();
+                } else {
+                    http_response_code(400);
+                    $error = "Invalid email or password";
+                }
+            } else {
+                http_response_code(400);
+                $error = "Invalid email or password";
+            }
         }
-        $stmt->close();
+        http_response_code(200);
+        $conn->close();
     }
-
-    // Logout
+    
     if (isset($_POST['logout'])) {
         session_destroy();
-        header("Location: " . $_SERVER['PHP_SELF']); // Reload site if logout
+        
+        header("Location: /login.php");
         exit();
     }
 }
 
-$errorMessages = [];
-
-// Display error messages
-if (!empty($errorMessages)) {
-    echo "<div style='background-color: red'>";
-    foreach ($errorMessages as $errorMessage) {
-        echo "<p>$errorMessage</p>";
-    }
-    echo "</div>";
-    die();
+if (!empty($error)) {
+    echo "<div class='error'>" . htmlspecialchars($error) . "</div>";
 }
