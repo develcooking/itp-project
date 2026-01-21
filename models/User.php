@@ -22,6 +22,7 @@ class User{
         if($result->num_rows > 0){
             while($row = $result->fetch_assoc()){
                 $users[] = [
+                    
                     'id' => $row['userid'],
                     'name' => $row['name'],
                     'vorname' => $row['vorname'],
