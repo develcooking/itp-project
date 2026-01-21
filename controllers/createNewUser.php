@@ -1,43 +1,61 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
-$errorMessages = [];
+require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
+
+
+$error = '';
+$success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Register
     if (isset($_POST['createAccount'])) {
-        $nachName = $_POST['nachname'];
-        $vorName = $_POST['vorname'];
+        $name = $_POST['nachname'];
+        $vorname = $_POST['vorname'];
         $username = $_POST['username'];
         $password = $_POST['password'];
-        $email = $_POST['email'];
-        $art = $_POST['art'];
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $art = $_POST['art'] ?? '';
         
-        if (empty($nachName) || empty($vorName) || empty($username) || empty($password) || empty($email) || empty($art)) {
-            array_push($errorMessages, "Bitte füllen Sie alle Felder aus!");
-        } else {
-            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        if(empty($name) || empty($vorname) || empty($username) || empty($password) || empty($email) || empty($art)){
+            http_response_code(400);
+            $error = 'Bitte füllen Sie alle Felder aus!';
+        }elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+            http_response_code(400);
+            $error = 'Ungültiges E-Mail-Format!';
+        }elseif(strlen($password) < 6){
+            //Es wird nachgearbeitet durch RegEx für Validierung, falls möglich das in Class zu machen
+            http_response_code(400);
+            $error = 'Passwort muss mindestens 6 Zeichen lang sein!';
+        }else{
+            $user = new User($conn);
 
-            $stmt = $conn->prepare("INSERT INTO Benutzer (name, vorname, username, password, email, art) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssss", $nachName, $vorName, $username, $hashedPassword, $email, $art);
+            if($user->getByEmail($email)){
+                http_response_code(409);
+                $error = 'Diese E-Mail-Adresse ist bereits registriert!';
+            }else{
+                $user->name = $name;
+                $user->vorname = $vorname;
+                $user->email = $email;
+                $user->username = $username;
+                $user->passwort = $password;
+                $user->art = $art;
 
-            if ($stmt->execute()) {
-                echo "Benutzer erfolgreich registriert!";
-            } else {
-                echo "Fehler beim Registrieren: " . $stmt->error;
+                if($user->post()){
+                    http_response_code(201);
+                    $success = 'Benutzer erfolgreich registriert. Sie können sich jetzt anmelden.';
+                    header("Location: /views/loginsite.php");
+                    exit();
+                }else{
+                http_response_code(500);
+                $error = 'Fehler beim Registrieren. Bitte versuchen Sie es später erneut.';
+                }
             }
-
-            $stmt->close();
-            $conn->close();
         }
     }
 }
 
-// Display error messages
-if (!empty($errorMessages)) {
-    echo "<div style='background-color: red'>";
-    foreach ($errorMessages as $errorMessage) {
-        echo "<p>$errorMessage</p>";
-    }
-    echo "</div>";
-    die();
+if (!empty($error)) {
+    echo "<div class='error'>" . htmlspecialchars($error) . "</div>";
+}
+if (!empty($success)) {
+    echo "<div class='success'>" . htmlspecialchars($success) . "</div>";
 }
