@@ -141,7 +141,7 @@ class User{
     public function getByEmail($email){
         $query = "SELECT * FROM " . $this->table . " WHERE email = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("s", $id);
+        $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
         
