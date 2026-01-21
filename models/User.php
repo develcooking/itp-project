@@ -3,11 +3,11 @@
 class User{
     private $conn;
     private $table = 'Benutzer';
-    private $id;
+    public $id;
     public $name;
     public $vorname;
     public $email;
-    private $passwort;
+    public $passwort;
     public $art;
 
     public function __construct($db){

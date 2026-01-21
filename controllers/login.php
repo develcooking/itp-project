@@ -8,7 +8,6 @@ if (!isset($_SESSION)) {
 }
 
 $error = '';
-$statusCode = 200;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['login'])) {
@@ -16,10 +15,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_POST['password'] ?? '';
         
         if (empty($email) || empty($password)) {
-            $statusCode = 400;
+            http_response_code(400);
             $error = "Email and password are required";
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $statusCode = 400;
+            http_response_code(400);
             $error = "Invalid email format";
         } else {
             $user = new User($conn);
@@ -31,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['user'] = $user->name;
                     $_SESSION['userid'] = $user->id;
                     $_SESSION['email'] = $user->email;
+                    //auch unsicher, weil name doppelt abgerufen wird
                     $_SESSION['name'] = $user->name;
                     $_SESSION['vorname'] = $user->vorname;
                     $_SESSION['art'] = $user->art;
@@ -39,15 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     header("Location: " . $_SERVER['PHP_SELF']);
                     exit();
                 } else {
-                    $statusCode = 400;
+                    http_response_code(400);
                     $error = "Invalid email or password";
                 }
             } else {
-                $statusCode = 400;
+                http_response_code(400);
                 $error = "Invalid email or password";
             }
         }
-        http_response_code($statusCode);
+        http_response_code(200);
     }
     
     if (isset($_POST['logout'])) {
