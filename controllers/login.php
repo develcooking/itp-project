@@ -35,14 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['email'] = $user->email;
                     $_SESSION['role'] = $user->role;
 
-                    header("Location: /views/createAccount.php");
+                    header("Location: /views/startpage.php");
                     exit();
                 } else {
-                    http_response_code(401);
+                    http_response_code(400);
                     $error = "Invalid email or password";
                 }
             } else {
-                http_response_code(401);
+                http_response_code(400);
                 $error = "Invalid email or password";
             }
         }
