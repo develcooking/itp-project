@@ -3,12 +3,19 @@
 class User{
     private $conn;
     private $table = 'Benutzer';
-    public $id;
-    public $name;
-    public $vorname;
+    public $userId;
+    public $userName;
+    public $firstName;
+    public $lastName;
     public $email;
-    public $passwort;
-    public $art;
+    public $password;
+    public $role;
+    public $securityAnswer;
+    public $activated;
+    public $createdAt;
+    public $modifiedAt;
+    public $createdBy;
+    public $modifiedBy;
 
     public function __construct($db){
         $this->conn = $db;
@@ -22,12 +29,19 @@ class User{
         if($result->num_rows > 0){
             while($row = $result->fetch_assoc()){
                 $users[] = [
-                    
-                    'id' => $row['userid'],
-                    'name' => $row['name'],
-                    'vorname' => $row['vorname'],
+                    'userId' => $row['userid'],
+                    'userName' => $row['userName'],
+                    'firstName' => $row['firstName'],
+                    'lastName' => $row['lastName'],
                     'email' => $row['email'],
-                    'art' => $row['art']
+                    'password' => $row['password'],
+                    'role' => $row['role'],
+                    'securityAnswer' => $row['securityAnswer'],
+                    'activated' => $row['activated'],
+                    'createdAt' => $row['createdAt'],
+                    'modifiedAt' => $row['modifiedAt'],
+                    'createdBy' => $row['createdBy'],
+                    'modifiedBy' => $row['modifiedBy']
                 ];
             }
         }
@@ -38,25 +52,43 @@ class User{
 
     public function post(){
         $query = " INSERT INTO " . $this->table . "
-        (name, vorname, email, password_hash, art) 
-        VALUES (?, ?, ?, ?, ?)";
+        (userName, firstName, lastName, email, password, role, securityAnswer, activated, createdAt, modifiedAt, createdBy, modifiedBy) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
 
-        //$hashedPassword = password_hash($this->passwort, PASSWORD_DEFAULT)
+        $password = password_hash($this->password, PASSWORD_DEFAULT);
 
         $stmt->bind_param(
-            "ssss",
-            $this->name,
-            $this->vorname,
+            "sssssssissii",
+            $this->userName,
+            $this->firstName,
+            $this->lastName,
             $this->email,
-          //  $hashedPassword,
-            $this->art
+            $password,
+            $this->role,
+            $this->securityAnswer,
+            $this->activated,
+            $this->createdAt,
+            $this->modifiedAt,
+            $this->createdBy,
+            $this->modifiedBy
         );
 
         if ($stmt->execute()) {
         $this->id = $stmt->insert_id;
         $stmt->close();
+
+
+        /* grad geht ja so dass der user by system erstellt wird, aber muss nicht so sein,
+        -> so ja mit der funktion kann ma machen createdBy === userId
+        if ($this->createdBy === 0) {
+            $this->createdBy = $this->userId;
+            $this->modifiedBy = $this->userId;
+            $this->updateCreatedBy();
+        }
+        */
+
         return true;
     }
     
@@ -156,5 +188,16 @@ class User{
         $stmt->close();
         return false;
     }
+
+    private function updateCreatedBy() {
+    $query = "UPDATE " . $this->table . " 
+              SET createdBy = ?, modifiedBy = ? 
+              WHERE userid = ?";
+    
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("iii", $this->userId, $this->userId, $this->userId);
+    $stmt->execute();
+    $stmt->close();
+}
 }
 ?>
