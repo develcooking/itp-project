@@ -5,9 +5,7 @@
 
     $model = new Forum($conn);
 
-    $bereiche = $model->getBereiche(); 
-    
+    $bereiche = $model->getBereiche();
+
     // Variablen an View übergeben
     require __DIR__ . '/../views/forum_start.php';
-
-?>

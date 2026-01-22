@@ -1,6 +1,7 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include $homepath . "/views/header.php";
+include $homepath . "/models/forum.php"
 
 ?>
 
@@ -12,24 +13,11 @@ include $homepath . "/views/header.php";
 </head>
 <body>
 
-//<?php if ($result && $result->num_rows > 0): ?>
-//    <?php while ($row = $result->fetch_assoc()): ?>
-//        <div class="bereich">
-//            <a href="forum.php?bereich_id=<?= $row['id'] ?>">
-//                <?= htmlspecialchars($row['name']) ?>
-//            </a>
-//            <p><?= htmlspecialchars($row['beschreibung']) ?></p>
-//        </div>
-//    <?php endwhile; ?>
-//<?php else: ?>
-//    <p>Keine Berufsbereiche vorhanden.</p>
-//<?php endif; ?>
-
 <?php foreach ($bereiche as $bereich): ?>
 
 <div class="card" style="width: 18rem;">
   <div class="card-body">
-    <h5 class="card-title"> $bereich->name </h5>
+    <h5 class="card-title"> <?=  $bereich->name ?> </h5>
 <!--    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p> -->
     <a href="/forum?bereich_id=<?= $bereich->name ?>" class="card-link">Zu den Themen</a>
   </div>
