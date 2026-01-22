@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="/resources/imgs/icon.png">
     <title>Ausbildungsportal.net</title>
-    <link rel="stylesheet" href="/resources/bootstrap-5.3.8-dist/css/bootstrap.min.css"> 
+    <link rel="stylesheet" href="/resources/css/bootstrap.min.css"> 
     <link rel="stylesheet" type="text/css" href="/resources/css/styles.css" />
 </head>
 <body>
