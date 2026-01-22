@@ -4,7 +4,7 @@ include $homepath . "/views/header.php";
 ?>
 <div class="login">
     <?php if (!isset($_SESSION['user'])): ?>
-        <form id="createAccountForm" method="post" action="../controllers/createNewUser.php">
+        <form id="createAccountForm" method="post" action="../controllers/register.php">
             <p>Create Account</p>
             <input type="text" name="userName" required placeholder="Username">
             <input type="text" name="firstName" required placeholder="Vorname">
