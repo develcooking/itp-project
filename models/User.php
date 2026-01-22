@@ -9,6 +9,7 @@ class User{
     public $email;
     public $passwort;
     public $art;
+    public $username;
 
     public function __construct($db){
         $this->conn = $db;
@@ -38,20 +39,21 @@ class User{
 
     public function post(){
         $query = " INSERT INTO " . $this->table . "
-        (name, vorname, email, password_hash, art) 
-        VALUES (?, ?, ?, ?, ?)";
+        (name, vorname, email, art, passwort_hash, username) 
+        VALUES (?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
 
-        //$hashedPassword = password_hash($this->passwort, PASSWORD_DEFAULT)
+        $hashedPassword = password_hash($this->passwort, PASSWORD_DEFAULT);
 
         $stmt->bind_param(
-            "ssss",
+            "ssssss",
             $this->name,
             $this->vorname,
             $this->email,
-          //  $hashedPassword,
-            $this->art
+            $this->art,
+            $hashedPassword,
+            $this->username,
         );
 
         if ($stmt->execute()) {
