@@ -6,7 +6,7 @@ $dotenv->load();
 require_once __DIR__ . '/../database/db.php';
 require_once __DIR__ . '/helpers/payloadHelper.php';
 
-require_once __DIR__ . '/../database/seeders/benutzerSeeder.php';
+require_once __DIR__ . '/../database/seeders/usersSeeder.php';
 $seeder = new BenutzerSeeder($conn);
 $seeder->run();
 

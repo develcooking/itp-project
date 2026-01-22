@@ -3,6 +3,10 @@ include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include $homepath . "/views/header.php";
 ?>
 
+<script>
+    console.log('dsadas')
+</script>
+
 <div class="container min-vh-100 d-flex justify-content-center align-items-center my-4">
   <div class="row w-100 justify-content-center">
     <div class="col-12 col-sm-10 col-md-8 col-lg-6">
@@ -13,10 +17,10 @@ include $homepath . "/views/header.php";
           <h2 class="fw-bold mb-2">Registrieren</h2>
           <p class="text-muted mb-4">Bitte geben Sie Ihre Daten ein.</p>
 
-          <form method="post" action="../controllers/createNewUser.php">
+          <form method="post" action="../controllers/register.php">
 
             <div class="form-floating mb-3">
-              <input type="text" name="username" class="form-control" placeholder="Benutzername" required>
+              <input type="text" name="userName" class="form-control" placeholder="Benutzername" required>
               <label for="username">Benutzername</label>
             </div>
 
@@ -58,11 +62,11 @@ include $homepath . "/views/header.php";
             </div>
 
             <div class="mb-4">
-              <select name="art" class="form-select" required>
+              <select name="role" class="form-select" required>
                 <option value="" disabled selected>Bitte Rolle wählen</option>
-                <option value="lehrer">Lehrkraft</option>
-                <option value="ausbilder">Ausbilder</option>
-                <option value="admin">Admin</option>
+                <option value="Lehrer">Lehrkraft</option>
+                <option value="Ausbilder">Ausbilder</option>
+                <option value="Admin">Admin</option>
               </select>
             </div>
 
@@ -87,7 +91,7 @@ include $homepath . "/views/header.php";
 
           <p class="mb-0">
             Bereits einen Account?
-            <a href="loginsite.php" class="fw-bold text-decoration-none">Hier anmelden</a>
+            <a href="register.php" class="fw-bold text-decoration-none">Hier anmelden</a>
           </p>
 
         </div>

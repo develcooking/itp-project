@@ -8,12 +8,13 @@ if (!isset($_SESSION)) {
 }
 
 $error = '';
+$success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['login'])) {
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-        $password = $_POST['password'] ?? '';
-        
+        $password = $_POST['password'];
+
         if (empty($email) || empty($password)) {
             http_response_code(400);
             $error = "Email and password are required";
@@ -22,39 +23,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "Invalid email format";
         } else {
             $user = new User($conn);
-            
+
             if ($user->getByEmail($email)) {
-                if (password_verify($password, $user->passwort)) {
+                if (password_verify($password, $user->password)) {
                     session_regenerate_id(true);
-                    //im not sure about userid, if its correct
-                    $_SESSION['user'] = $user->name;
-                    $_SESSION['userid'] = $user->id;
-                    $_SESSION['email'] = $user->email;
-                    //auch unsicher, weil name doppelt abgerufen wird
-                    $_SESSION['name'] = $user->name;
-                    $_SESSION['vorname'] = $user->vorname;
-                    $_SESSION['art'] = $user->art;
                     $_SESSION['logged_in'] = true;
-                    
-                    header("Location: " . $_SERVER['PHP_SELF']);
+                    $_SESSION['userId'] = $user->userId;
+                    $_SESSION['userName'] = $user->userName;
+                    $_SESSION['firstName'] = $user->firstName;
+                    $_SESSION['lastName'] = $user->lastName;
+                    $_SESSION['email'] = $user->email;
+                    $_SESSION['role'] = $user->role;
+
+                    header("Location: /views/createAccount.php");
                     exit();
                 } else {
-                    http_response_code(400);
+                    http_response_code(401);
                     $error = "Invalid email or password";
                 }
             } else {
-                http_response_code(400);
+                http_response_code(401);
                 $error = "Invalid email or password";
             }
         }
-        http_response_code(200);
-        $conn->close();
     }
-    
+
     if (isset($_POST['logout'])) {
         session_destroy();
-        
-        header("Location: /login.php");
+
+        header("Location: /views/loginsite.php");
         exit();
     }
 }

@@ -4,7 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f291d9c9-880c-4a77-b7f3-0b20c2d803a9" name="Changes" comment="" />
+    <list default="true" id="f291d9c9-880c-4a77-b7f3-0b20c2d803a9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/itp-project.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/laravel-idea.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/phpunit.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/seeders/usersSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/createNewUser.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/register.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/login.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/login.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/db.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/db.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/001_create_Users_table.sql" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/001_create_Users_table.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/benutzerSeeder.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/setup.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/setup.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/models/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/setup.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/setup.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/createAccount.php" beforeDir="false" afterPath="$PROJECT_DIR$/views/createAccount.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -70,6 +89,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "git-widget-placeholder": "Rebasing main",
     "last_opened_file_path": "/Users/aleksandrsmagin/Desktop/itp-project",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -110,6 +130,7 @@
       <workItem from="1769100422508" duration="71000" />
       <workItem from="1769100506478" duration="540000" />
       <workItem from="1769101062625" duration="2585000" />
+      <workItem from="1769103799916" duration="1583000" />
     </task>
     <servers />
   </component>
