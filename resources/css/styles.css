@@ -1,23 +1,17 @@
+/* ===================== VARIABLES ===================== */
 :root {
-  --enabled-text: #000;
-  --disabled-text: #808080;
-  --backgroundWhite: #fff;
-  --backgroundSidebarGrey: #f1f1f1;
-  --backgroundSidebarHoverGrey: #e2e2e2;
-  --backgroundSidebarActiveGrey: #dddddd;
   --accentColor: #083985;
-  --accentColorFaided: #083a853d;
+  --backgroundWhite: #fff;
 }
 
+/* ===================== BODY ===================== */
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  font-weight: normal;
-  font-style: normal;
   min-height: 100vh;
 }
 
-
+/* ===================== HEADER ===================== */
 .header {
   background-color: var(--accentColor);
   color: #fff;
@@ -31,60 +25,44 @@ body {
 .hat {
   flex: 1;
   text-align: left;
-  margin: 0;
   text-decoration: none;
   color: inherit;
-  margin-right: 20px;
-  h2 {
-    margin-right: 20px;
-  }
 }
 
 #headerspacer {
   width: 35%;
 }
 
-button {
-  border-radius: 5px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.header .login {
-  margin-left: auto;
-}
-
+/* ===================== BUTTON & INPUTS ===================== */
 button,
 input[type="text"],
+input[type="email"],
 input[type="date"],
-input[type="password"] {
+input[type="password"],
+select {
   border: 1px solid #ccc;
   border-radius: 3px;
   padding: 10px;
+  font-size: 1rem;
 }
 
-#createAccountForm {
-  display: flex;
-  flex-direction: column;
-  align-items: center
-}
-
+/* ===================== CENTERED CARD ===================== */
 .center-card-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 72px); 
+  min-height: calc(100vh - 72px); /* full viewport minus header */
   padding: 20px;
   box-sizing: border-box;
 }
 
 .center-card {
-  min-width: 600px;
+  width: 100%;
   max-width: 800px;
   border-radius: 1rem;
   padding: 2.5rem;
+  background-color: var(--backgroundWhite);
   box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
-  background-color: #fff;
   text-align: center;
 }
 
@@ -92,8 +70,9 @@ input[type="password"] {
 .center-card .form-select {
   width: 100%;
   padding: 0.8rem 1rem;
-  font-size: 1rem;
 }
+
+/* ===================== FOOTER ===================== */
 .footer {
   background-color: var(--accentColor);
   color: #fff;
@@ -115,6 +94,7 @@ input[type="password"] {
 .footer-right a {
   color: #fff;
   text-decoration: none;
+  margin-left: 10px;
   transition: 0.3s;
 }
 
@@ -122,6 +102,7 @@ input[type="password"] {
   color: var(--backgroundWhite);
 }
 
+/* ===================== RESPONSIVE ===================== */
 @media(min-width: 768px){
   .footer-container {
     flex-direction: row;
@@ -132,7 +113,3 @@ input[type="password"] {
     margin-bottom: 0;
   }
 }
-
-
-
-
