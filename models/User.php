@@ -96,10 +96,10 @@ class User{
     return false;
     }
 
-    public function getById($id){
+    public function getById($userId){
         $query = "SELECT * FROM " . $this->table . " WHERE userid = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $id);
+        $stmt->bind_param("i", $userId);
         $stmt->execute();
         $result = $stmt->get_result();
         
@@ -114,35 +114,37 @@ class User{
         return false;
     }
 
-    public function update(){
-        $query = " UPDATE " . $this->table . " 
-        SET name = ?, vorname = ?, email = ?, password_hash = ?, art = ? 
-        WHERE userid = ?";
-    
-    $stmt = $this->conn->prepare($query);
-    $stmt->bind_param(
-        "sssssi",
-        $this->name,
-        $this->vorname,
-        $this->email,
-        $this->passwort,
-        $this->art,
-        $this->id
-    );
 
-    if ($stmt->execute()) {
-        $stmt->close();
-        return true;
-    }
+    public function update($userId){
+        $query = " UPDATE " . $this->table . " 
+        SET userName = ?, firstName = ?, lastName = ?, email = ?, password = ?, role = ?, securityAnswer = ?, activated = ? WHERE userid = ?";
+    
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param(
+        "sssssi",
+        $this->userId,
+        $this->userName,
+        $this->firstName,
+        $this->lastName,
+        $this->email,
+        $this->password,
+        $this->role,
+        $this->securityAnswer,
+        $this->activated);
+
+        if ($stmt->execute()) {
+            $stmt->close();
+            return true;
+        }
     
         $stmt->close();
         return false;
     }
 
-    public function delete(){
+    public function delete($userId){
         $query = "DELETE FROM " . $this->table . " WHERE userid = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $this->id);
+        $stmt->bind_param("i", $this->userId);
         if ($stmt->execute()) {
             $stmt->close();
             return true;
@@ -153,22 +155,25 @@ class User{
     }
     
     private function mapData($row) {
-        $this->id = $row['userid'];
-        $this->name = $row['name'];
-        $this->vorname = $row['vorname'] ?? null;
+        $this->userId = $row['userId'];
+        $this->userName = $row['userName'];
+        $this->firstName = $row['firstName'] ?? null;
+        $this->lastName = $row['lastName'];
         $this->email = $row['email'];
-        $this->passwort = $row['password_hash'];
-        $this->art = $row['art'];
+        $this->password = $row['password'];
+        $this->role = $row['role'];
+        $this->securityAnswer = $row['securityAnswer'];
+        $this->activated = $row['activated'];
     }
 
     public function toArray() {
-    return [
-        'id' => $this->id,
-        'name' => $this->name,
-        'vorname' => $this->vorname,
-        'email' => $this->email,
-        'art' => $this->art
-    ];
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'vorname' => $this->vorname,
+            'email' => $this->email,
+            'art' => $this->art
+        ];
     }
 
     public function getByEmail($email){
@@ -190,14 +195,11 @@ class User{
     }
 
     private function updateCreatedBy() {
-    $query = "UPDATE " . $this->table . " 
-              SET createdBy = ?, modifiedBy = ? 
-              WHERE userid = ?";
-    
-    $stmt = $this->conn->prepare($query);
-    $stmt->bind_param("iii", $this->userId, $this->userId, $this->userId);
-    $stmt->execute();
-    $stmt->close();
-}
+        $query = "UPDATE " . $this->table . " SET createdBy = ?, modifiedBy = ? WHERE userid = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("iii", $this->userId, $this->userId, $this->userId);
+        $stmt->execute();
+        $stmt->close();
+    }
 }
 ?>
