@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS `Appointment`;
 
 CREATE TABLE `Appointments` (
   `appointmentId` int(11) NOT NULL AUTO_INCREMENT,
+  `jobId` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `start` datetime NOT NULL,
   `end` datetime NOT NULL,
@@ -14,6 +15,7 @@ CREATE TABLE `Appointments` (
   `modifiedBy` INT,
   FOREIGN KEY (`createdBy`) REFERENCES Users(`userId`),
   FOREIGN KEY (`modifiedBy`) REFERENCES Users(`userId`),
+  FOREIGN KEY (`jobId`) REFERENCES Jobs(`jobId`),
   PRIMARY KEY (`appointmentId`),
   KEY `userId` (`userId`),
   CONSTRAINT `Appointment_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `Users` (`userId`)
