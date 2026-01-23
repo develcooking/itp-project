@@ -102,6 +102,26 @@ select {
   color: var(--backgroundWhite);
 }
 
+/* ===================== Eye icon ===================== */
+
+.password-container {
+  position: relative;
+}
+
+.password-container input {
+  padding-right: 2.5rem; 
+}
+
+.password-container .password-eye {
+  position: absolute;
+  top: 50%;
+  right: 1.8rem;       
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6c757d;
+  z-index: 5;
+}
+
 /* ===================== RESPONSIVE ===================== */
 @media(min-width: 768px){
   .footer-container {

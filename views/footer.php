@@ -7,6 +7,6 @@
       &copy; <?= date("Y"); ?> Ausbildungsportal.net. Alle Rechte vorbehalten.
     </div>
 </footer>
-<script src="/resources/js/bootstrap.bundle.min.js"></script>
+<script src="/resources/js/bootstrap.min.js"></script>
 
 
