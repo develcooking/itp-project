@@ -1,34 +1,50 @@
 <?php
 
-class User{
+class User
+{
     private $conn;
-    private $table = 'Benutzer';
-    public $id;
-    public $name;
-    public $vorname;
-    public $email;
-    public $passwort;
-    public $art;
-    public $username;
+    private $table = 'Users';
+    public $userId;
+    public $userName;
+    public $firstName;
+    public $lastName;
 
-    public function __construct($db){
+    public $email;
+
+    public $password;
+    public $role;
+    public $securityAnswer;
+    public $activated;
+    public $createdBy;
+    public $modifiedBy;
+
+    public function __construct($db)
+    {
         $this->conn = $db;
     }
 
-    public function getAll(){
+    public function getAll()
+    {
         $query = " SELECT * FROM " . $this->table;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();
-        if($result->num_rows > 0){
-            while($row = $result->fetch_assoc()){
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
                 $users[] = [
-                    
-                    'id' => $row['userid'],
-                    'name' => $row['name'],
-                    'vorname' => $row['vorname'],
+                    'userId' => $row['userid'],
+                    'userName' => $row['userName'],
+                    'firstName' => $row['firstName'],
+                    'lastName' => $row['lastName'],
                     'email' => $row['email'],
-                    'art' => $row['art']
+                    'password' => $row['password'],
+                    'role' => $row['role'],
+                    'securityAnswer' => $row['securityAnswer'],
+                    'activated' => $row['activated'],
+                    'createdAt' => $row['createdAt'],
+                    'modifiedAt' => $row['modifiedAt'],
+                    'createdBy' => $row['createdBy'],
+                    'modifiedBy' => $row['modifiedBy']
                 ];
             }
         }
@@ -37,126 +53,165 @@ class User{
         return $users ?? [];
     }
 
-    public function post(){
+    public function post()
+    {
         $query = " INSERT INTO " . $this->table . "
-        (name, vorname, email, art, passwort_hash, username) 
-        VALUES (?, ?, ?, ?, ?, ?)";
+        (userName, firstName, lastName, email, password, role, securityAnswer, activated, createdBy, modifiedBy) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
 
-        $hashedPassword = password_hash($this->passwort, PASSWORD_DEFAULT);
+        $password = password_hash($this->password, PASSWORD_DEFAULT);
+        $createdBy = $this->createdBy ?? null;
+        $modifiedBy = $this->modifiedBy ?? null;
 
         $stmt->bind_param(
-            "ssssss",
-            $this->name,
-            $this->vorname,
+            "sssssssiii",
+            $this->userName,
+            $this->firstName,
+            $this->lastName,
             $this->email,
-            $this->art,
-            $hashedPassword,
-            $this->username,
+            $password,
+            $this->role,
+            $this->securityAnswer,
+            $this->activated,
+            $createdBy,
+            $modifiedBy
         );
 
         if ($stmt->execute()) {
-        $this->id = $stmt->insert_id;
+            $this->userId = $stmt->insert_id;
+            $stmt->close();
+
+
+            /* grad geht ja so dass der user by system erstellt wird, aber muss nicht so sein,
+            -> so ja mit der funktion kann ma machen createdBy === userId
+            if ($this->createdBy === 0) {
+                $this->createdBy = $this->userId;
+                $this->modifiedBy = $this->userId;
+                $this->updateCreatedBy();
+            }
+            */
+
+            return true;
+        }
+
         $stmt->close();
-        return true;
-    }
-    
-    $stmt->close();
-    return false;
+        return false;
     }
 
-    public function getById($id){
+    public function getById($userId)
+    {
         $query = "SELECT * FROM " . $this->table . " WHERE userid = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $id);
+        $stmt->bind_param("i", $userId);
         $stmt->execute();
         $result = $stmt->get_result();
-        
+
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $this->mapData($row);
             $stmt->close();
             return true;
         }
-        
+
         $stmt->close();
         return false;
     }
 
-    public function update(){
+
+    public function update($userId)
+    {
         $query = " UPDATE " . $this->table . " 
-        SET name = ?, vorname = ?, email = ?, password_hash = ?, art = ? 
-        WHERE userid = ?";
-    
-    $stmt = $this->conn->prepare($query);
-    $stmt->bind_param(
-        "sssssi",
-        $this->name,
-        $this->vorname,
-        $this->email,
-        $this->passwort,
-        $this->art,
-        $this->id
-    );
+        SET userName = ?, firstName = ?, lastName = ?, email = ?, password = ?, role = ?, securityAnswer = ?, activated = ? WHERE userid = ?";
 
-    if ($stmt->execute()) {
-        $stmt->close();
-        return true;
-    }
-    
-        $stmt->close();
-        return false;
-    }
-
-    public function delete(){
-        $query = "DELETE FROM " . $this->table . " WHERE userid = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $this->id);
+        $stmt->bind_param(
+            "sssssi",
+            $this->userId,
+            $this->userName,
+            $this->firstName,
+            $this->lastName,
+            $this->email,
+            $this->password,
+            $this->role,
+            $this->securityAnswer,
+            $this->activated);
+
         if ($stmt->execute()) {
             $stmt->close();
             return true;
         }
-        
+
         $stmt->close();
         return false;
     }
-    
-    private function mapData($row) {
-        $this->id = $row['userid'];
-        $this->name = $row['name'];
-        $this->vorname = $row['vorname'] ?? null;
+
+    public function delete($userId)
+    {
+        $query = "DELETE FROM " . $this->table . " WHERE userid = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $this->userId);
+        if ($stmt->execute()) {
+            $stmt->close();
+            return true;
+        }
+
+        $stmt->close();
+        return false;
+    }
+
+    private function mapData($row)
+    {
+        $this->userId = $row['userId'];
+        $this->userName = $row['userName'];
+        $this->firstName = $row['firstName'] ?? null;
+        $this->lastName = $row['lastName'];
         $this->email = $row['email'];
-        $this->passwort = $row['password_hash'];
-        $this->art = $row['art'];
+        $this->password = $row['password'];
+        $this->role = $row['role'];
+        $this->securityAnswer = $row['securityAnswer'];
+        $this->activated = $row['activated'];
     }
 
-    public function toArray() {
-    return [
-        'id' => $this->id,
-        'name' => $this->name,
-        'vorname' => $this->vorname,
-        'email' => $this->email,
-        'art' => $this->art
-    ];
+    public function toArray()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'vorname' => $this->vorname,
+            'email' => $this->email,
+            'role' => $this->role
+        ];
     }
 
-    public function getByEmail($email){
+    public function getByEmail($email)
+    {
         $query = "SELECT * FROM " . $this->table . " WHERE email = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
-        
+
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $this->mapData($row);
             $stmt->close();
             return true;
         }
-        
+
         $stmt->close();
         return false;
     }
+
+    private function updateCreatedBy()
+    {
+        $query = "UPDATE " . $this->table . " SET createdBy = ?, modifiedBy = ? WHERE userid = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("iii", $this->userId, $this->userId, $this->userId);
+        $stmt->execute();
+        $stmt->close();
+    }
 }
+
 ?>

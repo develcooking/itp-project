@@ -8,45 +8,50 @@ $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['createAccount'])) {
-        $name = $_POST['nachname'];
-        $vorname = $_POST['vorname'];
-        $username = $_POST['username'];
-        $password = $_POST['password'];
+        $userName = $_POST['userName'];
+        $firstName = $_POST['firstName'];
+        $lastName = $_POST['lastName'];
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-        $art = $_POST['art'] ?? '';
-        
-        if(empty($name) || empty($vorname) || empty($username) || empty($password) || empty($email) || empty($art)){
+        $password = $_POST['password'];
+        $role = $_POST['role'];
+        $securityAnswer = $_POST['securityAnswer'];
+
+        if (empty($userName) || empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($role) || empty($securityAnswer)) {
             http_response_code(400);
             $error = 'Bitte füllen Sie alle Felder aus!';
-        }elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             http_response_code(400);
             $error = 'Ungültiges E-Mail-Format!';
-        }elseif(strlen($password) < 6){
+        } elseif (strlen($password) < 6) {
             //Es wird nachgearbeitet durch RegEx für Validierung, falls möglich das in Class zu machen
             http_response_code(400);
             $error = 'Passwort muss mindestens 6 Zeichen lang sein!';
-        }else{
+        } else {
             $user = new User($conn);
 
-            if($user->getByEmail($email)){
+            if ($user->getByEmail($email)) {
                 http_response_code(409);
                 $error = 'Diese E-Mail-Adresse ist bereits registriert!';
-            }else{
-                $user->name = $name;
-                $user->vorname = $vorname;
+            } else {
+                $user->userName = $userName;
+                $user->firstName = $firstName;
+                $user->lastName = $lastName;
                 $user->email = $email;
-                $user->username = $username;
-                $user->passwort = $password;
-                $user->art = $art;
+                $user->password = $password;
+                $user->role = $role;
+                $user->securityAnswer = $securityAnswer;
+                $user->activated = 0;
+                $user->createdBy = null;
+                $user->modifiedBy = null;
 
-                if($user->post()){
+                if ($user->post()) {
                     http_response_code(201);
                     $success = 'Benutzer erfolgreich registriert. Sie können sich jetzt anmelden.';
                     header("Location: /views/loginsite.php");
                     exit();
-                }else{
-                http_response_code(500);
-                $error = 'Fehler beim Registrieren. Bitte versuchen Sie es später erneut.';
+                } else {
+                    http_response_code(500);
+                    $error = 'Fehler beim Registrieren. Bitte versuchen Sie es später erneut.';
                 }
             }
         }
