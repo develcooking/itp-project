@@ -8,7 +8,6 @@ CREATE TABLE `Appointments` (
   `start` datetime NOT NULL,
   `end` datetime NOT NULL,
   `description` text DEFAULT NULL,
-  `userId` int(11) NOT NULL,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modifiedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `createdBy` INT,
@@ -17,6 +16,7 @@ CREATE TABLE `Appointments` (
   FOREIGN KEY (`modifiedBy`) REFERENCES Users(`userId`),
   FOREIGN KEY (`jobId`) REFERENCES Jobs(`jobId`),
   PRIMARY KEY (`appointmentId`),
-  KEY `userId` (`userId`),
-  CONSTRAINT `Appointment_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `Users` (`userId`)
+  KEY `createdBy` (`createdBy`),
+  CONSTRAINT `Appointment_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `Users` (`userId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
