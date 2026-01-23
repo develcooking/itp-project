@@ -8,7 +8,7 @@ $command = $argv[1] ?? 'seed';
 switch ($command) {
     case 'seed':
         echo "Running seeders...\n";
-        $seeder = new BenutzerSeeder($conn);
+        $seeder = new usersSeeder($conn);
         $seeder->run();
         echo "Seeding complete!\n";
         break;

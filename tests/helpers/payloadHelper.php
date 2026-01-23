@@ -16,12 +16,16 @@ class PayloadHelper {
         $faker = self::getFaker();
         
         $defaults = [
-            'name' => $faker->lastName(),
-            'vorname' => $faker->firstName(),
-            'email' => $faker->unique()->safeEmail(),
-            'username' => $faker->unique()->userName(),
+            'userName' => $faker->lastName(),
+            'firstName' => $faker->firstName(),
+            'lastName' => $faker->unique()->safeEmail(),
+            'email' => $faker->unique()->userName(),
             'password' => 'Password123!',
-            'art' => $faker->randomElement(['Lehrer', 'Ausbilder', 'Admin'])
+            'role' => $faker->randomElement(['Lehrer', 'Ausbilder']),
+            'securityAnswer' => $faker->lastName(),
+            'activated' => $faker->randomElement([0,1]),
+            'createdBy' => null,
+            'modifiedBy' => null
         ];
         
         return array_merge($defaults, $overrides);
