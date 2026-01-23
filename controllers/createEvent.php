@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $startDateTime = $date1 . ' ' . $time1 . ':00'; // Ergebnis: "2023-10-27 14:30:00"
         $endDateTime   = $date2 . ' ' . $time2 . ':00';
         
-        if (empty($title) || empty($createdBy) || empty($startDateTime) || empty($endDateTime) || empty($Beschreibung)) {
+        if (empty($title) || empty($createdBy) || empty($startDateTime) || empty($endDateTime)) {
             array_push($errorMessages, "Bitte füllen Sie alle Felder aus!");    
         } else {
 
