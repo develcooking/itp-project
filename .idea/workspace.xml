@@ -5,17 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f291d9c9-880c-4a77-b7f3-0b20c2d803a9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/002_create_Jobs_table.sql" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/002_create_Jobs_table.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/003_create_Topics_table.sql" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/003_create_Topics_table.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/004_create_Appointments_table.sql" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/004_create_Appointments_table.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/005_create_users_jobs_table.sql" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/005_create_users_jobs_table.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/006_create_Post.sql" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/006_create_Post.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/setup.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/setup.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/helpers/payloadHelper.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/helpers/payloadHelper.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/setup.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/setup.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/createAccount.php" beforeDir="false" afterPath="$PROJECT_DIR$/views/createAccount.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/reset.php" beforeDir="false" afterPath="$PROJECT_DIR$/views/reset.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,14 +74,14 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "dev/creating-payload-helper",
     "last_opened_file_path": "/Users/aleksandrsmagin/Desktop/itp-project",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "MTContrastSettingsConfigurable",
+    "settings.editor.selected.configurable": "preferences.keymap",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
