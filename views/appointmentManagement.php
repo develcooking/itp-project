@@ -38,7 +38,7 @@ include $homepath . "/views/header.php";
           },
           
           // calling events from getEvents.php
-          events: 'getEvents.php',
+          events: '../controllers/getEvents.php',
 
           // Optional: Was passiert beim Klick auf ein Event?
           eventClick: function(info) {
