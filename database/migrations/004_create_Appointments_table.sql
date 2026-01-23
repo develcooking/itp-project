@@ -16,7 +16,6 @@ CREATE TABLE `Appointments` (
   FOREIGN KEY (`modifiedBy`) REFERENCES Users(`userId`),
   FOREIGN KEY (`jobId`) REFERENCES Jobs(`jobId`),
   PRIMARY KEY (`appointmentId`),
-  KEY `createdBy` (`createdBy`),
   CONSTRAINT `Appointment_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `Users` (`userId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
