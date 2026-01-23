@@ -3,16 +3,11 @@
 use PHPUnit\Framework\TestCase;
 
 class PayloadHelperTest extends TestCase {
-    
-    /**
-     * @test
-     * Тест создания базового payload пользователя
-     */
+
+    //
     public function it_should_create_default_user_payload() {
-        // Act
         $payload = PayloadHelper::createUser();
-        
-        // Assert
+
         $this->assertIsArray($payload);
         $this->assertArrayHasKey('name', $payload);
         $this->assertArrayHasKey('vorname', $payload);
@@ -20,25 +15,18 @@ class PayloadHelperTest extends TestCase {
         $this->assertArrayHasKey('username', $payload);
         $this->assertArrayHasKey('password', $payload);
         $this->assertArrayHasKey('art', $payload);
-        
-        // Проверка значений по умолчанию
+
         $this->assertEquals('Password123!', $payload['password']);
         $this->assertContains($payload['art'], ['Lehrer', 'Ausbilder', 'Admin']);
     }
-    
-    /**
-     * @test
-     * Тест переопределения полей через overrides
-     */
+
     public function it_should_override_default_values() {
-        // Act
         $payload = PayloadHelper::createUser([
             'name' => 'CustomName',
             'email' => 'custom@test.com',
             'art' => 'Admin'
         ]);
-        
-        // Assert
+
         $this->assertEquals('CustomName', $payload['name']);
         $this->assertEquals('custom@test.com', $payload['email']);
         $this->assertEquals('Admin', $payload['art']);

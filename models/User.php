@@ -83,15 +83,12 @@ class User
             $this->userId = $stmt->insert_id;
             $stmt->close();
 
-
-            /* grad geht ja so dass der user by system erstellt wird, aber muss nicht so sein,
-            -> so ja mit der funktion kann ma machen createdBy === userId
             if ($this->createdBy === 0) {
                 $this->createdBy = $this->userId;
                 $this->modifiedBy = $this->userId;
                 $this->updateCreatedBy();
             }
-            */
+
 
             return true;
         }
