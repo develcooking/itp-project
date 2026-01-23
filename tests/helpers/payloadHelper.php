@@ -12,7 +12,7 @@ class PayloadHelper {
         return self::$faker;
     }
     
-    public static function createUser(array $overrides = []): array {
+    public static function createUser(array $overrides = []) {
         $faker = self::getFaker();
         
         $defaults = [
