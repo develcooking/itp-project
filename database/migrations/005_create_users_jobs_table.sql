@@ -8,7 +8,7 @@ CREATE TABLE `users_jobs` (
   `modifiedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userId`,`jobId`),
   KEY `jobId` (`jobId`),
-  `createdBy` INT,
+`createdBy` INT NOT NULL,
   `modifiedBy` INT,
   FOREIGN KEY (`createdBy`) REFERENCES Users(`userId`),
   FOREIGN KEY (`modifiedBy`) REFERENCES Users(`userId`),

@@ -7,7 +7,7 @@ CREATE TABLE `Jobs` (
   `name` varchar(100) NOT NULL,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modifiedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `createdBy` INT,
+`createdBy` INT NOT NULL,
   `modifiedBy` INT,
   FOREIGN KEY (`createdBy`) REFERENCES Users(`userId`),
   FOREIGN KEY (`modifiedBy`) REFERENCES Users(`userId`),
