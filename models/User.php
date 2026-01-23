@@ -32,7 +32,7 @@ class User
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $users[] = [
-                    'userId' => $row['userid'],
+                    'userId' => $row['userId'],
                     'userName' => $row['userName'],
                     'firstName' => $row['firstName'],
                     'lastName' => $row['lastName'],
@@ -120,7 +120,7 @@ class User
     public function update($userId)
     {
         $query = " UPDATE " . $this->table . " 
-        SET userName = ?, firstName = ?, lastName = ?, email = ?, password = ?, role = ?, securityAnswer = ?, activated = ? WHERE userid = ?";
+        SET userName = ?, firstName = ?, lastName = ?, email = ?, password = ?, role = ?, securityAnswer = ?, activated = ? WHERE userId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
