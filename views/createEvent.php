@@ -1,6 +1,6 @@
 <form id="createEvent" method="post" action="../controllers/createEvent.php">
-    <p>Create Account</p>
-    <input type="title" name="username" required placeholder="Username">
+    <p>Erstelle Termin</p>
+    <input type="title" name="title" required placeholder="Name des Termins">
     <input type="date" name="date1" required placeholder="Erstes Datum">
     <input type="time" name="time1" required placeholder="erste Uhrzeit">
     <input type="date" name="date2" required placeholder="zweites Datum">
