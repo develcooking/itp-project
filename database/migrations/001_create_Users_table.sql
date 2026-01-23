@@ -1,5 +1,3 @@
-/* das soll später weggehen, wenn es sicher wird, dass wir keine "Benutzer" Tabelle haben */
-DROP TABLE IF EXISTS `Benutzer`;
 DROP TABLE IF EXISTS `Users`;
 
 CREATE TABLE `Users` (

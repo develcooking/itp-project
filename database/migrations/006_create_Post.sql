@@ -1,4 +1,3 @@
-
 DROP TABLE IF EXISTS `Beitraege`;
 DROP TABLE IF EXISTS `Post`;
 

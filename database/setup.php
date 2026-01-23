@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/seeders/benutzerSeeder.php';
+require_once __DIR__ . '/seeders/usersSeeder.php';
 
 $command = $argv[1] ?? 'seed';
 

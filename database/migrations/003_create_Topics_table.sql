@@ -1,4 +1,3 @@
-
 DROP TABLE IF EXISTS `Thema`;
 DROP TABLE IF EXISTS `Topic`;
 
