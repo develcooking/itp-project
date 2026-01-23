@@ -10,7 +10,7 @@ CREATE TABLE `Topics` (
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modifiedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 `createdBy` INT NOT NULL,
-  `modifiedBy` INT,
+  `modifiedBy` INT NOT NULL,
   FOREIGN KEY (`createdBy`) REFERENCES Users(`userId`),
   FOREIGN KEY (`modifiedBy`) REFERENCES Users(`userId`),
   PRIMARY KEY (`topicId`),

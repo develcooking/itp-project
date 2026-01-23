@@ -14,8 +14,8 @@ CREATE TABLE `Users` (
   `activated` tinyint(1) NOT NULL DEFAULT 0,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modifiedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `createdBy` INT,
-  `modifiedBy` INT,
+`createdBy` INT NOT NULL,
+  `modifiedBy` INT NOT NULL,
   FOREIGN KEY (`createdBy`) REFERENCES Users(`userId`),
   FOREIGN KEY (`modifiedBy`) REFERENCES Users(`userId`),
   PRIMARY KEY (`userId`)

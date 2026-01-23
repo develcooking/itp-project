@@ -9,7 +9,7 @@ CREATE TABLE `users_jobs` (
   PRIMARY KEY (`userId`,`jobId`),
   KEY `jobId` (`jobId`),
 `createdBy` INT NOT NULL,
-  `modifiedBy` INT,
+  `modifiedBy` INT NOT NULL,
   FOREIGN KEY (`createdBy`) REFERENCES Users(`userId`),
   FOREIGN KEY (`modifiedBy`) REFERENCES Users(`userId`),
   CONSTRAINT `user_job_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `Users` (`userId`) ON DELETE CASCADE,
