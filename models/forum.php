@@ -28,7 +28,7 @@ class Forum{
         //}
 
         //$stmt->close();
-        $query = "SELECT name FROM " . $this->Tbenutzer_berufsbereich; //" WHERE ID = ?";
+        $query = "SELECT name FROM " . $this->TBerufsbereiche . " WHERE ID = 1";
         $stmt = $this->conn->prepare($query);
         //$stmt->bind_param("i", $bereich_id);
         $stmt->execute();
