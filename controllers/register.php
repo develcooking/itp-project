@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $password = $_POST['password'];
         $role = $_POST['role'];
         $securityAnswer = $_POST['securityAnswer'];
+        $validRoles = ['Ausbilder', 'Lehrer', 'Admin'];
 
         if (empty($userName) || empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($role) || empty($securityAnswer)) {
             http_response_code(400);
@@ -33,16 +34,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 http_response_code(409);
                 $error = 'Diese E-Mail-Adresse ist bereits registriert!';
             } else {
-                $user->userName = $userName;
-                $user->firstName = $firstName;
-                $user->lastName = $lastName;
-                $user->email = $email;
-                $user->password = $password;
-                $user->role = $role;
-                $user->securityAnswer = $securityAnswer;
-                $user->activated = 0;
-                $user->createdBy = null;
-                $user->modifiedBy = null;
+                $user->setUserName($userName);
+                $user->setFirstName($firstName);
+                $user->setLastName($lastName);
+                $user->setEmail($email);
+                $user->setPassword($password);
+                $user->setRole($role);
+                $user->setSecurityAnswer(password_hash($securityAnswer, PASSWORD_DEFAULT));
+                $user->setActivated(0);
+                $user->setCreatedBy(null);
+                $user->setModifiedBy(null);
 
                 if ($user->post()) {
                     http_response_code(201);
