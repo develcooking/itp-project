@@ -4,13 +4,13 @@ class Appointment
 {
     private $conn;
     private ?string $table = 'Appointments';
-    public ?int $appointmentId;
-    public ?string $title;
-    public ?string $start;
-    public ?string $end;
-    public ?string $description;
-    public ?int $createdBy;
-    public ?int $modifiedBy;
+    private ?int $appointmentId;
+    private ?string $title;
+    private ?string $start;
+    private ?string $end;
+    private ?string $description;
+    private ?int $createdBy;
+    private ?int $modifiedBy;
 
     public function __construct($db)
     {
