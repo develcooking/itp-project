@@ -1,5 +1,5 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+include $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
 $errorMessages = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -12,22 +12,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $time1 = $_POST['time1'];
         $date2 = $_POST['date2'];
         $time2 = $_POST['time2'];
-        $description = $_POST['description'];
-        $jobId = $_POST['jobId'];
+        if (isset($_POST["description"])) {
+            $description = $_POST["description"];
+        } else {
+            $description = '';
+        }
+        $jobId = $_POST['jobselection'];
 
         $startDateTime = $date1 . ' ' . $time1 . ':00'; // Ergebnis: "2023-10-27 14:30:00"
-        $endDateTime   = $date2 . ' ' . $time2 . ':00';
-        
-        if (empty($title) || empty($createdBy) || empty($startDateTime) || empty($endDateTime)) {
-            array_push($errorMessages, "Bitte füllen Sie alle Felder aus!");    
-        } else {
+        $endDateTime = $date2 . ' ' . $time2 . ':00';
 
+        if (empty($title) || empty($createdBy) || empty($startDateTime) || empty($endDateTime)) {
+            http_response_code(400);
+            array_push($errorMessages, "Bitte füllen Sie alle Felder aus!");
+        } else {
             $stmt = $conn->prepare("INSERT INTO Appointments (title, start, end, description, createdBy, modifiedBy, jobId) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssiii", $title, $startDateTime, $endDateTime, $description, $createdBy, $modifiedBy ,$jobId);
+            $stmt->bind_param("ssssiii", $title, $startDateTime, $endDateTime, $description, $createdBy, $modifiedBy, $jobId);
 
             if ($stmt->execute()) {
+                http_response_code(response_code: 201);
                 echo "Termin erfolgreich erstellt!";
             } else {
+                http_response_code(500);
                 echo "Fehler beim erstellen des Termins: " . $stmt->error;
             }
             $stmt->close();
