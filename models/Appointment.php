@@ -3,20 +3,91 @@
 class Appointment
 {
     private $conn;
-    private $table = 'Appointments';
-    public $appointmentId;
-    public $title;
-    public $start;
-    public $end;
-    public $description;
-    public $userId;
-    public $createdBy;
-    public $modifiedBy;
+    private ?string $table = 'Appointments';
+    public ?int $appointmentId;
+    public ?string $title;
+    public ?string $start;
+    public ?string $end;
+    public ?string $description;
+    public ?int $createdBy;
+    public ?int $modifiedBy;
 
     public function __construct($db)
     {
         $this->conn = $db;
     }
+
+    public function getAppointmentId(): ?int
+    {
+        return $this->appointmentId;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function getStart(): ?string
+    {
+        return $this->title;
+    }
+
+    public function getEnd(): ?string
+    {
+        return $this->title;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->title;
+    }
+
+    public function getCreatedBy(): ?int
+    {
+        return $this->createdBy;
+    }
+
+    public function getModifiedBy(): ?int
+    {
+        return $this->modifiedBy;
+    }
+
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    public function setStart(string $start): self
+    {
+        $this->start = $start;
+        return $this;
+    }
+
+    public function setEnd(string $end): self
+    {
+        $this->title = $end;
+        return $this;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    public function setCreatedBy(int $createdBy): self
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
+
+    public function setModifiedBy(int $modifiedBy): self
+    {
+        $this->modifiedBy = $modifiedBy;
+        return $this;
+    }
+
 
     public function getAll()
     {
@@ -32,7 +103,6 @@ class Appointment
                     'start' => $row['start'],
                     'end' => $row['end'],
                     'description' => $row['description'],
-                    'userId' => $row['userId'],
                     'createdAt' => $row['createdAt'],
                     'modifiedAt' => $row['modifiedAt'],
                     'createdBy' => $row['createdBy'],
@@ -49,16 +119,15 @@ class Appointment
     {
         $query = " INSERT INTO " . $this->table . "
         (title, start, end, description, userId, createdBy, modifiedBy) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)";
+        VALUES (?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "siisiii",
+            "siisii",
             $this->title,
             $this->start,
             $this->end,
             $this->description,
-            $this->userId,
             $this->createdBy,
             $this->modifiedBy
         );
@@ -96,16 +165,15 @@ class Appointment
     public function update($appointmentId)
     {
         $query = " UPDATE " . $this->table . " 
-        SET title = ?, start = ?, end = ?, description = ?, userId = ?  WHERE appointmentId = ?";
+        SET title = ?, start = ?, end = ?, description = ?,  WHERE appointmentId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "sii",
+            "siis",
             $this->title,
             $this->start,
             $this->end,
-            $this->description,
-            $this->userId
+            $this->description
         );
 
         if ($stmt->execute()) {
