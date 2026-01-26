@@ -217,8 +217,7 @@ class User
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "sssssi",
-            $this->userId,
+            "sssssssi",
             $this->userName,
             $this->firstName,
             $this->lastName,
