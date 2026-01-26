@@ -118,12 +118,12 @@ class Appointment
     public function post()
     {
         $query = " INSERT INTO " . $this->table . "
-        (title, start, end, description, userId, createdBy, modifiedBy) 
+        (title, start, end, description, createdBy, modifiedBy) 
         VALUES (?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "siisii",
+            "ssssii",
             $this->title,
             $this->start,
             $this->end,
@@ -169,7 +169,7 @@ class Appointment
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "siis",
+            "ssss",
             $this->title,
             $this->start,
             $this->end,
