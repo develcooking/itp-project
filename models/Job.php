@@ -41,8 +41,7 @@ class Job
     public function post()
     {
         $query = " INSERT INTO " . $this->table . "
-        (name, createdBy, modifiedBy) 
-        VALUES (?, ?, ?)";
+        (name ) VALUES (?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
@@ -85,7 +84,7 @@ class Job
     public function update($jobId)
     {
         $query = " UPDATE " . $this->table . " 
-        SET name = ?  WHERE jobId = ?";
+        SET name = ?, WHERE jobId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
