@@ -9,6 +9,7 @@ $endParam   = isset($_GET['end'])   ? $_GET['end']   : null;
 session_start();
 // Sicherstellen, dass userId gesetzt ist, sonst Abbruch
 if (!isset($_SESSION['userId'])) {
+    http_response_code(401);
     echo json_encode([]);
     exit;
 }
@@ -41,7 +42,7 @@ if (empty($jobsOfUser)) {
 $placeholders = implode(',', array_fill(0, count($jobsOfUser), '?'));
 
 // WICHTIG: 'jobId' im SELECT hinzufügen, da du es unten benutzt
-$sql = "SELECT id, title, start, end, description, jobId FROM Appointments 
+$sql = "SELECT appointmentId, title, start, end, description, jobId FROM Appointments 
         WHERE start >= ? AND end <= ? AND jobId IN ($placeholders)";
 
 $stmt = $conn->prepare($sql);
@@ -63,7 +64,7 @@ if ($stmt) {
     $events = [];
     while ($row = $result->fetch_assoc()) {
         $events[] = [
-            'id'    => $row['id'], // ID ist oft nützlich für Updates später
+            'appointmentId'    => $row['appointmentId'], // ID ist oft nützlich für Updates später
             'title' => $row['title'],
             'start' => $row['start'],
             'end'   => $row['end'],

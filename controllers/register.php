@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $user->modifiedBy = null;
 
                 if ($user->post()) {
-                    http_response_code(201);
+                    http_response_code(response_code: 201);
                     $success = 'Benutzer erfolgreich registriert. Sie können sich jetzt anmelden.';
                     header("Location: /views/loginsite.php");
                     exit();
