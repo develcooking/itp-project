@@ -3,36 +3,130 @@
 class User
 {
     private $conn;
-    private $table = 'Users';
-    public $userId;
-    public $userName;
-    public $firstName;
-    public $lastName;
+    private ?string $table = 'Users';
 
-    public $email;
-
-    public $password;
-    public $role;
-    public $securityAnswer;
-    public $activated;
-    public $createdBy;
-    public $modifiedBy;
+    private ?int $userId;
+    private ?string $userName;
+    private ?string $firstName;
+    private ?string $lastName;
+    private ?string $email;
+    private ?string $password;
+    private ?string $role;
+    private ?string $securityAnswer;
+    private ?int $activated;
+    private ?int $createdBy;
+    private ?int $modifiedBy;
 
     public function __construct($db)
     {
         $this->conn = $db;
     }
 
-    public function getAll()
-    {
-        $query = " SELECT * FROM " . $this->table;
+    public function getUserId(): ?int {
+        return $this->userId;
+    }
+
+    public function getUserName(): ?string {
+        return $this->userName;
+    }
+
+    public function getFirstName(): ?string {
+        return $this->firstName;
+    }
+
+    public function getLastName(): ?string {
+        return $this->lastName;
+    }
+
+    public function getEmail(): ?string {
+        return $this->email;
+    }
+
+    public function getPassword(): ?string {
+        return $this->password;
+    }
+
+    public function getRole(): ?string {
+        return $this->role;
+    }
+
+    public function getSecurityAnswer(): ?string {
+        return $this->securityAnswer;
+    }
+
+    public function getActivated(): ?int {
+        return $this->activated;
+    }
+
+    public function getCreatedBy(): ?int {
+        return $this->createdBy;
+    }
+
+    public function getModifiedBy(): ?int {
+        return $this->modifiedBy;
+    }
+
+    public function setUserName(string $userName): self {
+        $this->userName = $userName;
+        return $this;
+    }
+
+    public function setFirstName(string $firstName): self {
+        $this->firstName = $firstName;
+        return $this;
+    }
+
+    public function setLastName(string $lastName): self {
+        $this->lastName = $lastName;
+        return $this;
+    }
+
+    public function setEmail(string $email): self {
+        $this->email = $email;
+        return $this;
+    }
+
+    public function setPassword(string $password): self {
+        $this->password = $password;
+        return $this;
+    }
+
+    public function setRole(string $role): self {
+        $this->role = $role;
+        return $this;
+    }
+
+    public function setSecurityAnswer(string $securityAnswer): self {
+        $this->securityAnswer = $securityAnswer;
+        return $this;
+    }
+
+    public function setActivated(int $activated): self {
+        $this->activated = $activated;
+        return $this;
+    }
+
+    public function setCreatedBy(?int $createdBy): self {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
+
+    public function setModifiedBy(?int $modifiedBy): self {
+        $this->modifiedBy = $modifiedBy;
+        return $this;
+    }
+
+    public function getAll(): array {
+        $query = "SELECT * FROM " . $this->table;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();
+
+        $users = [];
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $users[] = [
-                    'userId' => $row['userid'],
+                    'userId' => $row['userId'],
                     'userName' => $row['userName'],
                     'firstName' => $row['firstName'],
                     'lastName' => $row['lastName'],
@@ -50,12 +144,11 @@ class User
         }
 
         $stmt->close();
-        return $users ?? [];
+        return $users;
     }
 
-    public function post()
-    {
-        $query = " INSERT INTO " . $this->table . "
+    public function post(): bool {
+        $query = "INSERT INTO " . $this->table . "
         (userName, firstName, lastName, email, password, role, securityAnswer, activated, createdBy, modifiedBy) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -83,15 +176,12 @@ class User
             $this->userId = $stmt->insert_id;
             $stmt->close();
 
-
-            /* grad geht ja so dass der user by system erstellt wird, aber muss nicht so sein,
-            -> so ja mit der funktion kann ma machen createdBy === userId
             if ($this->createdBy === 0) {
                 $this->createdBy = $this->userId;
                 $this->modifiedBy = $this->userId;
                 $this->updateCreatedBy();
             }
-            */
+
 
             return true;
         }
@@ -123,12 +213,11 @@ class User
     public function update($userId)
     {
         $query = " UPDATE " . $this->table . " 
-        SET userName = ?, firstName = ?, lastName = ?, email = ?, password = ?, role = ?, securityAnswer = ?, activated = ? WHERE userid = ?";
+        SET userName = ?, firstName = ?, lastName = ?, email = ?, password = ?, role = ?, securityAnswer = ?, activated = ? WHERE userId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "sssssi",
-            $this->userId,
+            "sssssssi",
             $this->userName,
             $this->firstName,
             $this->lastName,
@@ -211,6 +300,9 @@ class User
         $stmt->bind_param("iii", $this->userId, $this->userId, $this->userId);
         $stmt->execute();
         $stmt->close();
+
+        $this->createdBy = $this->userId;
+        $this->modifiedBy = $this->userId;
     }
 }
 
