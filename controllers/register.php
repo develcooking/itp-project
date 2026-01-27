@@ -1,10 +1,12 @@
 <?php
+// Initializes PHP session handling so session data can be stored and accessed
+// Used here to track successful registration flow between pages
+session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
 
 
 $error = '';
-$success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['createAccount'])) {
@@ -47,8 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 if ($user->post()) {
                     http_response_code(201);
-                    $success = 'Benutzer erfolgreich registriert. Sie können sich jetzt anmelden.';
-                    header("Location: /views/loginsite.php");
+                    header("Location: /views/successRegister.php");
+                    $_SESSION['registered'] = true;
                     exit();
                 } else {
                     http_response_code(500);
