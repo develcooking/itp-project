@@ -5,11 +5,11 @@ include $homepath . "/views/header.php";
 ?>    
     <!-- FullCalendar CSS und JS via CDN -->
     <?php #TODO replace with local link?>
+    <script src='../resources/js/fullCalendar.min.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js'></script>
     
     <style>
       body {
-        margin: 40px 10px;
         padding: 0;
         font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
         font-size: 14px;
@@ -52,5 +52,5 @@ include $homepath . "/views/header.php";
       });
     </script>
 
-  </body>
-</html>
+<?php
+# include "footer.php" ?>
