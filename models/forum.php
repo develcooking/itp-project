@@ -28,7 +28,7 @@ class Forum{
         $stmt->close();
         
         $condition = implode(separator: ', ', array: $bereich_id);
-        $query = "SELECT name FROM " . $this->TJobs . " WHERE ID IN(" . $condition . ")";
+        $query = "SELECT name FROM " . $this->TJobs . " WHERE jobId IN(" . $condition . ")";
         $stmt = $this->conn->prepare($query);
         //$stmt->bind_param("i", $bereich_id['berufsbereich_id']);
         $stmt->execute();
