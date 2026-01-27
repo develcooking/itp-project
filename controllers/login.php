@@ -25,16 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = new User($conn);
 
             if ($user->getByEmail($email)) {
-                if (password_verify($password, $user->password)) {
+                if (password_verify($password, htmlspecialchars(trim($password)))) {
                     session_regenerate_id(true);
-                    $_SESSION['logged_in'] = true;
-                    $_SESSION['userId'] = $user->userId;
-                    $_SESSION['userName'] = $user->userName;
-                    $_SESSION['firstName'] = $user->firstName;
-                    $_SESSION['lastName'] = $user->lastName;
-                    $_SESSION['email'] = $user->email;
-                    $_SESSION['role'] = $user->role;
-
+                    $_SESSION['userId'] = $user->getUserId();
                     header("Location: /views/startpage.php");
                     exit();
                 } else {
