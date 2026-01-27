@@ -8,13 +8,14 @@ $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['createAccount'])) {
-        $userName = $_POST['userName'];
-        $firstName = $_POST['firstName'];
-        $lastName = $_POST['lastName'];
+        $userName = htmlspecialchars(trim($_POST['userName']));;
+        $firstName = htmlspecialchars(trim($_POST['firstName']));
+        $lastName = htmlspecialchars(trim($_POST['lastName']));
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-        $password = $_POST['password'];
-        $role = $_POST['role'];
-        $securityAnswer = $_POST['securityAnswer'];
+        $email = htmlspecialchars(trim($_POST['email']));
+        $password = htmlspecialchars(trim($_POST['password']));
+        $role = htmlspecialchars(trim($_POST['role']));
+        $securityAnswer = htmlspecialchars(trim($_POST['securityAnswer']));
 
         if (empty($userName) || empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($role) || empty($securityAnswer)) {
             http_response_code(400);
@@ -33,16 +34,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 http_response_code(409);
                 $error = 'Diese E-Mail-Adresse ist bereits registriert!';
             } else {
-                $user->userName = $userName;
-                $user->firstName = $firstName;
-                $user->lastName = $lastName;
-                $user->email = $email;
-                $user->password = $password;
-                $user->role = $role;
-                $user->securityAnswer = $securityAnswer;
-                $user->activated = 0;
-                $user->createdBy = null;
-                $user->modifiedBy = null;
+                $user->setUserName($userName);
+                $user->setFirstName($firstName);
+                $user->setLastName($lastName) ;
+                $user->setEmail($email);
+                $user->setPassword($password);
+                $user->setRole($role);
+                $user->setSecurityAnswer($securityAnswer);
+                $user->setActivated(0);
+                $user->setCreatedBy(null);
+                $user->setModifiedBy(null);
 
                 if ($user->post()) {
                     http_response_code(201);
