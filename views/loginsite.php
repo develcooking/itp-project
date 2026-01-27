@@ -32,7 +32,7 @@ include $homepath . "/views/header.php";
               </span>
             </div>
             <div class="mb-2 text-start">
-              <a href="reset.php" class="text-muted small">Passwort vergessen?</a>
+              <a href="passwordForgot.php" class="text-muted small">Passwort vergessen?</a>
             </div>
 
             <button class="btn btn-outline-primary btn-lg w-100" type="submit" name="login">
