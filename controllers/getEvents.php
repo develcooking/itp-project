@@ -30,32 +30,28 @@ if ($stmtJobs) {
     $stmtJobs->close();
 }
 
-// WICHTIG: Wenn der User gar keine Jobs hat, sofort leeres Array zurückgeben.
-// Sonst knallt der SQL-Befehl gleich bei "IN ()".
+// check if user has no jobs if yes retun empty array to prevent wierd behavior
 if (empty($jobsOfUser)) {
     echo json_encode([]);
     exit;
 }
 
-// 2. Termine abfragen
-// Wir müssen dynamisch Fragezeichen generieren: ?,?,?
+// we have to make the query dynamic with questionmarks: ?,?,?
 $placeholders = implode(',', array_fill(0, count($jobsOfUser), '?'));
 
-// WICHTIG: 'jobId' im SELECT hinzufügen, da du es unten benutzt
 $sql = "SELECT appointmentId, title, start, end, description, jobId FROM Appointments 
         WHERE start >= ? AND end <= ? AND jobId IN ($placeholders)";
 
 $stmt = $conn->prepare($sql);
 
 if ($stmt) {
-    // Typen-String bauen: "ss" für start/end + "i" für jede JobID (z.B. "ssiii")
+    // generate i's for every job the user has
     $types = "ss" . str_repeat("i", count($jobsOfUser));
     
-    // Parameter-Array zusammenführen: [start, end, jobID1, jobID2, ...]
+    // merge parameters
     $params = array_merge([$startParam, $endParam], $jobsOfUser);
     
-    // Dynamisches Binding mit dem Spread-Operator (...)
-    // Das entpackt das Array in einzelne Argumente für bind_param
+    // map the dynamc types and parameters via bind
     $stmt->bind_param($types, ...$params);
     
     $stmt->execute();
@@ -64,7 +60,7 @@ if ($stmt) {
     $events = [];
     while ($row = $result->fetch_assoc()) {
         $events[] = [
-            'appointmentId'    => $row['appointmentId'], // ID ist oft nützlich für Updates später
+            'appointmentId'    => $row['appointmentId'],
             'title' => $row['title'],
             'start' => $row['start'],
             'end'   => $row['end'],
@@ -77,6 +73,7 @@ if ($stmt) {
     $stmt->close();
 } else {
     // Fallback bei SQL Fehler
+    http_response_code(500);
     echo json_encode([]);
 }
 
