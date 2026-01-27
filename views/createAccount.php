@@ -2,20 +2,176 @@
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include $homepath . "/views/header.php";
 ?>
-<div class="login">
-    <?php if (!isset($_SESSION['user'])): ?>
-        <form id="createAccountForm" method="post" action="../controllers/createNewUser.php">
-            <p>Create Account</p>
-            <input type="text" name="username" required placeholder="Username">
-            <input type="text" name="vorname" required placeholder="Vorname">
-            <input type="text" name="nachname" required placeholder="Nachname">
-            <input type="text" name="email" required placeholder="E-Mail address">
-            <input type="password" name="password" required placeholder="Password">
-            <button class="submitbtn" type="submit" name="createAccount">Create Account</button>
-        </form>
-    <?php else: ?>
-        <form method="post" action="">
-            <button class="submitbtn" type="submit" name="logout"><?= "Logout" ?> (<?= htmlspecialchars($_SESSION['user']); ?>)</button>
-        </form>
-    <?php endif; ?>
-</div>
+
+    <div class="container min-vh-100 d-flex justify-content-center align-items-center my-4">
+        <div class="row w-100 justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+
+                <?php if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']): ?>
+                    <div class="card bg-light shadow p-4 text-center">
+
+                        <h2 class="fw-bold mb-2">Registrieren</h2>
+                        <p class="text-muted mb-4">Bitte geben Sie Ihre Daten ein.</p>
+
+                        <form method="post" action="../controllers/register.php">
+
+                            <div class="form-floating mb-3">
+                                <input type="text" name="userName" class="form-control" placeholder="Benutzername" required>
+                                <label for="userName">Benutzername</label>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="text" name="firstName" class="form-control" placeholder="Vorname" required>
+                                <label for="firstName">Vorname</label>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="text" name="lastName" class="form-control" placeholder="Nachname" required>
+                                <label for="lastName">Nachname</label>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="email" name="email" class="form-control" placeholder="E-Mail-Adresse" required>
+                                <label for="email">E-Mail-Adresse</label>
+                            </div>
+                            <div class="form-floating mb-3 position-relative password-container">
+                                <input type="password" name="password" class="form-control pe-5" id="password" placeholder="Passwort" required>
+                                <label for="password">Passwort</label>
+                                <span id="togglePassword" class="password-eye">
+                                    <!-- Eye open: visible initially -->
+                                    <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+                                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+                                    </svg>
+                                    </svg>
+                                    <!-- Eye slash: hidden initially -->
+                                    <svg id="eyeSlash" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16" style="display: none;">
+                                     <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/>
+                                    <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
+                                    <path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z"/>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="form-floating mb-3 position-relative password-container">
+                                <input type="password" name="password2" class="form-control pe-5" id="password2" placeholder="Passwort bestätigen" required>
+                                <label for="password2">Passwort bestätigen</label>
+                                <span id="togglePassword2" class="password-eye">
+                                    <!-- Eye open: visible initially -->
+                                    <svg id="eyeOpen2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+                                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+                                    </svg>
+                                    <!-- Eye slash: hidden initially -->
+                                    <svg id="eyeSlash2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16" style="display: none;">
+                                     <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/>
+                                    <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
+                                    <path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z"/>
+                                    </svg>
+                                </span>
+                            </div>
+
+
+                            <div class="mb-3">
+                                <select name="securityQuestion" class="form-select" required>
+                                    <option value="" disabled selected>Bitte Sicherheitsfrage auswählen</option>
+                                    <option value="pet">Wie hieß dein erstes Haustier?</option>
+                                    <option value="school">Wie hieß deine Grundschule?</option>
+                                    <option value="city">In welcher Stadt wurdest du geboren?</option>
+                                    <option value="mother_maiden">Wie lautet der Mädchenname deiner Mutter?</option>
+                                    <option value="first_car">Was war dein erstes Auto?</option>
+                                    <option value="nickname">Wie lautete dein Kindheitsspitzname?</option>
+                                </select>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="text" name="securityAnswer" class="form-control" placeholder="Antwort" required>
+                                <label for="securityAnswer">Antwort auf die Sicherheitsfrage</label>
+                            </div>
+
+                            <div class="mb-4">
+                                <select name="role" class="form-select" required>
+                                    <option value="" disabled selected>Bitte Rolle wählen</option>
+                                    <option value="Lehrer">Lehrkraft</option>
+                                    <option value="Ausbilder">Ausbilder</option>
+                                    <option value="Admin">Admin</option>
+                                </select>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="datenschutzCheck" name="datenschutz" required>
+                                <label class="form-check-label" for="datenschutzCheck">
+                                    Ich habe die
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#datenschutzModal">
+                                        Datenschutzerklärung
+                                    </a>
+                                    gelesen und akzeptiere sie.
+                                </label>
+                            </div>
+
+                            <button class="btn btn-outline-primary btn-lg w-100 mt-3" type="submit" name="createAccount">
+                                Registrieren
+                            </button>
+
+                        </form>
+
+                        <hr class="my-4">
+
+                        <p class="mb-0">
+                            Bereits einen Account?
+                            <a href="loginsite.php" class="fw-bold text-decoration-none">Hier anmelden</a>
+                        </p>
+
+                    </div>
+                <?php else: ?>
+                    <div class="card bg-light shadow p-4 text-center">
+                        <h2 class="fw-bold mb-3">Bereits angemeldet</h2>
+                        <p class="text-muted mb-4">Sie sind bereits als <?= htmlspecialchars($_SESSION['userName']); ?> angemeldet.</p>
+                        <a href="/views/dashboard.php" class="btn btn-primary btn-lg w-100 mb-2">Zum Dashboard</a>
+                        <form method="post" action="../controllers/login.php">
+                            <button class="btn btn-outline-danger btn-lg w-100" type="submit" name="logout">
+                                Abmelden
+                            </button>
+                        </form>
+                    </div>
+                <?php endif; ?>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= DATENSCHUTZ MODAL ================= -->
+    <div class="modal fade" id="datenschutzModal" tabindex="-1" aria-labelledby="datenschutzModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="datenschutzModalLabel">Datenschutzerklärung</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p><strong>1. Allgemeine Hinweise</strong></p>
+                    <p>Der Schutz deiner persönlichen Daten ist uns wichtig.</p>
+
+                    <p><strong>2. Datenerhebung</strong></p>
+                    <p>Personenbezogene Daten werden nur erhoben, wenn du diese freiwillig angibst.</p>
+
+                    <p><strong>3. Zweck</strong></p>
+                    <p>Die Verarbeitung erfolgt zur Erstellung und Verwaltung deines Benutzerkontos.</p>
+
+                    <p><strong>4. Weitergabe</strong></p>
+                    <p>Es erfolgt keine Weitergabe an Dritte ohne deine ausdrückliche Zustimmung.</p>
+
+                    <p><strong>5. Rechte</strong></p>
+                    <p>Du hast jederzeit das Recht auf Auskunft, Löschung und Berichtigung deiner Daten.</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Schließen</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+<script src="/resources/js/createAccount.js"></script>
+<?php include $homepath . "/views/footer.php"; ?>
