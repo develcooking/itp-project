@@ -24,7 +24,7 @@ class Forum{
         if($result->num_rows > 0){
             while($row = $result->fetch_assoc()){
                 $bereich_id[] = $row; //['berufsbereich_id'];
-            }
+            }}
         $stmt->close();
         
         $condition = implode(separator: ', ', array: $bereich_id);
@@ -48,6 +48,5 @@ class Forum{
         
         return $bereiche;
 
-    }
     }
     }
