@@ -36,11 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             } else {
                 $user->setUserName($userName);
                 $user->setFirstName($firstName);
-                $user->setLastName($lastName) ;
+                $user->setLastName($lastName);
                 $user->setEmail($email);
                 $user->setPassword($password);
                 $user->setRole($role);
-                $user->setSecurityAnswer($securityAnswer);
+                $user->setSecurityAnswer(password_hash($securityAnswer, PASSWORD_DEFAULT));
                 $user->setActivated(0);
                 $user->setCreatedBy(null);
                 $user->setModifiedBy(null);
