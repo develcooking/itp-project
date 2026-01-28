@@ -59,5 +59,5 @@ include $homepath . "/views/header.php";
     </div>
   </div>
 </div>
-<script src="/resources/js/createAccount.js"></script>
+<script src="/resources/js/formValidation.js"></script>
 <?php include $homepath . "/views/footer.php"; ?>
