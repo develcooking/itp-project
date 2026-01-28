@@ -1,5 +1,6 @@
 <?php
 include $homepath . "/views/header.php";
+require $homepath . "/controllers/forum.php";
 ?>
 
 <!DOCTYPE html>
