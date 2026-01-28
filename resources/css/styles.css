@@ -122,6 +122,13 @@ select {
   z-index: 5;
 }
 
+/* ===================== Forum ===========================*/
+
+.card-forum{
+  width: 18rem;
+  display:inline-block;
+}
+
 /* ===================== RESPONSIVE ===================== */
 @media(min-width: 768px){
   .footer-container {
