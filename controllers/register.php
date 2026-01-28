@@ -8,14 +8,14 @@ $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['createAccount'])) {
-        $userName = $_POST['userName'];
-        $firstName = $_POST['firstName'];
-        $lastName = $_POST['lastName'];
+        $userName = htmlspecialchars(trim($_POST['userName']));;
+        $firstName = htmlspecialchars(trim($_POST['firstName']));
+        $lastName = htmlspecialchars(trim($_POST['lastName']));
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-        $password = $_POST['password'];
-        $role = $_POST['role'];
-        $securityAnswer = $_POST['securityAnswer'];
-        $validRoles = ['Ausbilder', 'Lehrer', 'Admin'];
+        $email = htmlspecialchars(trim($_POST['email']));
+        $password = htmlspecialchars(trim($_POST['password']));
+        $role = htmlspecialchars(trim($_POST['role']));
+        $securityAnswer = htmlspecialchars(trim($_POST['securityAnswer']));
 
         if (empty($userName) || empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($role) || empty($securityAnswer)) {
             http_response_code(400);

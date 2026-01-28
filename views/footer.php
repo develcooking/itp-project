@@ -4,9 +4,8 @@
 <footer class="footer">
   <div class="footer-container">
     <div class="footer-left">
-      &copy; <?= date("Y"); ?> Ausbildungsportal.net. Alle Rechte vorbehalten.
-    </div>
+      &copy; <?= date("Y"); ?> Ausbildungsportal.net | Schulprojekt
 </footer>
-<script src="/resources/js/bootstrap.bundle.min.js"></script>
+<script src="/resources/js/bootstrap.min.js"></script>
 
 

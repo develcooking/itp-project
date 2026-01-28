@@ -16,29 +16,41 @@ include $homepath . "/views/header.php";
                         <form method="post" action="../controllers/register.php">
 
                             <div class="form-floating mb-3">
-                                <input type="text" name="userName" class="form-control" placeholder="Benutzername" required>
+                                <input type="text" name="userName" id="userName" class="form-control" placeholder="Benutzername" required>
                                 <label for="userName">Benutzername</label>
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="text" name="firstName" class="form-control" placeholder="Vorname" required>
+                                <input type="text" name="firstName" id="firstName" class="form-control" placeholder="Vorname" required>
                                 <label for="firstName">Vorname</label>
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="text" name="lastName" class="form-control" placeholder="Nachname" required>
+                                <input type="text" name="lastName" id="lastName" class="form-control" placeholder="Nachname" required>
                                 <label for="lastName">Nachname</label>
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="email" name="email" class="form-control" placeholder="E-Mail-Adresse" required>
+                                <input type="email" name="email" id="email" class="form-control" placeholder="E-Mail-Adresse" required>
                                 <label for="email">E-Mail-Adresse</label>
                             </div>
-
-                            <div class="form-floating mb-3">
-                                <input type="password" name="password" class="form-control" placeholder="Passwort" required>
+                            <div class="form-floating mb-3 position-relative password-container">
+                                <input type="password" name="password" class="form-control pe-5" id="password" placeholder="Passwort" required>
                                 <label for="password">Passwort</label>
+                                <span class="password-eye">
+                                    <img id="eyeOpen" src="/resources/imgs/eye.svg" alt="Show password" width="16" height="16" style="cursor:pointer;">
+                                    <img id="eyeSlash" src="/resources/imgs/eye-slash.svg" alt="Hide password" width="16" height="16" style="cursor:pointer; display:none;">
+                                </span>
                             </div>
+                            <div class="form-floating mb-3 position-relative password-container">
+                                <input type="password" name="password" class="form-control pe-5" id="confirmPassword" placeholder="Passwort" required>
+                                <label for="confirmpassword">Passwort bestätigen</label>
+                                <span class="password-eye">
+                                    <img id="eyeOpenConfirm" src="/resources/imgs/eye.svg" alt="Show password" width="16" height="16" style="cursor:pointer;">
+                                    <img id="eyeSlashConfirm" src="/resources/imgs/eye-slash.svg" alt="Hide password" width="16" height="16" style="cursor:pointer; display:none;">
+                                </span>
+                            </div>
+
 
                             <div class="mb-3">
                                 <select name="securityQuestion" class="form-select" required>
@@ -142,5 +154,5 @@ include $homepath . "/views/header.php";
             </div>
         </div>
     </div>
-
+<script src="/resources/js/createAccount.js"></script>
 <?php include $homepath . "/views/footer.php"; ?>
