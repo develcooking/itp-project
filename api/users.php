@@ -27,6 +27,9 @@ if ($method === 'GET') {
                 'message' => 'User not found'
             ], JSON_UNESCAPED_UNICODE);
         }
+    }if (isset($_GET['all'])) {
+        if ($user->getById($_SESSION['userId']) -> role == 'admin') {
+        }
     } else {
         http_response_code(400);
         echo json_encode([
