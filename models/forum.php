@@ -31,7 +31,7 @@ class Forum {
         
         $condition = implode(", ", $bereich_id);
 
-        $query = "SELECT name FROM " . $this->TJobs . " WHERE jobId IN ($condition)";
+        $query = "SELECT name FROM " . $this->TJobs . " WHERE jobId IN (" . $condition . ")";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();
