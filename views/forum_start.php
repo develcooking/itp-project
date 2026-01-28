@@ -1,13 +1,6 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include $homepath . "/views/header.php";
-//include $homepath . "/controllers/forum.php";
-
-//$bereiche = $bereiche ?? [];
-echo '<pre>';
-var_dump($bereiche);
-echo '</pre>';
-
+require $homepath . "/controllers/forum.php";
 ?>
 
 <!DOCTYPE html>
@@ -18,16 +11,23 @@ echo '</pre>';
 </head>
 <body>
 
-<?php foreach ($bereiche as $bereich): ?>
+<?php if(empty($bereiche)): ?>
+    <p>Keine Berufsbereiche gefunden.</p>
+<?php else: ?>
 
-<div class="card" style="width: 18rem;">
-  <div class="card-body">
-    <h5 class="card-title"> <?=  $bereich['name'] ?> </h5>
-<!--    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p> -->
-    <a href="/forum?bereich_id=<?= $bereich['name'] ?>" class="card-link">Zu den Themen</a>
-  </div>
-</div>
+    <?php foreach ($bereiche as $bereich): ?>
 
-<?php endforeach; ?>
+    <div class="card card-forum m-2">
+      <div class="card-body">
+        <h5 class="card-title"> <?= htmlspecialchars($bereich) ?> </h5>
+        <!--    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p> -->
+        <a href="/forum?bereich_id=<?= urlencode($bereich) ?>" class="card-link">Zu den Themen</a>
+      </div>
+    </div>
+
+    <?php endforeach; ?>
+
+<?php endif; ?>
+
 </body>
 </html>

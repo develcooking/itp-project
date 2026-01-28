@@ -1,20 +1,19 @@
 <?php
 
-class Forum{
+class Forum {
     
     private $conn;
     public $userid;
     private $Tusers_jobs = 'users_jobs';
     public $TJobs = 'Jobs';
     
-    
     public function __construct($conn){
         $this->conn = $conn;
     }
     
-    public function getBereiche(): array{
-        
-        //$userid = $_SESSION['userid'];
+    public function getBereiche(): array {
+
+         //$userid = $_SESSION['userid'];
         //$query = "SELECT jobId FROM " . $this->Tusers_jobs . " WHERE userId = ?";
         //$stmt = $this->conn->prepare($query);
         //$stmt->bind_param("i", $userid);
@@ -27,31 +26,23 @@ class Forum{
         //    }}
         //$stmt->close();
 
-        //testing!
+        //testing! (replace later with session query)
         $bereich_id = [1, 2];
         
-        $condition = implode(", ",$bereich_id);
+        $condition = implode(", ", $bereich_id);
 
-        $query = "SELECT name FROM " . $this->TJobs . " WHERE jobId IN(" . $condition . ")";
+        $query = "SELECT name FROM " . $this->TJobs . " WHERE jobId IN ($condition)";
         $stmt = $this->conn->prepare($query);
-        //$stmt->bind_param("i", $bereich_id['berufsbereich_id']);
         $stmt->execute();
-        //$bereiche = [];
         $result = $stmt->get_result();
 
-        if($result->num_rows === 0){
-            return [];
-        }
-        
-        while($row = $result->fetch_assoc())
-        {
-            $bereiche[] = $row; 
-            //echo $row['name'];
-            //echo $bereiche['name'];
-        }
-        $stmt->close();
-        
-        return $bereiche ?? [];
+        $bereiche = []; // always initialize
 
+        while ($row = $result->fetch_assoc()) {
+            $bereiche[] = $row['name']; // push into array
+        }
+
+        $stmt->close();
+        return $bereiche;
     }
-    }
+}
