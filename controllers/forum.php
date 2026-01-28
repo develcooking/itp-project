@@ -1,7 +1,7 @@
 <?php 
 
-    require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
-    require_once $_SERVER['DOCUMENT_ROOT'] . "/models/forum.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/models/forum.php";
     
     $model = new Forum($conn);
     

@@ -1,6 +1,12 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
-include $homepath . "/views/header.php";
+//include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+//include $homepath . "/views/header.php";
+//include $homepath . "/controllers/forum.php";
+
+$bereiche = $bereiche ?? [];
+echo '<pre>';
+var_dump($bereiche);
+echo '</pre>';
 
 ?>
 
@@ -16,9 +22,9 @@ include $homepath . "/views/header.php";
 
 <div class="card" style="width: 18rem;">
   <div class="card-body">
-    <h5 class="card-title"> <?=  $bereich ?> </h5>
+    <h5 class="card-title"> <?=  $bereich['name'] ?> </h5>
 <!--    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p> -->
-    <a href="/forum?bereich_id=<?= $bereich ?>" class="card-link">Zu den Themen</a>
+    <a href="/forum?bereich_id=<?= $bereich['name'] ?>" class="card-link">Zu den Themen</a>
   </div>
 </div>
 

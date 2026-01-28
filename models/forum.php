@@ -45,13 +45,13 @@ class Forum{
         
         while($row = $result->fetch_assoc())
         {
-            $bereiche = $row; 
+            $bereiche[] = $row; 
             //echo $row['name'];
             //echo $bereiche['name'];
         }
         $stmt->close();
         
-        return $bereiche;
+        return $bereiche ?? [];
 
     }
     }
