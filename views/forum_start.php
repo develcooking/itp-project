@@ -1,9 +1,9 @@
 <?php
-//include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
-//include $homepath . "/views/header.php";
+include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+include $homepath . "/views/header.php";
 //include $homepath . "/controllers/forum.php";
 
-$bereiche = $bereiche ?? [];
+//$bereiche = $bereiche ?? [];
 echo '<pre>';
 var_dump($bereiche);
 echo '</pre>';
