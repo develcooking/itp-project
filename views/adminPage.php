@@ -1,7 +1,12 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/database/db.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
 
-if (!isset($users)) {
-    $users = [];
+$users = [];
+
+if ($conn) {
+    $userModel = new User($conn);
+    $users = $userModel->getAll();
 }
 ?>
 
@@ -18,7 +23,7 @@ if (!isset($users)) {
     <script src="../resources/js/datatables.min.js"></script>
 </head>
 <body>
-    <?php include '../includes/header.php'; ?>
+    <?php include './header.php'; ?>
 
     <main class="container">
         <h1>Admin Panel - Benutzerverwaltung</h1>
@@ -33,12 +38,35 @@ if (!isset($users)) {
                     <th>Rolle</th>
                     <th>Wann</th>
                     <th>Aktiviert</th>
-                    <th>Aktionen</th>
                 </tr>
             </thead>
+            <tbody>
+                <?php foreach ($users as $user): ?>
+                <tr>
+                    <td><?= htmlspecialchars($user['userName'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($user['firstName'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($user['lastName'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($user['email'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($user['role'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($user['createdAt'] ?? '') ?></td>
+                    <td><?= $user['activated'] ? 'Ja' : 'Nein' ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
         </table>
     </main>
 
-    <?php include '../includes/footer.php'; ?>
+    <?php include './footer.php'; ?>
+
+    <script>
+        $(document).ready(function() {
+            $('#usersTable').DataTable({
+                order: [[5, 'desc']],
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/2.0.0/i18n/de-DE.json'
+                }
+            });
+        });
+    </script>
 </body>
 </html>
