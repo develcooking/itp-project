@@ -8,7 +8,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/models/forum.php";
     if (isset($_GET['bereich_id'])) {
 
     $bereich_id = (int)$_GET['bereich_id'];
-    echo''. $bereich_id .'';
 
     $topics = $model->getTopicsByBereich($bereich_id);
 

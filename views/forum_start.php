@@ -31,7 +31,7 @@ include $homepath . "/views/header.php";
             <input type="hidden" name="bereich" value="<?= $bereich ?>">
         </form> -->
 
-        <a href="/forum?bereich_id=<?= $bereich['jobId'] ?>" class="card-link">Zu den Themen</a>
+        <a href="/controllers/forum.php?bereich_id=<?= $bereich['jobId'] ?>" class="card-link">Zu den Themen</a>
 
       </div>
     </div>

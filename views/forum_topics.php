@@ -11,7 +11,7 @@ include $homepath . "/views/header.php";
 
 <div class="card m-2">
     <div class="card-body">
-        <h5><?= htmlspecialchars($topic['title']) ?></h5>
+        <h5><?= htmlspecialchars($topic['name']) ?></h5>
     </div>
 </div>
 
