@@ -1,5 +1,6 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
+require_once $homepath . "/models/Appointment.php";
 $errorMessages = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -26,17 +27,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             http_response_code(400);
             array_push($errorMessages, "Bitte füllen Sie alle Felder aus!");
         } else {
-            $stmt = $conn->prepare("INSERT INTO Appointments (title, start, end, description, createdBy, modifiedBy, jobId) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssiii", $title, $startDateTime, $endDateTime, $description, $createdBy, $modifiedBy, $jobId);
+            $appointmentmodel = new Appointment($conn);
+            $appointmentmodel->setTitle($title);
+            $appointmentmodel->setJobId($jobId);
+            $appointmentmodel->setStart($startDateTime);
+            $appointmentmodel->setEnd($endDateTime);
+            $appointmentmodel->setDescription($description);
+            $appointmentmodel->setCreatedBy($createdBy);
+            $appointmentmodel->setModifiedBy($modifiedBy);
+            
 
-            if ($stmt->execute()) {
+            if ($appointmentmodel->post()) {
                 http_response_code(response_code: 201);
                 echo "Termin erfolgreich erstellt!";
             } else {
                 http_response_code(500);
-                echo "Fehler beim erstellen des Termins: " . $stmt->error;
+                array_push($errorMessages, "Fehler beim erstellen des Termins: " . $stmt->error);
             }
-            $stmt->close();
             $conn->close();
         }
     }
