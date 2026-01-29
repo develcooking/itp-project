@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 echo "Termin erfolgreich erstellt!";
             } else {
                 http_response_code(500);
-                array_push($errorMessages, "Fehler beim erstellen des Termins: " . $stmt->error);
+                array_push($errorMessages, "Fehler beim Erstellen des Termins.");
             }
             $conn->close();
         }
