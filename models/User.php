@@ -266,9 +266,9 @@ class User
     public function toArray()
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'vorname' => $this->vorname,
+            'id' => $this->userId,
+            'lastName' => $this->lastName,
+            'firstName' => $this->firstName,
             'email' => $this->email,
             'role' => $this->role
         ];

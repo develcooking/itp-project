@@ -1,6 +1,8 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include $homepath . "/views/header.php";
+require_once $homepath . "/models/UserJobs.php";
+require_once $homepath . "/models/Job.php";
 ?>
 <form id="createEvent" method="post" action="../controllers/createEvent.php">
     <p>Erstelle Termin</p>
@@ -13,12 +15,16 @@ include $homepath . "/views/header.php";
     <select name="jobselection" required>
         <option value="" disabled selected>Bitte Berufsbereich auswählen</option>
         <?php
-            #TODO Add selection for every job by id sorted by name create sql query
-            #Waiting for #48 to be merged
-            #<option value="<<BERUFSBEREICH id>>">BERUFSBEREICH TITLE</option>
+            $user_jobs = new UserJobs($conn);
+            $job = new Job($conn);
+            $userId = $_SESSION['userId'];
+            //var_dump($userId);
+            $jobIdsOfUser = $user_jobs->getJobsForUserByID($_SESSION['userId']);
+            //var_dump($jobIdsOfUser);
         ?>
-        <!-- Beispiel: DAS SOLLTE ABER NUR zum testen da sein-->
-        <option value="1">Informatik</option>
+            <?php foreach ($jobIdsOfUser as $jobId):?>
+                <option value="<?= $jobId; ?>"><?= $job->getNameById($jobId); ?></option>
+            <?php endforeach; ?>
 
     </select>
     <button class="submitbtn" type="submit" name="createEvent">Create Event</button>

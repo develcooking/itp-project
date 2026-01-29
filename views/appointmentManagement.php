@@ -6,18 +6,7 @@ include $homepath . "/views/header.php";
 
 <script src='../resources/js/fullCalendar.min.js'></script>
 <script src='../resources/js/fullCalendarBootstrapPlugin.js'></script>
-<style>
-  body {
-    padding: 0;
-    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-    font-size: 14px;
-  }
 
-  #calendar {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-</style>
 </head>
 
 <body>

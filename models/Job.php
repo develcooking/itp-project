@@ -5,15 +5,16 @@ class Job
     private $conn;
     private $table = "Jobs";
 
-    public $jobId;
-    public $name;
-    public $createdBy;
-    public $modifiedBy;
+    private $jobId;
+    private $name;
+    private $createdBy;
+    private $modifiedBy;
 
     public function __construct($db)
     {
         $this->conn = $db;
     }
+ 
 
     public function getAll()
     {
@@ -80,16 +81,37 @@ class Job
         $stmt->close();
         return false;
     }
+    public function getNameById($jobId):string {
+        $sql = "SELECT name FROM Jobs WHERE jobId = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $jobId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            return $row["name"];
+        }
+        else {
+            return "";
+        }
+    }
 
-    public function update($jobId)
+    private function mapData($row)
     {
+        $this->jobId = $row['jobId'];
+        $this->name = $row['name'];
+        $this->createdBy = $row['createdBy'];
+        $this->modifiedBy = $row['modifiedBy'];
+    }
+
+    public function update($jobId, $name): bool {
         $query = " UPDATE " . $this->table . " 
         SET name = ?, WHERE jobId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
             "s",
-            $this->name
+            $name
         );
 
         if ($stmt->execute()) {
@@ -101,7 +123,7 @@ class Job
         return false;
     }
 
-    public function delete($jobId)
+    public function delete($jobId): bool
     {
         $query = "DELETE FROM " . $this->table . " WHERE jobId = ?";
         $stmt = $this->conn->prepare($query);

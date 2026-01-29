@@ -5,6 +5,7 @@ class Appointment
     private $conn;
     private ?string $table = 'Appointments';
     private ?int $appointmentId;
+    private ?int $jobId;
     private ?string $title;
     private ?string $start;
     private ?string $end;
@@ -20,6 +21,10 @@ class Appointment
     public function getAppointmentId(): ?int
     {
         return $this->appointmentId;
+    }
+    public function getJobId(): ?int
+    {
+        return $this->jobId;
     }
 
     public function getTitle(): ?string
@@ -100,6 +105,7 @@ class Appointment
                 $appointments[] = [
                     'appointmentId' => $row['appointmentId'],
                     'title' => $row['title'],
+                    'jobId' => $row['jobId'],
                     'start' => $row['start'],
                     'end' => $row['end'],
                     'description' => $row['description'],
@@ -118,13 +124,14 @@ class Appointment
     public function post()
     {
         $query = " INSERT INTO " . $this->table . "
-        (title, start, end, description, createdBy, modifiedBy) 
-        VALUES (?, ?, ?, ?, ?, ?)";
+        (title, jobId, start, end, description, createdBy, modifiedBy) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "ssssii",
+            "ssissii",
             $this->title,
+            $this->jobId,
             $this->start,
             $this->end,
             $this->description,

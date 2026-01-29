@@ -122,6 +122,12 @@ select {
   z-index: 5;
 }
 
+/* ===================== Calendar ===================== */
+#calendar {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
 /* ===================== RESPONSIVE ===================== */
 @media(min-width: 768px){
   .footer-container {
