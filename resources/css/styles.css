@@ -159,6 +159,12 @@ select {
   z-index: 5;
 }
 
+/* ===================== Calendar ===================== */
+.calendar-container {
+  max-width: 1100px;
+  margin: 20px;
+}
+
 /* ===================== RESPONSIVE ===================== */
 @media(min-width: 768px){
   .footer-container {

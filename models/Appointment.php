@@ -5,6 +5,7 @@ class Appointment
     private $conn;
     private ?string $table = 'Appointments';
     private ?int $appointmentId;
+    private ?int $jobId;
     private ?string $title;
     private ?string $start;
     private ?string $end;
@@ -21,6 +22,10 @@ class Appointment
     {
         return $this->appointmentId;
     }
+    public function getJobId(): ?int
+    {
+        return $this->jobId;
+    }
 
     public function getTitle(): ?string
     {
@@ -29,17 +34,17 @@ class Appointment
 
     public function getStart(): ?string
     {
-        return $this->title;
+        return $this->start; // Was returning $this->title
     }
 
     public function getEnd(): ?string
     {
-        return $this->title;
+        return $this->end; // Was returning $this->title
     }
 
     public function getDescription(): ?string
     {
-        return $this->title;
+        return $this->description; // Was returning $this->title
     }
 
     public function getCreatedBy(): ?int
@@ -58,6 +63,12 @@ class Appointment
         return $this;
     }
 
+    public function setJobId(int $jobId): self
+    {
+        $this->jobId = $jobId;
+        return $this;
+    }
+
     public function setStart(string $start): self
     {
         $this->start = $start;
@@ -66,7 +77,7 @@ class Appointment
 
     public function setEnd(string $end): self
     {
-        $this->title = $end;
+        $this->end = $end;
         return $this;
     }
 
@@ -100,6 +111,7 @@ class Appointment
                 $appointments[] = [
                     'appointmentId' => $row['appointmentId'],
                     'title' => $row['title'],
+                    'jobId' => $row['jobId'],
                     'start' => $row['start'],
                     'end' => $row['end'],
                     'description' => $row['description'],
@@ -115,16 +127,20 @@ class Appointment
         return $appointments ?? [];
     }
 
-    public function post()
+    public function post(): bool
     {
         $query = " INSERT INTO " . $this->table . "
-        (title, start, end, description, createdBy, modifiedBy) 
-        VALUES (?, ?, ?, ?, ?, ?)";
+        (title, jobId, start, end, description, createdBy, modifiedBy) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
+
+        // types: s=string, i=integer
+        // Title(s), JobId(i), Start(s), End(s), Desc(s), Created(i), Modified(i)
         $stmt->bind_param(
-            "ssssii",
+            "sisssii",
             $this->title,
+            $this->jobId,
             $this->start,
             $this->end,
             $this->description,
@@ -135,7 +151,6 @@ class Appointment
         if ($stmt->execute()) {
             $this->appointmentId = $stmt->insert_id;
             $stmt->close();
-
             return true;
         }
 
@@ -161,6 +176,17 @@ class Appointment
         $stmt->close();
         return false;
     }
+    private function mapData($row) {
+        $this->appointmentId = $row['appointmentId'];
+        $this->jobId = $row['jobId'];
+        $this->title = $row['title'];
+        $this->start = $row['start'];
+        $this->end = $row['end'];
+        $this->description = $row['description'];
+        $this->createdBy = $row['createdBy'];
+        $this->modifiedBy = $row['modifiedBy'];
+    }
+
 
     public function update($appointmentId)
     {
@@ -198,5 +224,4 @@ class Appointment
         $stmt->close();
         return false;
     }
-
 }
