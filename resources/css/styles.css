@@ -123,9 +123,9 @@ select {
 }
 
 /* ===================== Calendar ===================== */
-#calendar {
+.calendar-container {
   max-width: 1100px;
-  margin: 0 auto;
+  margin: 20px;
 }
 
 /* ===================== RESPONSIVE ===================== */
