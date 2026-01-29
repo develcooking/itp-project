@@ -13,21 +13,21 @@ class Forum {
     
     public function getBereiche(): array {
 
-         //$userid = $_SESSION['userid'];
-        //$query = "SELECT jobId FROM " . $this->Tusers_jobs . " WHERE userId = ?";
-        //$stmt = $this->conn->prepare($query);
-        //$stmt->bind_param("i", $userid);
-        //$stmt->execute();
-        //$bereich_id = [];
-        //$result = $stmt->get_result();
-        //if($result->num_rows > 0){
-        //    while($row = $result->fetch_assoc()){
-        //        $bereich_id[] = $row; //['berufsbereich_id'];
-        //    }}
-        //$stmt->close();
+        $userid = $_SESSION['userid'];
+        $query = "SELECT jobId FROM " . $this->Tusers_jobs . " WHERE userId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $userid);
+        $stmt->execute();
+        $bereich_id = [];
+        $result = $stmt->get_result();
+        if($result->num_rows > 0){
+            while($row = $result->fetch_assoc()){
+                $bereich_id[] = $row; //['berufsbereich_id'];
+            }}
+        $stmt->close();
 
         //testing! (replace later with session query)
-        $bereich_id = [1, 2];
+        //$bereich_id = [1, 2];
         
         $condition = implode(", ", $bereich_id);
 
@@ -47,20 +47,8 @@ class Forum {
     }
 
     public function getTopicsByBereich(int $bereich_id): array {
-        //$query = "SELECT * FROM topics WHERE bereich_id = ?";
-        //$stmt = $this->conn->prepare($query);
-        //$stmt->bind_param("i", $bereich_id);
-        //$stmt->execute();
-        //$result = $stmt->get_result();
-//
-        //$topics = [];
-        //while ($row = $result->fetch_assoc()) {
-        //    $topics[] = $row;
-        //}
-//
-        //$stmt->close();
-        //return $topics;
-        $query = "SELECT topicId, name FROM Topics WHERE jobId = ?";
+
+    $query = "SELECT topicId, name FROM Topics WHERE jobId = ?";
 
     $stmt = $this->conn->prepare($query);
     $stmt->bind_param("i", $bereich_id);
