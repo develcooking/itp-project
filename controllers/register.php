@@ -33,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $user = new User($conn);
 
             if ($user->getByEmail($email)) {
-                http_response_code(409);
                 $error = 'Diese E-Mail-Adresse ist bereits registriert!';
             } else {
                 $user->setUserName($userName);
