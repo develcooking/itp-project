@@ -31,7 +31,7 @@ class Forum {
         
         $condition = implode(", ", $bereich_id);
 
-        $query = "SELECT name FROM " . $this->TJobs . " WHERE jobId IN (" . $condition . ")";
+        $query = "SELECT * FROM " . $this->TJobs . " WHERE jobId IN (" . $condition . ")";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -39,10 +39,41 @@ class Forum {
         $bereiche = []; // always initialize
 
         while ($row = $result->fetch_assoc()) {
-            $bereiche[] = $row['name']; // push into array
+            $bereiche[] = $row; //$row['name']; // push into array
         }
 
         $stmt->close();
         return $bereiche;
+    }
+
+    public function getTopicsByBereich(int $bereich_id): array {
+        //$query = "SELECT * FROM topics WHERE bereich_id = ?";
+        //$stmt = $this->conn->prepare($query);
+        //$stmt->bind_param("i", $bereich_id);
+        //$stmt->execute();
+        //$result = $stmt->get_result();
+//
+        //$topics = [];
+        //while ($row = $result->fetch_assoc()) {
+        //    $topics[] = $row;
+        //}
+//
+        //$stmt->close();
+        //return $topics;
+        $query = "SELECT topicId, name FROM Topics WHERE jobId = ?";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $bereich_id);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $topics = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $topics[] = $row;
+    }
+
+    $stmt->close();
+    return $topics;
     }
 }

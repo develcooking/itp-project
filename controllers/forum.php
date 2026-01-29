@@ -4,10 +4,18 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/forum.php";
     
     $model = new Forum($conn);
+
+    if (isset($_GET['bereich_id'])) {
+
+    $bereich_id = (int)$_GET['bereich_id'];
+    echo''. $bereich_id .'';
+
+    $topics = $model->getTopicsByBereich($bereich_id);
+
+    require $_SERVER['DOCUMENT_ROOT'] . '/views/forum_topics.php';
+    exit;
+}
     
     $bereiche = $model->getBereiche();
-    
-    // Variablen an View übergeben
-   //echo($_SERVER['DOCUMENT_ROOT'] . '/views/forum_start.php');
-    //require_once $_SERVER['DOCUMENT_ROOT'] . '/views/forum_start.php';
-    //include $_SERVER['DOCUMENT_ROOT'] . "/views/forum_start.php";
+
+    require $_SERVER['DOCUMENT_ROOT'] . '/views/forum_start.php';
