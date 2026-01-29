@@ -8,10 +8,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $title = $_POST['title'];
         $createdBy = $_SESSION['userId'];
         $modifiedBy = $_SESSION['userId'];
-        $date1 = $_POST['date1'];
-        $time1 = $_POST['time1'];
-        $date2 = $_POST['date2'];
-        $time2 = $_POST['time2'];
+        $startdate = $_POST['startdate'];
+        $starttime = $_POST['starttime'];
+        $enddate = $_POST['enddate'];
+        $endtime = $_POST['endtime'];
         if (isset($_POST["description"])) {
             $description = $_POST["description"];
         } else {
@@ -19,8 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         $jobId = $_POST['jobselection'];
 
-        $startDateTime = $date1 . ' ' . $time1 . ':00'; // Ergebnis: "2023-10-27 14:30:00"
-        $endDateTime = $date2 . ' ' . $time2 . ':00';
+        $startDateTime = $startdate . ' ' . $starttime . ':00'; // Ergebnis: "2023-10-27 14:30:00"
+        $endDateTime = $enddate . ' ' . $endtime . ':00';
 
         if (empty($title) || empty($createdBy) || empty($startDateTime) || empty($endDateTime)) {
             http_response_code(400);

@@ -7,10 +7,10 @@ require_once $homepath . "/models/Job.php";
 <form id="createEvent" method="post" action="../controllers/createEvent.php">
     <p>Erstelle Termin</p>
     <input type="title" name="title" required placeholder="Name des Termins">
-    <input type="date" name="date1" required placeholder="Erstes Datum">
-    <input type="time" name="time1" required placeholder="erste Uhrzeit">
-    <input type="date" name="date2" required placeholder="zweites Datum">
-    <input type="time" name="time2" required placeholder="zweites Uhrzeit">
+    <input type="date" name="startdate" required placeholder="Erstes Datum">
+    <input type="time" name="starttime" required placeholder="erste Uhrzeit">
+    <input type="date" name="enddate" required placeholder="zweites Datum">
+    <input type="time" name="endtime" required placeholder="zweites Uhrzeit">
     <input type="text" name="description" placeholder="In der Hautstraße">
     <select name="jobselection" required>
         <option value="" disabled selected>Bitte Berufsbereich auswählen</option>
