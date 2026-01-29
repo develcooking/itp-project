@@ -1,0 +1,39 @@
+body {
+    background: #f4f6f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.confetti {
+    position: absolute;
+    width: 8px;
+    height: 12px;
+    background-color: red;
+    top: 0; 
+    pointer-events: none;
+    opacity: 0.9;
+    animation: confetti-fall linear forwards;
+    z-index: 0; 
+    border-radius: 1px;
+}
+
+@keyframes confetti-fall {
+    0% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+
+.card {
+    position: relative;
+    z-index: 10;
+}
+.success-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    position: relative;
+    display: inline-block;
+}

@@ -25,9 +25,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = new User($conn);
 
             if ($user->getByEmail($email)) {
-                if (password_verify($password, htmlspecialchars(trim($password)))) {
+                if (password_verify($password, $user->getPassword())) {
                     session_regenerate_id(true);
+                    $_SESSION['logged_in'] = true;
                     $_SESSION['userId'] = $user->getUserId();
+                    $_SESSION['userName'] = $user->getUserName();
+                    $_SESSION['firstName'] = $user->getFirstName();
+                    $_SESSION['lastName'] = $user->getLastName();
+                    $_SESSION['email'] = $user->getEmail();
+                    $_SESSION['role'] = $user->getRole();
+
                     header("Location: /views/startpage.php");
                     exit();
                 } else {

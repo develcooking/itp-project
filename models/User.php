@@ -5,17 +5,17 @@ class User
     private $conn;
     private ?string $table = 'Users';
 
-    private ?int $userId;
-    private ?string $userName;
-    private ?string $firstName;
-    private ?string $lastName;
-    private ?string $email;
-    private ?string $password;
-    private ?string $role;
-    private ?string $securityAnswer;
-    private ?int $activated;
-    private ?int $createdBy;
-    private ?int $modifiedBy;
+    private ?int $userId = null;
+    private ?string $userName = '';
+    private ?string $firstName = '';
+    private ?string $lastName = '';
+    private ?string $email = '';
+    private ?string $password = '';
+    private ?string $role = '';
+    private ?string $securityAnswer = '';
+    private ?int $activated = null;
+    private ?int $createdBy = null;
+    private ?int $modifiedBy = null;
 
     public function __construct($db)
     {
@@ -305,5 +305,3 @@ class User
         $this->modifiedBy = $this->userId;
     }
 }
-
-?>
