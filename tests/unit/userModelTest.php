@@ -226,7 +226,9 @@ class UserModelTest extends TestCase
         $this->assertArrayHasKey('activated', $array);
     }
 
-//-> da frage ich den Lehrer, ob es alles so tief getestet werden soll...
+//->
+//    Gemeint war, dass wir diese Tests grundsätzlich implementieren sollten, dies aber nicht machen
+//    werden, da es sehr zeitaufwändig ist und wir dafür aktuell keine ausreichende Zeit haben.
 //    public function test_It_Should_Return_An_Error_On_Delete_If_The_User_Does_Not_Exist(){}
 //    public function test_It_Should_Return_An_Error_On_Update_If_The_User_Does_Exist(){}
 //    public function test_It_Should_Return_An_Error_On_Get_By_Id_If_The_User_Does_Exist(){}
@@ -240,4 +242,11 @@ class UserModelTest extends TestCase
 //    public function test_It_Should_Successfully_Update_Password_Field(){}
 //    public function test_It_Should_Successfully_Update_Role_Field(){}
 //    public function test_It_Should_Successfully_Update_SecurityAnswer_Field(){}
+
+//->
+//  Testfälle in Bezug auf Pagination, Sorting, Filter und Field Selection sollen ebenfalls
+//  implementiert werden. Falls sich dies jedoch als sehr zeitaufwändig erweist – da diese Tests
+//  auch für andere Modelle entsprechend umgesetzt werden müssen –, sollen zunächst allgemeine
+//  Test-Suites für Pagination, Sorting, Filter und Field Selection erstellt und anschließend für
+//  alle weiteren Modelle angepasst werden.
 }
