@@ -22,101 +22,123 @@ class User
         $this->conn = $db;
     }
 
-    public function getUserId(): ?int {
+    public function getUserId(): ?int
+    {
         return $this->userId;
     }
 
-    public function getUserName(): ?string {
+    public function getUserName(): ?string
+    {
         return $this->userName;
     }
 
-    public function getFirstName(): ?string {
+    public function getFirstName(): ?string
+    {
         return $this->firstName;
     }
 
-    public function getLastName(): ?string {
+    public function getLastName(): ?string
+    {
         return $this->lastName;
     }
 
-    public function getEmail(): ?string {
+    public function getEmail(): ?string
+    {
         return $this->email;
     }
 
-    public function getPassword(): ?string {
+    public function getPassword(): ?string
+    {
         return $this->password;
     }
 
-    public function getRole(): ?string {
+    public function getRole(): ?string
+    {
         return $this->role;
     }
 
-    public function getSecurityAnswer(): ?string {
+    public function getSecurityAnswer(): ?string
+    {
         return $this->securityAnswer;
     }
 
-    public function getActivated(): ?int {
+    public function getActivated(): ?int
+    {
         return $this->activated;
     }
 
-    public function getCreatedBy(): ?int {
+    public function getCreatedBy(): ?int
+    {
         return $this->createdBy;
     }
 
-    public function getModifiedBy(): ?int {
+    public function getModifiedBy(): ?int
+    {
         return $this->modifiedBy;
     }
 
-    public function setUserName(string $userName): self {
+    public function setUserName(string $userName): self
+    {
         $this->userName = $userName;
         return $this;
     }
 
-    public function setFirstName(string $firstName): self {
+    public function setFirstName(string $firstName): self
+    {
         $this->firstName = $firstName;
         return $this;
     }
 
-    public function setLastName(string $lastName): self {
+    public function setLastName(string $lastName): self
+    {
         $this->lastName = $lastName;
         return $this;
     }
 
-    public function setEmail(string $email): self {
+    public function setEmail(string $email): self
+    {
         $this->email = $email;
         return $this;
     }
 
-    public function setPassword(string $password): self {
+    public function setPassword(string $password): self
+    {
         $this->password = $password;
         return $this;
     }
 
-    public function setRole(string $role): self {
+    public function setRole(string $role): self
+    {
         $this->role = $role;
         return $this;
     }
 
-    public function setSecurityAnswer(string $securityAnswer): self {
+    public function setSecurityAnswer(string $securityAnswer): self
+    {
         $this->securityAnswer = $securityAnswer;
         return $this;
     }
 
-    public function setActivated(int $activated): self {
+    public function setActivated(int $activated): self
+    {
         $this->activated = $activated;
         return $this;
     }
 
-    public function setCreatedBy(?int $createdBy): self {
+    public function setCreatedBy(?int $createdBy): self
+    {
         $this->createdBy = $createdBy;
         return $this;
     }
 
-    public function setModifiedBy(?int $modifiedBy): self {
+    public function setModifiedBy(?int $modifiedBy): self
+    {
         $this->modifiedBy = $modifiedBy;
         return $this;
     }
 
-    public function getAll(): array {
+    public function getAll(): array
+    {
         $query = "SELECT * FROM " . $this->table;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -147,7 +169,8 @@ class User
         return $users;
     }
 
-    public function post(): bool {
+    public function post(): bool
+    {
         $query = "INSERT INTO " . $this->table . "
         (userName, firstName, lastName, email, password, role, securityAnswer, activated, createdBy, modifiedBy) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -210,30 +233,32 @@ class User
     }
 
 
-    public function update($userId)
+    public function update(int $userId): bool
     {
-        $query = " UPDATE " . $this->table . " 
-        SET userName = ?, firstName = ?, lastName = ?, email = ?, password = ?, role = ?, securityAnswer = ?, activated = ? WHERE userId = ?";
+        $query = "UPDATE " . $this->table . "
+              SET userName = ?, firstName = ?, lastName = ?, email = ?, password = ?, role = ?, securityAnswer = ?, activated = ?
+              WHERE userId = ?";
 
         $stmt = $this->conn->prepare($query);
+
+        $password = password_hash($this->password, PASSWORD_DEFAULT);
+
         $stmt->bind_param(
-            "sssssssi",
+            "sssssssii",
             $this->userName,
             $this->firstName,
             $this->lastName,
             $this->email,
-            $this->password,
+            $password,
             $this->role,
             $this->securityAnswer,
-            $this->activated);
+            $this->activated,
+            $userId
+        );
 
-        if ($stmt->execute()) {
-            $stmt->close();
-            return true;
-        }
-
+        $updated = $stmt->execute();
         $stmt->close();
-        return false;
+        return $updated;
     }
 
     public function delete($userId)
@@ -254,7 +279,7 @@ class User
     {
         $this->userId = $row['userId'];
         $this->userName = $row['userName'];
-        $this->firstName = $row['firstName'] ?? null;
+        $this->firstName = $row['firstName'];
         $this->lastName = $row['lastName'];
         $this->email = $row['email'];
         $this->password = $row['password'];
@@ -263,14 +288,18 @@ class User
         $this->activated = $row['activated'];
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'vorname' => $this->vorname,
-            'email' => $this->email,
-            'role' => $this->role
+            'userId' => $this->getUserId(),
+            'userName' => $this->getUserName(),
+            'firstName' => $this->getFirstName(),
+            'lastName' => $this->getLastName(),
+            'email' => $this->getEmail(),
+//            'password' => $this->getPassword(),
+            'role' => $this->getRole(),
+//            'securityAnswer' => $this->getSecurityAnswer(),
+            'activated' => $this->getActivated()
         ];
     }
 
