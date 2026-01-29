@@ -304,4 +304,25 @@ class User
         $this->createdBy = $this->userId;
         $this->modifiedBy = $this->userId;
     }
+
+    public function resetPassword(string $email, string $newPassword, ?int $modifiedBy = null): bool
+{
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+    $modifiedById = $modifiedBy ?? null;
+
+    $query = "UPDATE " . $this->table . " 
+              SET password = ?, modifiedBy = ?, modifiedAt = CURRENT_TIMESTAMP
+              WHERE LOWER(email) = LOWER(?)";
+
+    $stmt = $this->conn->prepare($query);
+    if (!$stmt) return false;
+
+    $stmt->bind_param("sis", $hashedPassword, $modifiedById, $email);
+    $success = $stmt->execute();
+    $stmt->close();
+
+    return $success;
+}
+
 }
