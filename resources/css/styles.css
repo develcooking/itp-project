@@ -38,6 +38,7 @@ body {
 .navbar {
   background-color: var(--accentColor);
   display: flex;
+  justify-content: flex-start;
   gap: 0;
   padding: 0;
   margin: 0;
@@ -47,8 +48,8 @@ body {
 .nav-btn {
   color: #fff;
   text-decoration: none;
-  padding: 15px 20px;
-  display: block;
+  padding: 10px 15px;
+  display: inline-block;
   transition: background-color 0.3s ease;
   border: none;
   cursor: pointer;
