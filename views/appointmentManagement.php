@@ -8,6 +8,12 @@ include $homepath . "/views/header.php";
 <script src='../resources/js/fullCalendarBootstrapPlugin.js'></script>
 
 <div class="calendar-container">
+  <a href="createEvent.php" class="btn btn-secondary float-end">
+    Termin erstellen
+  </a>
+  
+  <br>
+  <br>
 
   <div id='calendar'></div>
 </div>
