@@ -48,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $user->setModifiedBy(null);
 
                 if ($user->post()) {
-                    http_response_code(201);
                     header("Location: /views/successRegister.php");
                     $_SESSION['registered'] = true;
                     exit();
