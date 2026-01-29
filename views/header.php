@@ -28,7 +28,7 @@ if (empty($current_page) || $current_page === '') {
 
     <?php if (!empty($_SESSION['userId'])): ?>
     <nav class="navbar">
-        <a href="/startpage.php" class="nav-btn <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
+        <a href="/views/startpage.php" class="nav-btn <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
         <a href="/views/loginsite.php" class="nav-btn <?=  $current_page === 'loginsite' ? 'current' : ''; ?>">Login</a>
         <a href="/views/createAccount.php" class="nav-btn <?=  $current_page === 'createAccount' ? 'current' : ''; ?>">Registrierung</a>
         <a href="/controllers/forum.php" class="nav-btn <?=  $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
