@@ -159,6 +159,15 @@ select {
   z-index: 5;
 }
 
+/* ===================== Forum ===========================*/
+
+.card-forum{
+  width: 20%;
+  /*display:inline-block;*/
+  display: flex;
+  justify-content: space-between; /*center;*/
+  padding: 20px;
+  box-sizing: border-box;
 /* ===================== Calendar ===================== */
 .calendar-container {
   max-width: 1100px;
