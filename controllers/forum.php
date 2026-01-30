@@ -3,6 +3,10 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/forum.php";
     
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
     $model = new Forum($conn);
 
     if (isset($_GET['bereich_id'])) {

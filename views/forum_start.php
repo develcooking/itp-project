@@ -18,7 +18,6 @@ include $homepath . "/views/header.php";
 
     <?php foreach ($bereiche as $bereich): ?>
 
-      <?php echo(var_dump($bereich)); ?>
 
     <div class="card card-forum m-2">
       <div class="card-body">
