@@ -3,6 +3,10 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/admin.php';
 ?>
 
 <?php include './header.php'; ?>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="../resources/css/datatables.min.css">
+    <!-- DataTables JS -->
+    <script src="../resources/js/datatables.min.js"></script>
 
     <h1>Admin Panel - Benutzerverwaltung</h1>
 
