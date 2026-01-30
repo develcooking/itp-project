@@ -70,6 +70,18 @@ body {
   border-bottom: 3px solid #fff;
 }
 
+/* Logout form in navbar (right aligned) */
+.nav-logout-form {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+.nav-logout-form .nav-btn {
+  background: transparent;
+  border: none;
+  padding: 10px 15px;
+}
+
 /* ===================== BUTTON & INPUTS ===================== */
 button,
 input[type="text"],
