@@ -4,6 +4,15 @@ require_once __DIR__ . '/../database/db.php';
 
 session_start();
 
+/**
+ * Hilfsfunktion für Redirects mit Fehlermeldung
+ */
+function redirectWithError($message, $target = "/views/passwordReset.php") {
+    $_SESSION['reset_error'] = $message;
+    header("Location: " . $target);
+    exit();
+}
+
 // Access control
 if (empty($_SESSION['password_reset']) || $_SESSION['password_reset']['verified'] !== true) {
     header("Location: /views/passwordForgot.php");
@@ -13,10 +22,8 @@ if (empty($_SESSION['password_reset']) || $_SESSION['password_reset']['verified'
 // Expiration check (15 min)
 if (time() - $_SESSION['password_reset']['time'] > 900) {
     unset($_SESSION['password_reset']);
-    header("Location: /views/passwordForgot.php");
-    exit();
+    redirectWithError("Die Sitzung ist abgelaufen. Bitte erneut versuchen.", "/views/passwordForgot.php");
 }
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -24,31 +31,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newPassword = $_POST['newPassword'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';
 
-    // Validation
+    // validate
     if (empty($newPassword) || empty($confirmPassword)) {
-        $_SESSION['reset_error'] = "Alle Felder sind erforderlich";
-    } elseif ($newPassword !== $confirmPassword) {
-        $_SESSION['reset_error'] = "Passwörter stimmen nicht überein";
-    } elseif (strlen($newPassword) < 4) { 
-        $_SESSION['reset_error'] = "Passwort muss mindestens 4 Zeichen haben";
-    } else {
-        // Update password
+        redirectWithError("Alle Felder sind erforderlich");
+    } 
+    
+    if ($newPassword !== $confirmPassword) {
+        redirectWithError("Passwörter stimmen nicht überein");
+    } 
+    
+    if (strlen($newPassword) < 8) {
+        redirectWithError("Passwort muss mindestens 8 Zeichen haben");
+    }
+
+    // passwort-update
+    try {
         $user = new User($conn);
-        $success = $user->resetPassword($email, $newPassword, null);
+        if (empty($user->getById($_SESSION['userId']))) {
+            redirectWithError("Benutzer nicht gefunden.");
+        }
+            $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+            $user->setPassword($hashedPassword);
+            $user->update($_SESSION['userId']);
 
         if ($success) {
+            // success: clear session
             unset($_SESSION['password_reset']);
+            
             session_regenerate_id(true);
             $_SESSION['reset_success'] = "Passwort erfolgreich zurückgesetzt.";
             header("Location: /views/loginsite.php");
             exit();
         } else {
-            $_SESSION['reset_error'] = "Fehler beim Zurücksetzen des Passworts. Benutzer nicht gefunden.";
+            redirectWithError("Fehler beim Zurücksetzen: Benutzer nicht gefunden oder Systemfehler.");
         }
+    } catch (Exception $e) {
+        // log the error $e->getMessage();
+        redirectWithError("Ein interner Fehler ist aufgetreten.");
     }
-
-    header("Location: /views/passwordReset.php");
-    exit();
 }
+// if someone tries to access this controller without POST
 header("Location: /views/passwordForgot.php");
 exit();

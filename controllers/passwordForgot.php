@@ -26,7 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['passwordForgot'])) {
     $user->getByEmail($email);
 
     if (!$user->getUserId()) {
-        controllerSendError(404, "E-Mail existiert nicht");
+        // we will not reveal whether the email exists or not
+        controllerSendError(404, "E-Mail oder Sicherheitsantwort ist falsch");
     }
 
     $inputAnswer  = strtolower(trim($securityAnswer));
