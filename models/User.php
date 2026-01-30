@@ -4,7 +4,6 @@ class User
 {
     private $conn;
     private ?string $table = 'Users';
-
     private ?int $userId = null;
     private ?string $userName = '';
     private ?string $firstName = '';
