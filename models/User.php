@@ -255,9 +255,9 @@ class User
             $userId
         );
 
-        $updated = $stmt->execute();
+        $ok = $stmt->execute();
         $stmt->close();
-        return $updated;
+        return $ok;
     }
 
     public function delete($userId)
