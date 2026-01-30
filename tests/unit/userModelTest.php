@@ -226,6 +226,7 @@ class UserModelTest extends TestCase
         $this->assertArrayHasKey('activated', $array);
     }
 
+    
 //->
 //    Gemeint war, dass wir diese Tests grundsätzlich implementieren sollten, dies aber nicht machen
 //    werden, da es sehr zeitaufwändig ist und wir dafür aktuell keine ausreichende Zeit haben.
