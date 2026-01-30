@@ -210,30 +210,32 @@ class User
     }
 
 
-    public function update($userId)
+    public function update(int $userId): bool
     {
-        $query = " UPDATE " . $this->table . " 
-        SET userName = ?, firstName = ?, lastName = ?, email = ?, password = ?, role = ?, securityAnswer = ?, activated = ? WHERE userId = ?";
+        $query = "UPDATE " . $this->table . "
+              SET userName = ?, firstName = ?, lastName = ?, email = ?, password = ?, role = ?, securityAnswer = ?, activated = ?
+              WHERE userId = ?";
 
         $stmt = $this->conn->prepare($query);
+
+        $hashedPassword = password_hash($this->password, PASSWORD_DEFAULT);
+
         $stmt->bind_param(
-            "sssssssi",
+            "sssssssii",
             $this->userName,
             $this->firstName,
             $this->lastName,
             $this->email,
-            $this->password,
+            $hashedPassword,
             $this->role,
             $this->securityAnswer,
-            $this->activated);
+            $this->activated,
+            $userId
+        );
 
-        if ($stmt->execute()) {
-            $stmt->close();
-            return true;
-        }
-
+        $ok = $stmt->execute();
         $stmt->close();
-        return false;
+        return $ok;
     }
 
     public function delete($userId)

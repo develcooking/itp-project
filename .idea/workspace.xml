@@ -6,7 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="f291d9c9-880c-4a77-b7f3-0b20c2d803a9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/register.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/register.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/passwordForgot.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/passwordForgot.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/passwordReset.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/passwordReset.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/models/User.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +82,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "dev/test-reset-password",
     "last_opened_file_path": "/Users/aleksandrsmagin/Desktop/itp-project",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",

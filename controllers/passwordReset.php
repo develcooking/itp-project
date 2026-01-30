@@ -7,7 +7,8 @@ session_start();
 /**
  * Hilfsfunktion für Redirects mit Fehlermeldung
  */
-function redirectWithError($message, $target = "/views/passwordReset.php") {
+function redirectWithError($message, $target = "/views/passwordReset.php")
+{
     $_SESSION['reset_error'] = $message;
     header("Location: " . $target);
     exit();
@@ -34,30 +35,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // validate
     if (empty($newPassword) || empty($confirmPassword)) {
         redirectWithError("Alle Felder sind erforderlich");
-    } 
-    
+    }
+
     if ($newPassword !== $confirmPassword) {
         redirectWithError("Passwörter stimmen nicht überein");
-    } 
-    
+    }
+
     if (strlen($newPassword) < 8) {
         redirectWithError("Passwort muss mindestens 8 Zeichen haben");
     }
 
-    // passwort-update
     try {
         $user = new User($conn);
-        if (empty($user->getById($_SESSION['userId']))) {
+
+        if (!$user->getByEmail($email)) {
             redirectWithError("Benutzer nicht gefunden.");
         }
-            $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
-            $user->setPassword($hashedPassword);
-            $user->update($_SESSION['userId']);
+
+        $user->setPassword($newPassword);
+        $success = $user->update($user->getUserId());
 
         if ($success) {
             // success: clear session
             unset($_SESSION['password_reset']);
-            
+
             session_regenerate_id(true);
             $_SESSION['reset_success'] = "Passwort erfolgreich zurückgesetzt.";
             header("Location: /views/loginsite.php");
