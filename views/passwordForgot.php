@@ -16,7 +16,7 @@ if (isset($_SESSION['user'])) {
 
                 <h2 class="fw-bold mb-2">Passwort zurücksetzen</h2>
 
-                <form method="post" action="../controllers/login.php">
+                <form method="post" action="../controllers/passwordForgot.php">
 
                     <div class="form-floating mb-3">
                         <input type="email" name="email" class="form-control" id="email" placeholder="E-Mail-Adresse"
@@ -25,12 +25,12 @@ if (isset($_SESSION['user'])) {
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="password" name="securityAnswer" class="form-control" id="securityAnswer"
+                        <input type="text" name="securityAnswer" class="form-control" id="securityAnswer"
                                placeholder="Antwort auf Sicherheitsfrage" required>
                         <label for="securityAnswer">Antwort auf die Sicherheitsfrage</label>
                     </div>
 
-                    <button class="btn btn-outline-primary btn-lg w-100" type="submit" name="reset">
+                    <button class="btn btn-outline-primary btn-lg w-100" type="submit" name="passwordForgot">
                         Weiter
                     </button>
                 </form>
