@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['passwordForgot'])) {
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     $securityAnswer = trim($_POST['securityAnswer'] ?? '');
 
-    if (!$email || !$securityAnswer) {
+    if (empty($email) || empty($securityAnswer)) {
         controllerSendError(400, "Alle Felder sind erforderlich");
     }
 
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['passwordForgot'])) {
     $storedAnswer = strtolower(trim($user->getSecurityAnswer()));
 
     if ($inputAnswer !== $storedAnswer) {
-        controllerSendError(401, "Sicherheitsantwort falsch");
+        controllerSendError(400, "Sicherheitsantwort falsch");
     }
 
     // Create reset session
