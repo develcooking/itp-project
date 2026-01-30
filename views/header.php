@@ -43,7 +43,7 @@ if (empty($current_page) || $current_page === '') {
     <?php endif; ?>
 
 <div class="main-container">
-        
+        <!--  -->
 
 
 
