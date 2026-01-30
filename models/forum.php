@@ -52,4 +52,13 @@ class Forum {
     $stmt->close();
     return $topics;
     }
+
+    public function createTopic(int $bereich_id, string $title, ?string $description = null): bool {
+        $query = "INSERT INTO Topics (jobId, name, description) VALUES (?, ?, ?)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("iss", $bereich_id, $title, $description);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
 }

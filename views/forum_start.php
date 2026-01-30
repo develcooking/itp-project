@@ -1,5 +1,5 @@
 <?php
-include $homepath . "/views/header.php";
+include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 ?>
 
 <!DOCTYPE html>
