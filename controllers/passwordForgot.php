@@ -30,10 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['passwordForgot'])) {
         controllerSendError(404, "E-Mail oder Sicherheitsantwort ist falsch");
     }
 
-    $inputAnswer  = strtolower(trim($securityAnswer));
-    $storedAnswer = strtolower(trim($user->getSecurityAnswer()));
+    $inputAnswer = trim($securityAnswer);
+    $storedHash  = $user->getSecurityAnswer();
 
-    if ($inputAnswer !== $storedAnswer) {
+    if (!password_verify($inputAnswer, $storedHash)) {
         controllerSendError(400, "Sicherheitsantwort falsch");
     }
 
