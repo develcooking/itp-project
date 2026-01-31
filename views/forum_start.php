@@ -10,11 +10,14 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 </head>
 <body>
 
- <h3> Berufsbereiche im Forum </h3>
+  
+  <div class="forum-container">
+    
+    <h3> Berufsbereiche im Forum </h3>
 
-<?php if(empty($bereiche)): ?>
-    <p>Keine Berufsbereiche gefunden.</p>
-<?php else: ?>
+    <?php if(empty($bereiche)): ?>
+        <p>Keine Berufsbereiche gefunden.</p>
+    <?php else: ?>
 
     <?php foreach ($bereiche as $bereich): ?>
 
@@ -30,7 +33,7 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
             <input type="hidden" name="bereich" value="<?= $bereich ?>">
         </form> -->
 
-        <a href="/controllers/forum.php?bereich_id=<?= $bereich['jobId'] ?>" class="card-link">Zu den Themen</a>
+        <a href="/controllers/forum.php?bereich_id=<?= $bereich['jobId'] ?>&name=<?= $bereich['name'] ?>" class="card-link">Zu den Themen</a>
 
       </div>
     </div>
@@ -38,6 +41,7 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
     <?php endforeach; ?>
 
 <?php endif; ?>
-
+    </div>
 </body>
 </html>
+<?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>

@@ -53,10 +53,10 @@ class Forum {
     return $topics;
     }
 
-    public function createTopic(int $bereich_id, string $title, ?string $description = null): bool {
-        $query = "INSERT INTO Topics (jobId, name, description) VALUES (?, ?, ?)";
+    public function createTopic(int $bereich_id, string $title): bool {
+        $query = "INSERT INTO Topics (name, jobId, userId, createdBy, modifiedBy) VALUES (?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("iss", $bereich_id, $title, $description);
+        $stmt->bind_param("siiii", $title, $bereich_id, $_SESSION['userId'], $_SESSION['userId'], $_SESSION['userId']);
         $result = $stmt->execute();
         $stmt->close();
         return $result;

@@ -174,11 +174,14 @@ select {
 /* ===================== Forum ===========================*/
 .card-forum{
   width: 20%;
-  /*display:inline-block;*/
   display: flex;
   justify-content: space-between;
   padding: 20px;
   box-sizing: border-box;
+}
+.forum-container {
+  min-height: 75vh;
+  margin: 10px;
 }
 
 /* ===================== Calendar ===================== */
