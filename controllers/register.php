@@ -8,6 +8,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
 
 $error = '';
 
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['createAccount'])) {
         $userName = htmlspecialchars(trim($_POST['userName']));;
