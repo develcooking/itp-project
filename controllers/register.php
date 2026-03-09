@@ -7,7 +7,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
 
 
 $error = '';
-
+$errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['createAccount'])) {
@@ -21,20 +21,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $securityAnswer = htmlspecialchars(trim($_POST['securityAnswer']));
 
         if (empty($userName) || empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($role) || empty($securityAnswer)) {
-            http_response_code(400);
             $error = 'Bitte füllen Sie alle Felder aus!';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            http_response_code(400);
-            $error = 'Ungültiges E-Mail-Format!';
+            $errors['email'] = 'Ungültiges E-Mail-Format!';
         } elseif (strlen($password) < 6) {
-            //Es wird nachgearbeitet durch RegEx für Validierung, falls möglich das in Class zu machen
-            http_response_code(400);
-            $error = 'Passwort muss mindestens 6 Zeichen lang sein!';
+            $error['password'] = 'Passwort muss mindestens 6 Zeichen lang sein!';
         } else {
             $user = new User($conn);
 
             if ($user->getByEmail($email)) {
-                $error = 'Diese E-Mail-Adresse ist bereits registriert!';
+                $errors['email'] = 'Diese E-Mail-Adresse ist bereits registriert!';
+            } elseif ($user->getByUserName($userName)) {
+                $errors['userName'] = 'Dieser Benutzername ist bereits registriert!';
             } else {
                 $user->setUserName($userName);
                 $user->setFirstName($firstName);
@@ -60,9 +58,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-if (!empty($error)) {
-    echo "<div class='error'>" . htmlspecialchars($error) . "</div>";
-}
-if (!empty($success)) {
-    echo "<div class='success'>" . htmlspecialchars($success) . "</div>";
-}
+require $_SERVER['DOCUMENT_ROOT'] . "/views/createAccount.php";
+exit();

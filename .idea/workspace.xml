@@ -5,7 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f291d9c9-880c-4a77-b7f3-0b20c2d803a9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/resources/css/createAccount.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/register.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/register.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/models/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/formValidation.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/formValidation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/createAccount.php" beforeDir="false" afterPath="$PROJECT_DIR$/views/createAccount.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +29,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="PHP File" />
+        <option value="CSS File" />
       </list>
     </option>
   </component>
@@ -94,16 +100,17 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "dev/add-checking-userName-on-login-and-registration-pages",
     "javascript.preferred.runtime.type.id": "node",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "/Users/aleksandrsmagin/Desktop/itp-project",
+    "list.type.of.created.stylesheet": "CSS",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "MTAccentSelectorConfigurable",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   },
@@ -122,7 +129,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-WS-253.31033.133" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PS-253.30387.85" />
+        <option value="bundled-php-predefined-a98d8de5180a-0e0d91225499-com.jetbrains.php.sharedIndexes-PS-253.30387.85" />
       </set>
     </attachedChunks>
   </component>
@@ -142,7 +150,9 @@
       <workItem from="1769772548345" duration="798000" />
       <workItem from="1769860261308" duration="339000" />
       <workItem from="1770421840635" duration="950000" />
-      <workItem from="1773050319375" duration="2260000" />
+      <workItem from="1773050319375" duration="3027000" />
+      <workItem from="1773059778625" duration="12000" />
+      <workItem from="1773060022398" duration="29000" />
     </task>
     <servers />
   </component>

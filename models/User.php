@@ -321,6 +321,26 @@ class User
         return false;
     }
 
+    public function getByUserName($userName)
+    {
+        $query = "SELECT * FROM " . $this->table . " WHERE userName = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("s", $userName);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $this->mapData($row);
+            $stmt->close();
+            return true;
+        }
+
+        $stmt->close();
+        return false;
+    }
+
+
     private function updateCreatedBy()
     {
         $query = "UPDATE " . $this->table . " SET createdBy = ?, modifiedBy = ? WHERE userid = ?";

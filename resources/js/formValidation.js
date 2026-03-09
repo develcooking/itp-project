@@ -1,4 +1,26 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const userNameInput = document.getElementById('userName');
+    const emailInput = document.getElementById('email');
+
+    if (userNameInput) {
+        userNameInput.addEventListener('input', function() {
+            const errorDiv = this.parentElement.querySelector('.invalidUserName');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+            this.classList.remove('is-invalid');
+        });
+    }
+
+    if (emailInput) {
+        emailInput.addEventListener('input', function() {
+            const errorDiv = this.parentElement.querySelector('.invalidUserName');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+            this.classList.remove('is-invalid');
+        });
+    }
     /* ===========================
        FORM + INPUT REFERENCES
     ============================ */
