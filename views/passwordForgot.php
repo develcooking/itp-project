@@ -19,7 +19,7 @@ if (isset($_SESSION['user'])) {
                 <form method="post" action="../controllers/passwordForgot.php">
 
                     <div class="form-floating mb-3">
-                        <input type="email" name="email" class="form-control" id="email" placeholder="E-Mail-Adresse"
+                        <input type="email" name="email" class="form-control" id="emailForgot" placeholder="E-Mail-Adresse"
                                required>
                         <label for="email">E-Mail-Adresse</label>
                     </div>
@@ -46,5 +46,5 @@ if (isset($_SESSION['user'])) {
         </div>
     </div>
 </div>
-
+<script src="/resources/js/formValidation.js"></script>
 <?php include $homepath . "/views/footer.php"; ?>
