@@ -230,6 +230,23 @@ class User
         $stmt->close();
         return false;
     }
+    public function getUserNameByID($id): ?string {
+        $query = "SELECT userName FROM " . $this->table . " WHERE userid = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $userName =  $row["userName"];
+            $stmt->close();
+            return $userName;
+        }
+
+        $stmt->close();
+        return null;
+    }
 
 
     public function update(int $userId): bool
