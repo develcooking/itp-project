@@ -1,6 +1,6 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
-include $homepath . "/views/header.php";
+include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 ?>
 
 <div class="container min-vh-100 d-flex justify-content-center align-items-center">
@@ -60,4 +60,5 @@ include $homepath . "/views/header.php";
   </div>
 </div>
 <script src="/resources/js/formValidation.js"></script>
-<?php include $homepath . "/views/footer.php"; ?>
+
+<?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php";?>

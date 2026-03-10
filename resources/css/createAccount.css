@@ -1,0 +1,5 @@
+.invalidUserName,
+.invalidEmail{
+    color: #dc3545;
+    font-size: .875em;
+}

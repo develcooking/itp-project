@@ -1,8 +1,10 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
-include $homepath . "/views/header.php";
+include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
+
 ?>
 
+<link rel="stylesheet" href="/resources/css/createAccount.css">
     <div class="container min-vh-100 d-flex justify-content-center align-items-center my-4">
         <div class="row w-100 justify-content-center">
             <div class="col-12 col-sm-10 col-md-8 col-lg-6">
@@ -12,30 +14,78 @@ include $homepath . "/views/header.php";
 
                         <h2 class="fw-bold mb-2">Registrieren</h2>
                         <p class="text-muted mb-4">Bitte geben Sie Ihre Daten ein.</p>
-
+                        <?php if (!empty($errors['general'])): ?>
+                                      <div class="alert alert-danger" role="alert">
+                                          <?= htmlspecialchars($errors['general']) ?>
+                                      </div>
+                                  <?php endif; ?>
                         <form method="post" action="../controllers/register.php">
 
                             <div class="form-floating mb-3">
-                                <input type="text" name="userName" id="userName" class="form-control" placeholder="Benutzername" required>
+                                <input
+                                type="text"
+                                name="userName"
+                                id="userName"
+                                class="form-control"
+                                placeholder="Benutzername"
+                                value="<?= htmlspecialchars($_POST['userName'] ?? '') ?>"
+                                required>
                                 <label for="userName">Benutzername</label>
+                                <?php if (!empty($errors['userName'])): ?>
+                                <div class="invalidUserName">
+                                    <?= htmlspecialchars($errors['userName']) ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="text" name="firstName" id="firstName" class="form-control" placeholder="Vorname" required>
+                                <input
+                                type="text"
+                                name="firstName"
+                                id="firstName"
+                                class="form-control"
+                                placeholder="Vorname"
+                                value="<?= htmlspecialchars($_POST['firstName'] ?? '') ?>"
+                                required>
                                 <label for="firstName">Vorname</label>
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="text" name="lastName" id="lastName" class="form-control" placeholder="Nachname" required>
+                                <input
+                                type="text"
+                                name="lastName"
+                                id="lastName"
+                                class="form-control"
+                                placeholder="Nachname"
+                                value="<?= htmlspecialchars($_POST['lastName'] ?? '') ?>"
+                                required>
                                 <label for="lastName">Nachname</label>
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="email" name="email" id="email" class="form-control" placeholder="E-Mail-Adresse" required>
+                                <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                class="form-control"
+                                placeholder="E-Mail-Adresse"
+                                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
+                                required>
                                 <label for="email">E-Mail-Adresse</label>
+                                <?php if (!empty($errors['email'])): ?>
+                                        <div class="invalidUserName">
+                                            <?= htmlspecialchars($errors['email']) ?>
+                                        </div>
+                                    <?php endif; ?>
                             </div>
                             <div class="form-floating mb-3 position-relative password-container">
-                                <input type="password" name="password" class="form-control pe-5" id="password" placeholder="Passwort" required>
+                                <input
+                                type="password"
+                                name="password"
+                                class="form-control pe-5"
+                                id="password"
+                                placeholder="Passwort"
+                                required>
                                 <label for="password">Passwort</label>
                                 <span class="password-eye">
                                     <img id="eyeOpen" src="/resources/imgs/eye.svg" alt="Show password" width="16" height="16" style="cursor:pointer;">
@@ -43,7 +93,13 @@ include $homepath . "/views/header.php";
                                 </span>
                             </div>
                             <div class="form-floating mb-3 position-relative password-container">
-                                <input type="password" name="password" class="form-control pe-5" id="confirmPassword" placeholder="Passwort" required>
+                                <input
+                                type="password"
+                                name="password"
+                                class="form-control pe-5"
+                                id="confirmPassword"
+                                placeholder="Passwort"
+                                required>
                                 <label for="confirmpassword">Passwort bestätigen</label>
                                 <span class="password-eye">
                                     <img id="eyeOpenConfirm" src="/resources/imgs/eye.svg" alt="Show password" width="16" height="16" style="cursor:pointer;">
@@ -53,7 +109,10 @@ include $homepath . "/views/header.php";
 
 
                             <div class="mb-3">
-                                <select name="securityQuestion" class="form-select" required>
+                                <select
+                                name="securityQuestion"
+                                class="form-select"
+                                required>
                                     <option value="" disabled selected>Bitte Sicherheitsfrage auswählen</option>
                                     <option value="pet">Wie hieß dein erstes Haustier?</option>
                                     <option value="school">Wie hieß deine Grundschule?</option>
@@ -65,12 +124,21 @@ include $homepath . "/views/header.php";
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="text" name="securityAnswer" class="form-control" placeholder="Antwort" required>
+                                <input
+                                type="text"
+                                name="securityAnswer"
+                                class="form-control"
+                                placeholder="Antwort"
+                                value="<?= htmlspecialchars($_POST['securityAnswer'] ?? '') ?>"
+                                required>
                                 <label for="securityAnswer">Antwort auf die Sicherheitsfrage</label>
                             </div>
 
                             <div class="mb-4">
-                                <select name="role" class="form-select" required>
+                                <select
+                                name="role"
+                                class="form-select"
+                                required>
                                     <option value="" disabled selected>Bitte Rolle wählen</option>
                                     <option value="Lehrer">Lehrkraft</option>
                                     <option value="Ausbilder">Ausbilder</option>
@@ -99,7 +167,7 @@ include $homepath . "/views/header.php";
 
                         <p class="mb-0">
                             Bereits einen Account?
-                            <a href="loginsite.php" class="fw-bold text-decoration-none">Hier anmelden</a>
+                            <a href="/views/loginsite.php" class="fw-bold text-decoration-none">Hier anmelden</a>
                         </p>
 
                     </div>
@@ -155,4 +223,4 @@ include $homepath . "/views/header.php";
         </div>
     </div>
 <script src="/resources/js/formValidation.js"></script>
-<?php include $homepath . "/views/footer.php"; ?>
+<?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>

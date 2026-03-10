@@ -4,21 +4,77 @@ class Post
 {
 
     private $conn;
-    private $table = 'Posts';
+    private string $table = 'Posts';
 
-    public $postId;
-    public $topicId;
-    public $userId;
-    public $content;
-    public $description;
-    public $reaction_negative;
-    public $reaction_positive;
-    public $createdBy;
-    public $modifiedBy;
+    private int $postId;
+    private int $topicId;
+    private int $userId;
+    private int $content;
+    private int $description;
+    private int $reaction_negative;
+    private int $reaction_positive;
+    private int $createdBy;
+    private int $modifiedBy;
 
     public function __construct($db)
     {
         $this->conn = $db;
+    }
+    /* #### Set functions #### */
+    public function setPostID($postId) :void {
+        $this->postId = $postId;
+    }
+    public function setTopicID($topicId) :void {
+        $this->topicId = $topicId;
+    }
+    public function setUserId($userId) :void {
+        $this->userId = $userId;
+    }
+    public function setContent($content) :void {
+        $this->content = $content;
+    }
+    public function setDescription($description) :void {
+        $this->description = $description;
+    }
+    public function setReactionNegative($reactionNegative) :void {
+        $this->reaction_negative = $reactionNegative;
+    }
+    public function setReactionPositive($reactionPositive) :void {
+        $this->reaction_positive = $reactionPositive;
+    }
+    public function setCreatedBy($createdBy) :void {
+        $this->createdBy = $createdBy;
+    }
+    public function setModifiedBy($modifiedBy) :void {
+        $this->modifiedBy = $modifiedBy;
+    }
+    /* #### Get functions #### */
+    public function getPostId():int {
+        return $this->postId;
+    }
+    public function getTopicId():int {
+        return $this->topicId;
+    }
+    public function getUserId():int {
+        return $this->userId;
+    }
+    public function getContent():string {
+        return $this->content;
+    }
+    public function getDescription():string {
+        return $this->description;
+    }
+    public function getReactionNegative():int {
+        return $this->reaction_negative;
+    }
+    public function getReactionPositive():int {
+        return $this->reaction_positive;
+    }
+    public function getCreatedBy():int {
+        return $this->createdBy;
+    }
+    public function getModifiedBy():int {
+        return $this->modifiedBy;
     }
 
     public function getAll()
@@ -52,13 +108,12 @@ class Post
     public function post()
     {
         $query = " INSERT INTO " . $this->table . "
-        (postId, topicId, userId, content, description, reaction_negative, reaction_positive,  createdBy, modifiedBy) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        (topicId, userId, content, description, reaction_negative, reaction_positive, createdBy, modifiedBy) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "iiissiiii",
-            $this->postId,
+            "iissiiii",
             $this->topicId,
             $this->userId,
             $this->content,
@@ -102,17 +157,16 @@ class Post
     public function update($postId)
     {
         $query = " UPDATE " . $this->table . " 
-        SET topicId = ?, userId = ?, content = ?, description = ?, reaction_negative = ?, reaction_positive  WHERE postId = ?";
+        SET content = ?, description = ?, reaction_negative = ?, reaction_positive = ? WHERE postId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "iissii",
-            $this->topicId,
-            $this->userId,
+            "ssiii",
             $this->content,
             $this->description,
             $this->reaction_negative,
             $this->reaction_positive,
+            $postId
         );
 
         if ($stmt->execute()) {
@@ -128,7 +182,7 @@ class Post
     {
         $query = "DELETE FROM " . $this->table . " WHERE postId = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $this->postId);
+        $stmt->bind_param("i", $postId);
         if ($stmt->execute()) {
             $stmt->close();
             return true;
@@ -136,6 +190,19 @@ class Post
 
         $stmt->close();
         return false;
+    }
+
+    private function mapData($row)
+    {
+        $this->postId = $row['postId'];
+        $this->topicId = $row['topicId'];
+        $this->userId = $row['userId'];
+        $this->content = $row['content'];
+        $this->description = $row['description'];
+        $this->reaction_negative = $row['reaction_negative'];
+        $this->reaction_positive = $row['reaction_positive'];
+        $this->createdBy = $row['createdBy'];
+        $this->modifiedBy = $row['modifiedBy'];
     }
 
 

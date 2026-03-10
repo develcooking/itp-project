@@ -30,15 +30,22 @@ unset($_SESSION['reset_error']);
                 <?php endif; ?>
 
                 <form method="post" action="/controllers/passwordReset.php">
-                    <div class="form-floating mb-3">
-                        <input type="password" name="newPassword" class="form-control" required>
-                        <label>Neues Passwort</label>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input type="password" name="confirmPassword" class="form-control" required>
-                        <label>Passwort bestätigen</label>
-                    </div>
+                    <div class="form-floating mb-3 position-relative password-container">
+                                <input type="password" name="newPassword" class="form-control pe-5" id="passwordReset" placeholder="Passwort" required>
+                                <label for="password">Passwort</label>
+                                <span class="password-eye">
+                                    <img id="eyeOpenReset" src="/resources/imgs/eye.svg" alt="Show password" width="16" height="16" style="cursor:pointer;">
+                                    <img id="eyeSlashReset" src="/resources/imgs/eye-slash.svg" alt="Hide password" width="16" height="16" style="cursor:pointer; display:none;">
+                                </span>
+                            </div>
+                            <div class="form-floating mb-3 position-relative password-container">
+                                <input type="password" name="confirmPassword" class="form-control pe-5" id="confirmPasswordReset" placeholder="Passwort" required>
+                                <label for="confirmpassword">Passwort bestätigen</label>
+                                <span class="password-eye">
+                                    <img id="eyeOpenConfirmReset" src="/resources/imgs/eye.svg" alt="Show password" width="16" height="16" style="cursor:pointer;">
+                                    <img id="eyeSlashConfirmReset" src="/resources/imgs/eye-slash.svg" alt="Hide password" width="16" height="16" style="cursor:pointer; display:none;">
+                                </span>
+                            </div>
 
                     <button class="btn btn-outline-primary btn-lg w-100" type="submit" name="passwordReset" value="1">
                         Bestätigen
