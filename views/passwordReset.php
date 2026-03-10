@@ -19,17 +19,17 @@ unset($_SESSION['reset_error']);
 
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php"; ?>
 
-<div class="container min-vh-100 d-flex justify-content-center align-items-center">
-    <div class="row w-100 justify-content-center">
-        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+<div class="container d-flex justify-content-center align-items-center m-5">
+    <div class="row w-100 justify-content-center m-5">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 p-3">
             <div class="card bg-light shadow p-4 text-center">
-                <h2 class="fw-bold mb-2">Neues Passwort festlegen</h2>
+                <h2 class="fw-bold mb-2">Neues Passwort</h2>
 
                 <?php if ($error): ?>
                     <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
 
-                <form method="post" action="/controllers/passwordReset.php">
+                <form method="post" class="p-3" action="/controllers/passwordReset.php">
                     <div class="form-floating mb-3 position-relative password-container">
                                 <input type="password" name="newPassword" class="form-control pe-5" id="passwordReset" placeholder="Passwort" required>
                                 <label for="password">Passwort</label>
@@ -55,5 +55,6 @@ unset($_SESSION['reset_error']);
         </div>
     </div>
 </div>
+                </main>
 <script src="/resources/js/formValidation.js"></script>
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>

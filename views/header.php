@@ -1,14 +1,16 @@
-<?php include $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";?>
 <?php
-// Get the current page name from the URL
+include $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
+include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+
+// Get current page name
 $current_page = basename($_SERVER['REQUEST_URI'], '.php');
-if (empty($current_page) || $current_page === '') {
+if (empty($current_page)) {
     $current_page = 'index';
 }
 ?>
 
 <!DOCTYPE html>
-<html land="de-DE">
+<html lang="de-DE">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,31 +21,37 @@ if (empty($current_page) || $current_page === '') {
     <link rel="stylesheet" type="text/css" href="/resources/css/styles.css">
 </head>
 <body>
-    <div class="header">
-        <a class="hat" href="../index.php" tabindex="-1">
-            <h2>Ausbildungsportal.net</h2>
+
+<?php if (empty($_SESSION['userId'])): ?>
+    <!-- Header (logo only) for not logged-in users -->
+    <header class="header d-flex align-items-center justify-content-between px-3">
+        <a class="hat" href="../index.php">
+            <img src="/resources/imgs/logo.jpeg" alt="Ausbildungsportal.net Logo" class="site-logo">
         </a>
-
         <div id="headerspacer"></div>
-    </div>
+    </header>
+<?php endif; ?>
 
-    <?php if (!empty($_SESSION['userId'])): ?>
-    <nav class="navbar">
-        <a href="/views/startpage.php" class="nav-btn <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
-        <!-- <a href="/views/loginsite.php" class="nav-btn <?=  $current_page === 'loginsite' ? 'current' : ''; ?>">Login</a> -->
-        <a href="/views/appointmentManagement.php" class="nav-btn <?=  $current_page === 'appointmentManagement' ? 'current' : ''; ?>">Termine</a>
-        <a href="/views/forum_start.php" class="nav-btn <?=  $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
-        <?php if ($_SESSION['role'] === 'Admin'): ?>   <!-- Nur Admins dürfen Adminpage sehen  !-->
-        <a href="/views/adminPage.php" class="nav-btn <?= $current_page === 'adminPage' ? 'current' : ''; ?>">Admin</a>
-         <?php endif; ?>
-        <form method="post" action="/controllers/login.php" class="nav-logout-form">
-            <button type="submit" name="logout" class="nav-btn">Abmelden</button>
-        </form>
-    </nav>
+<!-- Navbar (always visible when logged in) -->
+<?php if (!empty($_SESSION['userId'])): ?>
+<nav class="navbar justify-content-start border-2 border-bottom p-0">
+    <a href="../index.php" class="logo border-end">
+        <img src="/resources/imgs/logo.jpeg" alt="Ausbildungsportal.net Logo" class="nav-logo">
+    </a>
+    <a href="/views/startpage.php" class="nav-btn-primary border-end <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
+    <a href="/views/appointmentManagement.php" class="nav-btn-primary border-end <?= $current_page === 'appointmentManagement' ? 'current' : ''; ?>">Termine</a>
+    <a href="/views/forum_start.php" class="nav-btn-primary border-end<?= $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
+    <?php if ($_SESSION['role'] === 'Admin'): ?>
+        <a href="/views/adminPage.php" class="nav-btn-primary border-end <?= $current_page === 'adminPage' ? 'current' : ''; ?>">Admin</a>
     <?php endif; ?>
+    <form method="post" action="/controllers/login.php" class="nav-logout-form">
+        <button type="submit" name="logout" class="btn-outline-primary rounded-0">Abmelden</button>
+    </form>
+</nav>
+<?php endif; ?>
 
-<div class="main-container">
-        <!--  -->
+<div class="main-container align-items-center">
+
 
 
 

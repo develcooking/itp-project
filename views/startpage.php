@@ -4,3 +4,4 @@ include $homepath . "/views/header.php";
 
 ?>
 <p> Startpage of Ausbildungsportal.Net</p>
+<?php include $homepath . "/views/footer.php"; ?>

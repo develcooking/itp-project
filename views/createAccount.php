@@ -217,5 +217,6 @@ include $homepath . "/views/header.php";
             </div>
         </div>
     </div>
+                </main>
 <script src="/resources/js/formValidation.js"></script>
 <?php include $homepath . "/views/footer.php"; ?>

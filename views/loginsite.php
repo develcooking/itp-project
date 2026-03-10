@@ -3,9 +3,9 @@ include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include $homepath . "/views/header.php";
 ?>
 
-<div class="container min-vh-100 d-flex justify-content-center align-items-center">
+<div class="flex-grow-1 d-flex justify-content-center align-items-center m-5">
   <div class="row w-100 justify-content-center">
-    <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 p-3">
       
       <?php if (!isset($_SESSION['user'])): ?>
         <div class="card bg-light shadow p-4 text-center">
@@ -13,7 +13,7 @@ include $homepath . "/views/header.php";
           <h2 class="fw-bold mb-2">Anmelden</h2>
           <p class="text-muted mb-4">Bitte geben Sie Ihre Zugangsdaten ein.</p>
 
-          <form method="post" action="../controllers/login.php">
+          <form method="post" class="p-3" action="../controllers/login.php">
 
             <div class="form-floating mb-3">
               <input type="email" name="email" class="form-control" id="emailLogin" placeholder="E-Mail-Adresse" required>
@@ -59,5 +59,6 @@ include $homepath . "/views/header.php";
     </div>
   </div>
 </div>
+      </main>
 <script src="/resources/js/formValidation.js"></script>
 <?php include $homepath . "/views/footer.php"; ?>
