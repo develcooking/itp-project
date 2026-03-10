@@ -80,7 +80,6 @@ include $homepath . "/views/header.php";
                                 class="form-control pe-5"
                                 id="password"
                                 placeholder="Passwort"
-                                value="<?= htmlspecialchars($_POST['password'] ?? '') ?>"
                                 required>
                                 <label for="password">Passwort</label>
                                 <span class="password-eye">
@@ -95,7 +94,6 @@ include $homepath . "/views/header.php";
                                 class="form-control pe-5"
                                 id="confirmPassword"
                                 placeholder="Passwort"
-                                value="<?= htmlspecialchars($_POST['password'] ?? '') ?>"
                                 required>
                                 <label for="confirmpassword">Passwort bestätigen</label>
                                 <span class="password-eye">
