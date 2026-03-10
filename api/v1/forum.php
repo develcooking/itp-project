@@ -81,7 +81,7 @@ if ($resource === 'topics') {
             if (!$topic->getById($id)) sendResponse(false, null, 'Topic not found', 404);
 
             if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $topic->userId) {
-                sendResponse(false, null, 'Unauthorized', 403);
+                sendResponse(false, null, 'Unauthorized', 401);
             }
 
             if (isset($data['name'])) $topic->name = $data['name'];
@@ -102,7 +102,7 @@ if ($resource === 'topics') {
             if (!$topic->getById(intval($id))) sendResponse(false, null, 'Topic not found', 404);
 
             if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $topic->userId) {
-                sendResponse(false, null, 'Unauthorized', 403);
+                sendResponse(false, null, 'Unauthorized', 401);
             }
 
             if ($topic->delete(intval($id))) {
@@ -175,7 +175,7 @@ if ($resource === 'topics') {
             if (!$post->getById($id)) sendResponse(false, null, 'Post not found', 404);
 
             if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $post->userId) {
-                sendResponse(false, null, 'Unauthorized', 403);
+                sendResponse(false, null, 'Unauthorized', 401);
             }
 
             if (isset($data['content'])) $post->content = $data['content'];
@@ -198,7 +198,7 @@ if ($resource === 'topics') {
             if (!$post->getById(intval($id))) sendResponse(false, null, 'Post not found', 404);
 
             if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $post->userId) {
-                sendResponse(false, null, 'Unauthorized', 403);
+                sendResponse(false, null, 'Unauthorized', 401);
             }
 
             if ($post->delete(intval($id))) {

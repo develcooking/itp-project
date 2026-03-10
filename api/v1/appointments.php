@@ -102,7 +102,7 @@ switch ($method) {
         }
 
         if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $appointment->getCreatedBy()) {
-            sendResponse(false, null, 'Unauthorized', 403);
+            sendResponse(false, null, 'Unauthorized', 401);
         }
 
         if ($appointment->delete(intval($id))) {

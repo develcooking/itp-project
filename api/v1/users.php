@@ -61,7 +61,7 @@ switch ($method) {
         
         // Only admin or the user themselves can update
         if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $userId) {
-            sendResponse(false, null, 'Unauthorized', 403);
+            sendResponse(false, null, 'Unauthorized', 401);
         }
 
         if (!$user->getById($userId)) sendResponse(false, null, 'User not found', 404);
