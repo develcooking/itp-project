@@ -15,22 +15,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createAccount'])) {
     $securityAnswer = htmlspecialchars(trim($_POST['securityAnswer'] ?? ''));
 
     if (empty($userName) || empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($role) || empty($securityAnswer)) {
-        http_response_code(400);
         $errors = 'Bitte füllen Sie alle Felder aus!';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        http_response_code(400);
         $errors['email'] = 'Ungültiges E-Mail-Format!';
     } elseif (strlen($password) < 6) {
-        http_response_code(400);
         $errors['password'] = 'Passwort muss mindestens 6 Zeichen lang sein!';
     } else {
         $user = new User($conn);
 
         if ($user->emailExists($email)) {
-            http_response_code(409);
             $errors['email'] = 'Diese E-Mail-Adresse ist bereits registriert!';
         } elseif ($user->userNameExists($userName)) {
-            http_response_code(409);
             $errors['userName'] = 'Dieser Benutzername ist bereits registriert!';
         } else {
             $user->setUserName($userName);
@@ -49,7 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createAccount'])) {
                 header("Location: /views/successRegister.php", true, 303);
                 exit();
             } else {
-                http_response_code(500);
                 $errors = 'Fehler beim Registrieren. Bitte versuchen Sie es später erneut.';
             }
         }
