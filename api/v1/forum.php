@@ -67,7 +67,7 @@ if ($resource === 'topics') {
             $topic->modifiedBy = $_SESSION['userId'];
 
             if ($topic->post()) {
-                sendResponse(true, ['topicId' => $conn->insert_id], 'Topic created successfully', 201);
+                sendResponse(true, ['topicId' => $conn->insert_id], 'Topic created successfully', 204);
             } else {
                 sendResponse(false, null, 'Failed to create topic', 500);
             }
@@ -88,7 +88,7 @@ if ($resource === 'topics') {
             if (isset($data['jobId'])) $topic->jobId = intval($data['jobId']);
 
             if ($topic->update($id)) {
-                sendResponse(true, null, 'Topic updated successfully');
+                sendResponse(true, null, 'Topic updated successfully', 204);
             } else {
                 sendResponse(false, null, 'Failed to update topic', 500);
             }
@@ -102,11 +102,11 @@ if ($resource === 'topics') {
             if (!$topic->getById(intval($id))) sendResponse(false, null, 'Topic not found', 404);
 
             if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $topic->userId) {
-                sendResponse(false, null, 'Unauthorized', 401);
+                sendResponse(false, null, 'Unauthorized', 403);
             }
 
             if ($topic->delete(intval($id))) {
-                sendResponse(true, null, 'Topic deleted successfully');
+                sendResponse(true, null, 'Topic deleted successfully', 204);
             } else {
                 sendResponse(false, null, 'Failed to delete topic', 500);
             }
@@ -175,7 +175,7 @@ if ($resource === 'topics') {
             if (!$post->getById($id)) sendResponse(false, null, 'Post not found', 404);
 
             if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $post->userId) {
-                sendResponse(false, null, 'Unauthorized', 401);
+                sendResponse(false, null, 'Unauthorized', 403);
             }
 
             if (isset($data['content'])) $post->content = $data['content'];
@@ -197,6 +197,9 @@ if ($resource === 'topics') {
             if (!$id) sendResponse(false, null, 'Missing postId', 400);
             if (!$post->getById(intval($id))) sendResponse(false, null, 'Post not found', 404);
 
+            if (empty($_SESSION['userId'])) {
+                sendResponse(false, null, 'Unauthorized: Login required', 401);
+            }
             if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $post->userId) {
                 sendResponse(false, null, 'Unauthorized', 401);
             }

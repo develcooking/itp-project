@@ -7,8 +7,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-include_once __DIR__ . "/../database/db.php";
-include_once __DIR__ . "/../models/Job.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Job.php";
 include_once __DIR__ . "/api_helper.php";
 
 if (!isset($_SESSION)) session_start();
@@ -20,8 +20,6 @@ switch ($method) {
     case 'GET':
         if (isset($_GET['id'])) {
             if ($job->getById(intval($_GET['id']))) {
-                // Job model doesn't have a toArray yet, but let's build a simple one or just fetch what we need.
-                // Re-mapping from model properties manually since Job.php lacks toArray
                 $data = [
                     'jobId' => $_GET['id'],
                     'name' => $job->getNameById(intval($_GET['id']))
@@ -59,7 +57,7 @@ switch ($method) {
         }
 
         if ($job->update(intval($data['jobId']), $data['name'])) {
-            sendResponse(true, null, 'Job updated successfully');
+            sendResponse(true, null, 'Job updated successfully', 204);
         } else {
             sendResponse(false, null, 'Failed to update job', 500);
         }
@@ -73,7 +71,7 @@ switch ($method) {
         if (!$id) sendResponse(false, null, 'Missing jobId', 400);
 
         if ($job->delete(intval($id))) {
-            sendResponse(true, null, 'Job deleted successfully');
+            sendResponse(true, null, 'Job deleted successfully', 204);
         } else {
             sendResponse(false, null, 'Failed to delete job', 500);
         }
