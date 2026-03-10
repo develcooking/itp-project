@@ -4,12 +4,63 @@ class Topic
 {
     private $conn;
     private $table = 'Topics';
-    public $topicId;
-    public $name;
-    public $jobId;
-    public $userId;
-    public $createdBy;
-    public $modifiedBy;
+    private int $topicId;
+    private string $name;
+    private int $jobId;
+    private int $userId;
+    private int $createdBy;
+    private int $modifiedBy;
+
+    /* #### Set functions #### */
+    public function setTopicId($topicId): void
+    {
+        $this->topicId = $topicId;
+    }
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+    public function setJobId(int $jobId): void
+    {
+        $this->jobId = $jobId;
+    }
+    public function setUserId(int $userId): void
+    {
+        $this->userId = $userId;
+    }
+    public function setCreatedBy(int $userId): void
+    {
+        $this->createdBy = $userId;
+    }
+    public function setModifiedBy(int $userId): void
+    {
+        $this->modifiedBy = $userId;
+    }
+    /* #### Get functions #### */
+    public function getTopicId(): int
+    {
+        return $this->topicId;
+    }
+    public function getName(): string
+    {
+        return $this->name;
+    }
+    public function getJobId(): int
+    {
+        return $this->jobId;
+    }
+    public function getUserId(): int
+    {
+        return $this->userId;
+    }
+    public function getCreatedBy(): int
+    {
+        return $this->createdBy;
+    }
+    public function getModifiedBy(): int
+    {
+        return $this->modifiedBy;
+    }
 
     public function __construct($db)
     {

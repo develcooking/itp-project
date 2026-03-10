@@ -73,6 +73,9 @@ switch ($method) {
             sendResponse(false, null, 'Appointment not found', 404);
         }
 
+        if (empty($_SESSION['userId'])) {
+            sendResponse(false, null, 'Unauthorized: Login required', 401);
+        }
         // Only admin or creator can update
         if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $appointment->getCreatedBy()) {
             sendResponse(false, null, 'Unauthorized', 403);
@@ -84,7 +87,7 @@ switch ($method) {
         if (isset($data['description'])) $appointment->setDescription($data['description']);
 
         if ($appointment->update($id)) {
-            sendResponse(true, null, 'Appointment updated successfully');
+            sendResponse(true, null, 'Appointment updated successfully', 204);
         } else {
             sendResponse(false, null, 'Failed to update appointment', 500);
         }
@@ -101,6 +104,9 @@ switch ($method) {
             sendResponse(false, null, 'Appointment not found', 404);
         }
 
+        if (empty($_SESSION['userId'])) {
+            sendResponse(false, null, 'Unauthorized: Login required', 401);
+        }
         if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $appointment->getCreatedBy()) {
             sendResponse(false, null, 'Unauthorized', 401);
         }

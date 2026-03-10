@@ -26,6 +26,6 @@ function checkAdmin() {
 function checkLoggedIn() {
     if (!isset($_SESSION)) session_start();
     if (!isset($_SESSION['userId'])) {
-        sendResponse(false, null, 'Unauthorized: Login required', 401);
+        sendResponse(false, null, 'Unauthorized: Login required', 403);
     }
 }
