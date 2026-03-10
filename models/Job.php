@@ -4,7 +4,6 @@ class Job
 {
     private $conn;
     private $table = "Jobs";
-
     private $jobId;
     private $name;
     private $createdBy;
@@ -13,6 +12,17 @@ class Job
     public function __construct($db)
     {
         $this->conn = $db;
+    }
+    public function setJobName($name)
+    {
+        $this->name = $name;
+    }
+    public function setCreateBy($id)
+    {
+        $this->createdBy = $id;
+    }
+    public function setModifiedBy($id) {
+        $this->modifiedBy = $id;
     }
  
 
@@ -42,7 +52,7 @@ class Job
     public function post()
     {
         $query = " INSERT INTO " . $this->table . "
-        (name ) VALUES (?, ?, ?)";
+        (name, createdBy, modifiedBy ) VALUES (?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
@@ -106,12 +116,13 @@ class Job
 
     public function update($jobId, $name): bool {
         $query = " UPDATE " . $this->table . " 
-        SET name = ?, WHERE jobId = ?";
+        SET name = ? WHERE jobId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "s",
-            $name
+            "si",
+            $name,
+            $jobId
         );
 
         if ($stmt->execute()) {

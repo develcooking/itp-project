@@ -52,13 +52,12 @@ class Post
     public function post()
     {
         $query = " INSERT INTO " . $this->table . "
-        (postId, topicId, userId, content, description, reaction_negative, reaction_positive,  createdBy, modifiedBy) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        (topicId, userId, content, description, reaction_negative, reaction_positive, createdBy, modifiedBy) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "iiissiiii",
-            $this->postId,
+            "iissiiii",
             $this->topicId,
             $this->userId,
             $this->content,
@@ -102,17 +101,16 @@ class Post
     public function update($postId)
     {
         $query = " UPDATE " . $this->table . " 
-        SET topicId = ?, userId = ?, content = ?, description = ?, reaction_negative = ?, reaction_positive  WHERE postId = ?";
+        SET content = ?, description = ?, reaction_negative = ?, reaction_positive = ? WHERE postId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "iissii",
-            $this->topicId,
-            $this->userId,
+            "ssiii",
             $this->content,
             $this->description,
             $this->reaction_negative,
             $this->reaction_positive,
+            $postId
         );
 
         if ($stmt->execute()) {
@@ -128,7 +126,7 @@ class Post
     {
         $query = "DELETE FROM " . $this->table . " WHERE postId = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $this->postId);
+        $stmt->bind_param("i", $postId);
         if ($stmt->execute()) {
             $stmt->close();
             return true;
@@ -136,6 +134,19 @@ class Post
 
         $stmt->close();
         return false;
+    }
+
+    private function mapData($row)
+    {
+        $this->postId = $row['postId'];
+        $this->topicId = $row['topicId'];
+        $this->userId = $row['userId'];
+        $this->content = $row['content'];
+        $this->description = $row['description'];
+        $this->reaction_negative = $row['reaction_negative'];
+        $this->reaction_positive = $row['reaction_positive'];
+        $this->createdBy = $row['createdBy'];
+        $this->modifiedBy = $row['modifiedBy'];
     }
 
 

@@ -1,0 +1,215 @@
+<?php
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit;
+}
+include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Topic.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Post.php";
+include_once __DIR__ . "/api_helper.php";
+
+if (!isset($_SESSION)) session_start();
+
+$method = $_SERVER['REQUEST_METHOD'];
+$resource = $_GET['resource'] ?? 'topics'; // 'topics' or 'posts'
+
+if ($resource === 'topics') {
+    $topic = new Topic($conn);
+    switch ($method) {
+        case 'GET':
+            if (isset($_GET['id'])) {
+                if ($topic->getById(intval($_GET['id']))) {
+                    $data = [
+                        'topicId' => $topic->topicId,
+                        'name' => $topic->name,
+                        'jobId' => $topic->jobId,
+                        'userId' => $topic->userId,
+                        'createdBy' => $topic->createdBy,
+                        'modifiedBy' => $topic->modifiedBy
+                    ];
+                    sendResponse(true, $data);
+                } else {
+                    sendResponse(false, null, 'Topic not found', 404);
+                }
+            } elseif (isset($_GET['name'])) {
+                if ($topic->getByName($_GET['name'])) {
+                    $data = [
+                        'topicId' => $topic->topicId,
+                        'name' => $topic->name,
+                        'jobId' => $topic->jobId,
+                        'userId' => $topic->userId,
+                        'createdBy' => $topic->createdBy,
+                        'modifiedBy' => $topic->modifiedBy
+                    ];
+                    sendResponse(true, $data);
+                } else {
+                    sendResponse(false, null, 'Topic not found', 404);
+                }
+            }
+            else {
+                sendResponse(true, $topic->getAll());
+            }
+            break;
+
+        case 'POST':
+            checkLoggedIn();
+            $data = getJsonInput();
+            if (!$data || !isset($data['name']) || !isset($data['jobId'])) {
+                sendResponse(false, null, 'Missing title or jobId', 400);
+            }
+            $topic->name = $data['name'];
+            $topic->jobId = intval($data['jobId']);
+            $topic->userId = $_SESSION['userId'];
+            $topic->createdBy = $_SESSION['userId'];
+            $topic->modifiedBy = $_SESSION['userId'];
+
+            if ($topic->post()) {
+                sendResponse(true, ['topicId' => $conn->insert_id], 'Topic created successfully', 201);
+            } else {
+                sendResponse(false, null, 'Failed to create topic', 500);
+            }
+            break;
+
+        case 'PUT':
+            checkLoggedIn();
+            $data = getJsonInput();
+            if (!$data || !isset($data['topicId'])) sendResponse(false, null, 'Missing topicId', 400);
+            $id = intval($data['topicId']);
+            if (!$topic->getById($id)) sendResponse(false, null, 'Topic not found', 404);
+
+            if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $topic->userId) {
+                sendResponse(false, null, 'Unauthorized', 403);
+            }
+
+            if (isset($data['name'])) $topic->name = $data['name'];
+            if (isset($data['jobId'])) $topic->jobId = intval($data['jobId']);
+
+            if ($topic->update($id)) {
+                sendResponse(true, null, 'Topic updated successfully');
+            } else {
+                sendResponse(false, null, 'Failed to update topic', 500);
+            }
+            break;
+
+        case 'DELETE':
+            checkLoggedIn();
+            $data = getJsonInput();
+            $id = $data['topicId'] ?? $_GET['id'] ?? null;
+            if (!$id) sendResponse(false, null, 'Missing topicId', 400);
+            if (!$topic->getById(intval($id))) sendResponse(false, null, 'Topic not found', 404);
+
+            if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $topic->userId) {
+                sendResponse(false, null, 'Unauthorized', 403);
+            }
+
+            if ($topic->delete(intval($id))) {
+                sendResponse(true, null, 'Topic deleted successfully');
+            } else {
+                sendResponse(false, null, 'Failed to delete topic', 500);
+            }
+            break;
+    }
+} elseif ($resource === 'posts') {
+    $post = new Post($conn);
+    switch ($method) {
+        case 'GET':
+            if (isset($_GET['id'])) {
+                if ($post->getById(intval($_GET['id']))) {
+                    $data = [
+                        'postId' => $post->postId,
+                        'topicId' => $post->topicId,
+                        'userId' => $post->userId,
+                        'content' => $post->content,
+                        'description' => $post->description,
+                        'reaction_negative' => $post->reaction_negative,
+                        'reaction_positive' => $post->reaction_positive,
+                        'createdBy' => $post->createdBy,
+                        'modifiedBy' => $post->modifiedBy
+                    ];
+                    sendResponse(true, $data);
+                } else {
+                    sendResponse(false, null, 'Post not found', 404);
+                }
+            } else {
+                // Optionally filter by topicId
+                $allPosts = $post->getAll();
+                if (isset($_GET['topicId'])) {
+                    $allPosts = array_values(array_filter($allPosts, function($p) {
+                        return $p['topicId'] == $_GET['topicId'];
+                    }));
+                }
+                sendResponse(true, $allPosts);
+            }
+            break;
+
+        case 'POST':
+            checkLoggedIn();
+            $data = getJsonInput();
+            if (!$data || !isset($data['topicId']) || !isset($data['content'])) {
+                sendResponse(false, null, 'Missing topicId or content', 400);
+            }
+            $post->topicId = intval($data['topicId']);
+            $post->userId = $_SESSION['userId'];
+            $post->content = $data['content'];
+            $post->description = $data['description'] ?? '';
+            $post->reaction_negative = 0;
+            $post->reaction_positive = 0;
+            $post->createdBy = $_SESSION['userId'];
+            $post->modifiedBy = $_SESSION['userId'];
+
+            if ($post->post()) {
+                sendResponse(true, ['postId' => $conn->insert_id], 'Post created successfully', 201);
+            } else {
+                sendResponse(false, null, 'Failed to create post', 500);
+            }
+            break;
+
+        case 'PUT':
+            checkLoggedIn();
+            $data = getJsonInput();
+            if (!$data || !isset($data['postId'])) sendResponse(false, null, 'Missing postId', 400);
+            $id = intval($data['postId']);
+            if (!$post->getById($id)) sendResponse(false, null, 'Post not found', 404);
+
+            if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $post->userId) {
+                sendResponse(false, null, 'Unauthorized', 403);
+            }
+
+            if (isset($data['content'])) $post->content = $data['content'];
+            if (isset($data['description'])) $post->description = $data['description'];
+            if (isset($data['reaction_negative'])) $post->reaction_negative = intval($data['reaction_negative']);
+            if (isset($data['reaction_positive'])) $post->reaction_positive = intval($data['reaction_positive']);
+
+            if ($post->update($id)) {
+                sendResponse(true, null, 'Post updated successfully');
+            } else {
+                sendResponse(false, null, 'Failed to update post', 500);
+            }
+            break;
+
+        case 'DELETE':
+            checkLoggedIn();
+            $data = getJsonInput();
+            $id = $data['postId'] ?? $_GET['id'] ?? null;
+            if (!$id) sendResponse(false, null, 'Missing postId', 400);
+            if (!$post->getById(intval($id))) sendResponse(false, null, 'Post not found', 404);
+
+            if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $post->userId) {
+                sendResponse(false, null, 'Unauthorized', 403);
+            }
+
+            if ($post->delete(intval($id))) {
+                sendResponse(true, null, 'Post deleted successfully');
+            } else {
+                sendResponse(false, null, 'Failed to delete post', 500);
+            }
+            break;
+    }
+} else {
+    sendResponse(false, null, 'Invalid resource', 400);
+}
+
+$conn->close();
