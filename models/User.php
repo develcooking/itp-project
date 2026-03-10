@@ -281,7 +281,7 @@ class User
     {
         $query = "DELETE FROM " . $this->table . " WHERE userid = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $this->userId);
+        $stmt->bind_param("i", $userId);
         if ($stmt->execute()) {
             $stmt->close();
             return true;
