@@ -8,17 +8,17 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
     <!-- DataTables JS -->
     <script src="../resources/js/datatables.min.js"></script>
 
-    <div style="padding: 0 20px; font-family: Arial, Helvetica, sans-serif;">
+    <div class="container-fluid px-3">
 
-    <h1 style="font-size: 1.8rem; font-weight: 600; margin-top: 28px; margin-bottom: 28px; color: #333;">Benutzerverwaltung</h1>
+    <h1 class="fw-bold my-4">Benutzerverwaltung</h1>
 
     <!-- Box: Nicht aktivierte Benutzer -->
-    <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 24px; margin-bottom: 28px;">
-        <h2 style="font-size: 1.3rem; font-weight: 600; margin: 0 0 16px 0; color: #444;">Noch nicht aktivierte Benutzer</h2>
+    <div class="card bg-white shadow p-4 mb-4">
+        <h2 class="h5 fw-semibold mb-3">Noch nicht aktivierte Benutzer</h2>
         <?php if (empty($pendingUsers)): ?>
-            <p style="font-size: 1.1rem; color: #888; margin: 12px 0 0 0;">Aktuell liegen keine neuen Anfragen vor.</p>
+            <p class="text-muted mt-2">Aktuell liegen keine neuen Anfragen vor.</p>
         <?php else: ?>
-        <table id="pendingUsersTable" class="display" style="width:100%">
+        <table id="pendingUsersTable" class="display w-100">
             <thead>
             <tr>
                 <th>Benutzername</th>
@@ -27,7 +27,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
                 <th>Email</th>
                 <th>Rolle</th>
                 <th>Wann</th>
-                <th>Aktionen</th>
+                <th class="w-auto">Aktionen</th>
             </tr>
             </thead>
             <tbody>
@@ -39,9 +39,9 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
                     <td><?= htmlspecialchars($user['email'] ?? '') ?></td>
                     <td><?= htmlspecialchars($user['role'] ?? '') ?></td>
                     <td><?= $user['createdAt'] ? date('d.m.Y H:i', strtotime($user['createdAt'])) : '' ?></td>
-                    <td style="white-space:nowrap; width:1%;">
-                        <button class="accept-btn" data-user-id="<?= $user['userId'] ?>" style="margin-right:4px; background-color:#28a745; color:#fff; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">Akzeptieren</button>
-                        <button class="reject-btn" data-user-id="<?= $user['userId'] ?>" style="background-color:#dc3545; color:#fff; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">Ablehnen</button>
+                    <td class="text-nowrap" style="width:1%">
+                        <button class="btn btn-success btn-sm me-1 accept-btn" data-user-id="<?= $user['userId'] ?>">Akzeptieren</button>
+                        <button class="btn btn-danger btn-sm reject-btn" data-user-id="<?= $user['userId'] ?>">Ablehnen</button>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -51,9 +51,9 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
     </div>
 
     <!-- Box: Aktivierte Benutzer -->
-    <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 24px; margin-bottom: 28px;">
-        <h2 style="font-size: 1.3rem; font-weight: 600; margin: 0 0 16px 0; color: #444;">Aktivierte Benutzer</h2>
-        <table id="usersTable" class="display" style="width:100%">
+    <div class="card bg-white shadow p-4 mb-4">
+        <h2 class="h5 fw-semibold mb-3">Aktivierte Benutzer</h2>
+        <table id="usersTable" class="display w-100">
             <thead>
             <tr>
                 <th>Benutzername</th>
@@ -62,7 +62,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
                 <th>Email</th>
                 <th>Rolle</th>
                 <th>Wann</th>
-                <th>Berufsbereiche</th>
+                <th class="w-auto">Berufsbereiche</th>
             </tr>
             </thead>
             <tbody>
@@ -74,8 +74,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
                     <td><?= htmlspecialchars($user['email'] ?? '') ?></td>
                     <td><?= htmlspecialchars($user['role'] ?? '') ?></td>
                     <td><?= $user['createdAt'] ? date('d.m.Y H:i', strtotime($user['createdAt'])) : '' ?></td>
-                    <td style="white-space:nowrap; width:1%;">
-                        <button class="jobs-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">
+                    <td class="text-nowrap" style="width:1%">
+                        <button class="btn btn-primary btn-sm jobs-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">
                             Berufsbereiche
                         </button>
                     </td>
@@ -85,21 +85,26 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
         </table>
     </div>
 <!-- Jobs Modal -->
-<div id="jobsModalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
-    <div style="background:#fff; border-radius:8px; width:500px; max-width:90%; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
-        <div style="padding:16px 20px; border-bottom:1px solid #dee2e6;">
-            <h4 id="jobsModalTitle" style="margin:0;">Berufsbereiche</h4>
-        </div>
-        <div id="jobsModalBody" style="padding:16px 20px; overflow-y:auto; flex:1;">
-            <p>Laden...</p>
-        </div>
-        <div style="padding:12px 20px; border-top:1px solid #dee2e6; text-align:right;">
-            <button id="jobsModalClose" style="padding:6px 20px; cursor:pointer;">OK</button>
+<div class="modal fade" id="jobsModal" tabindex="-1" aria-labelledby="jobsModalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="jobsModalTitle">Berufsbereiche</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="jobsModalBody">
+                <p>Laden...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+            </div>
         </div>
     </div>
 </div>
     </div>
 </main>
+
+<?php include './footer.php'; ?>
 
 <script>
     $(document).ready(function() {
@@ -174,84 +179,74 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
                 }
             });
         });
-    });
 
-    // Berufsbereiche Modal
-    const overlay = $('#jobsModalOverlay');
-    const modalTitle = $('#jobsModalTitle');
-    const modalBody = $('#jobsModalBody');
+        // Berufsbereiche Modal
+        const jobsModalEl = document.getElementById('jobsModal');
+        const jobsModal = new bootstrap.Modal(jobsModalEl);
+        const modalTitle = $('#jobsModalTitle');
+        const modalBody = $('#jobsModalBody');
 
-    // Open modal
-    $(document).on('click', '.jobs-btn', function() {
-        const userId = $(this).data('userId');
-        const userName = $(this).data('username');
-        modalTitle.text('Berufsbereiche von ' + userName);
-        modalBody.html('<p>Laden...</p>');
-        overlay.css('display', 'flex');
+        // Open modal
+        $(document).on('click', '.jobs-btn', function() {
+            const userId = $(this).data('userId');
+            const userName = $(this).data('username');
+            modalTitle.text('Berufsbereiche von ' + userName);
+            modalBody.html('<p>Laden...</p>');
+            jobsModal.show();
 
-        $.ajax({
-            url: '/controllers/admin.php',
-            type: 'POST',
-            dataType: 'json',
-            data: { action: 'getJobsForUser', userId: userId },
-            success: function(response) {
-                if (response.success) {
-                    let html = '<div style="display:flex; flex-direction:column; gap:8px;">';
-                    if (response.jobs.length === 0) {
-                        html += '<p>Keine Berufsbereiche vorhanden.</p>';
+            $.ajax({
+                url: '/controllers/admin.php',
+                type: 'POST',
+                dataType: 'json',
+                data: { action: 'getJobsForUser', userId: userId },
+                success: function(response) {
+                    if (response.success) {
+                        let html = '<div class="d-flex flex-column gap-2">';
+                        if (response.jobs.length === 0) {
+                            html += '<p>Keine Berufsbereiche vorhanden.</p>';
+                        } else {
+                            response.jobs.forEach(function(job) {
+                                html += '<label class="d-flex align-items-center gap-2" role="button">';
+                                html += '<input type="checkbox" class="job-checkbox" data-user-id="' + userId + '" data-job-id="' + job.jobId + '"' + (job.assigned ? ' checked' : '') + '>';
+                                html += '<span>' + $('<span>').text(job.name).html() + '</span>';
+                                html += '</label>';
+                            });
+                        }
+                        html += '</div>';
+                        modalBody.html(html);
                     } else {
-                        response.jobs.forEach(function(job) {
-                            html += '<label style="display:flex; align-items:center; gap:8px; cursor:pointer;">';
-                            html += '<input type="checkbox" class="job-checkbox" data-user-id="' + userId + '" data-job-id="' + job.jobId + '"' + (job.assigned ? ' checked' : '') + '>';
-                            html += '<span>' + $('<span>').text(job.name).html() + '</span>';
-                            html += '</label>';
-                        });
+                        modalBody.html('<p>Fehler: ' + response.message + '</p>');
                     }
-                    html += '</div>';
-                    modalBody.html(html);
-                } else {
-                    modalBody.html('<p>Fehler: ' + response.message + '</p>');
+                },
+                error: function() {
+                    modalBody.html('<p>Fehler beim Laden der Berufsbereiche.</p>');
                 }
-            },
-            error: function() {
-                modalBody.html('<p>Fehler beim Laden der Berufsbereiche.</p>');
-            }
+            });
         });
-    });
 
-    // Close modal
-    $('#jobsModalClose').click(function() {
-        overlay.css('display', 'none');
-    });
-    overlay.click(function(e) {
-        if (e.target === this) {
-            overlay.css('display', 'none');
-        }
-    });
+        // Toggle job checkbox
+        $(document).on('change', '.job-checkbox', function() {
+            const checkbox = $(this);
+            const userId = checkbox.data('userId');
+            const jobId = checkbox.data('jobId');
+            const assign = checkbox.is(':checked') ? 1 : 0;
 
-    // Toggle job checkbox
-    $(document).on('change', '.job-checkbox', function() {
-        const checkbox = $(this);
-        const userId = checkbox.data('userId');
-        const jobId = checkbox.data('jobId');
-        const assign = checkbox.is(':checked') ? 1 : 0;
-
-        $.ajax({
-            url: '/controllers/admin.php',
-            type: 'POST',
-            dataType: 'json',
-            data: { action: 'toggleUserJob', userId: userId, jobId: jobId, assign: assign },
-            success: function(response) {
-                if (!response.success) {
-                    alert('Fehler: ' + response.message);
+            $.ajax({
+                url: '/controllers/admin.php',
+                type: 'POST',
+                dataType: 'json',
+                data: { action: 'toggleUserJob', userId: userId, jobId: jobId, assign: assign },
+                success: function(response) {
+                    if (!response.success) {
+                        alert('Fehler: ' + response.message);
+                        checkbox.prop('checked', !checkbox.is(':checked'));
+                    }
+                },
+                error: function() {
+                    alert('Fehler beim Speichern der Zuweisung.');
                     checkbox.prop('checked', !checkbox.is(':checked'));
                 }
-            },
-            error: function() {
-                alert('Fehler beim Speichern der Zuweisung.');
-                checkbox.prop('checked', !checkbox.is(':checked'));
-            }
+            });
         });
     });
 </script>
-<?php include './footer.php'; ?>
