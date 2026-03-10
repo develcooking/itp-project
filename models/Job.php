@@ -3,30 +3,31 @@
 class Job
 {
     private $conn;
-    private $table = "Jobs";
-    private $jobId;
-    private $name;
-    private $createdBy;
-    private $modifiedBy;
+    private string $table = "Jobs";
+    private int $jobId;
+    private string $name;
+    private int $createdBy;
+    private int $modifiedBy;
 
     public function __construct($db)
     {
         $this->conn = $db;
     }
-    public function setJobName($name)
+    public function setJobName($name) : void
     {
         $this->name = $name;
     }
-    public function setCreateBy($id)
+    public function setCreateBy($id) : void
     {
         $this->createdBy = $id;
     }
-    public function setModifiedBy($id) {
+    public function setModifiedBy($id) : void
+    {
         $this->modifiedBy = $id;
     }
  
 
-    public function getAll()
+    public function getAll() : array
     {
         $query = "SELECT * FROM " . $this->table;
         $stmt = $this->conn->prepare($query);
@@ -49,7 +50,7 @@ class Job
         return $jobs ?? [];
     }
 
-    public function post()
+    public function post() : bool
     {
         $query = " INSERT INTO " . $this->table . "
         (name, createdBy, modifiedBy ) VALUES (?, ?, ?)";
@@ -73,7 +74,7 @@ class Job
         return false;
     }
 
-    public function getById($jobId)
+    public function getById($jobId) : bool
     {
         $query = "SELECT * FROM " . $this->table . " WHERE jobId = ?";
         $stmt = $this->conn->prepare($query);
@@ -91,7 +92,7 @@ class Job
         $stmt->close();
         return false;
     }
-    public function getNameById($jobId):string {
+    public function getNameById($jobId) : string {
         $sql = "SELECT name FROM Jobs WHERE jobId = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $jobId);
@@ -106,7 +107,7 @@ class Job
         }
     }
 
-    private function mapData($row)
+    private function mapData($row) : void
     {
         $this->jobId = $row['jobId'];
         $this->name = $row['name'];
@@ -114,7 +115,7 @@ class Job
         $this->modifiedBy = $row['modifiedBy'];
     }
 
-    public function update($jobId, $name): bool {
+    public function update($jobId, $name) : bool {
         $query = " UPDATE " . $this->table . " 
         SET name = ? WHERE jobId = ?";
 
@@ -134,7 +135,7 @@ class Job
         return false;
     }
 
-    public function delete($jobId): bool
+    public function delete() : bool
     {
         $query = "DELETE FROM " . $this->table . " WHERE jobId = ?";
         $stmt = $this->conn->prepare($query);

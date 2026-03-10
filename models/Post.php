@@ -4,21 +4,77 @@ class Post
 {
 
     private $conn;
-    private $table = 'Posts';
+    private string $table = 'Posts';
 
-    public $postId;
-    public $topicId;
-    public $userId;
-    public $content;
-    public $description;
-    public $reaction_negative;
-    public $reaction_positive;
-    public $createdBy;
-    public $modifiedBy;
+    private int $postId;
+    private int $topicId;
+    private int $userId;
+    private int $content;
+    private int $description;
+    private int $reaction_negative;
+    private int $reaction_positive;
+    private int $createdBy;
+    private int $modifiedBy;
 
     public function __construct($db)
     {
         $this->conn = $db;
+    }
+    /* #### Set functions #### */
+    public function setPostID($postId) :void {
+        $this->postId = $postId;
+    }
+    public function setTopicID($topicId) :void {
+        $this->topicId = $topicId;
+    }
+    public function setUserId($userId) :void {
+        $this->userId = $userId;
+    }
+    public function setContent($content) :void {
+        $this->content = $content;
+    }
+    public function setDescription($description) :void {
+        $this->description = $description;
+    }
+    public function setReactionNegative($reactionNegative) :void {
+        $this->reaction_negative = $reactionNegative;
+    }
+    public function setReactionPositive($reactionPositive) :void {
+        $this->reaction_positive = $reactionPositive;
+    }
+    public function setCreatedBy($createdBy) :void {
+        $this->createdBy = $createdBy;
+    }
+    public function setModifiedBy($modifiedBy) :void {
+        $this->modifiedBy = $modifiedBy;
+    }
+    /* #### Get functions #### */
+    public function getPostId():int {
+        return $this->postId;
+    }
+    public function getTopicId():int {
+        return $this->topicId;
+    }
+    public function getUserId():int {
+        return $this->userId;
+    }
+    public function getContent():string {
+        return $this->content;
+    }
+    public function getDescription():string {
+        return $this->description;
+    }
+    public function getReactionNegative():int {
+        return $this->reaction_negative;
+    }
+    public function getReactionPositive():int {
+        return $this->reaction_positive;
+    }
+    public function getCreatedBy():int {
+        return $this->createdBy;
+    }
+    public function getModifiedBy():int {
+        return $this->modifiedBy;
     }
 
     public function getAll()
