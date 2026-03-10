@@ -15,10 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_POST['password'];
 
         if (empty($email) || empty($password)) {
-            http_response_code(400);
             $errors['login'] = "E-Mail und Passwort sind erforderlich.";
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            http_response_code(400);
             $errors['login'] = "Ungültiges E-Mail-Format.";
         } else {
             $user = new User($conn);
@@ -26,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($user->getByEmail($email)) {
                 if (password_verify($password, $user->getPassword())) {
                     if ($user->getActivated() !== 1) {
-                        http_response_code(403);
                         $errors['login'] = "Ihr Konto ist nicht aktiviert. Bitte wenden Sie sich an einen Administrator.";
                     } else {
                         session_regenerate_id(true);
@@ -42,11 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         exit();
                     }
                 } else {
-                    http_response_code(400);
                     $errors['login'] = "Ungültige E-Mail oder Passwort.";
                 }
             } else {
-                http_response_code(400);
                 $errors['login'] = "Ungültige E-Mail oder Passwort.";
             }
         }
