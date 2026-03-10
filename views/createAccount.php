@@ -1,6 +1,7 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
-include $homepath . "/views/header.php";
+include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
+
 ?>
 
 <link rel="stylesheet" href="/resources/css/createAccount.css">
@@ -13,7 +14,11 @@ include $homepath . "/views/header.php";
 
                         <h2 class="fw-bold mb-2">Registrieren</h2>
                         <p class="text-muted mb-4">Bitte geben Sie Ihre Daten ein.</p>
-
+                        <?php if (!empty($errors['general'])): ?>
+                                      <div class="alert alert-danger" role="alert">
+                                          <?= htmlspecialchars($errors['general']) ?>
+                                      </div>
+                                  <?php endif; ?>
                         <form method="post" action="../controllers/register.php">
 
                             <div class="form-floating mb-3">
@@ -162,7 +167,7 @@ include $homepath . "/views/header.php";
 
                         <p class="mb-0">
                             Bereits einen Account?
-                            <a href="loginsite.php" class="fw-bold text-decoration-none">Hier anmelden</a>
+                            <a href="/views/loginsite.php" class="fw-bold text-decoration-none">Hier anmelden</a>
                         </p>
 
                     </div>
@@ -219,4 +224,4 @@ include $homepath . "/views/header.php";
     </div>
                 </main>
 <script src="/resources/js/formValidation.js"></script>
-<?php include $homepath . "/views/footer.php"; ?>
+<?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>

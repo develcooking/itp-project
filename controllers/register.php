@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createAccount'])) {
     $securityAnswer = htmlspecialchars(trim($_POST['securityAnswer'] ?? ''));
 
     if (empty($userName) || empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($role) || empty($securityAnswer)) {
-        $errors = 'Bitte füllen Sie alle Felder aus!';
+        $errors['general'] = 'Bitte füllen Sie alle Felder aus!';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors['email'] = 'Ungültiges E-Mail-Format!';
     } elseif (strlen($password) < 6) {
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createAccount'])) {
                 header("Location: /views/successRegister.php", true, 303);
                 exit();
             } else {
-                $errors = 'Fehler beim Registrieren. Bitte versuchen Sie es später erneut.';
+                $errors['general'] = 'Fehler beim Registrieren. Bitte versuchen Sie es später erneut.';
             }
         }
     }

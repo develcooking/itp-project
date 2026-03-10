@@ -3,9 +3,9 @@
 class Forum {
     
     private $conn;
-    public $userid;
-    private $Tusers_jobs = 'users_jobs';
-    public $TJobs = 'Jobs';
+    private int $userid;
+    private string $Tusers_jobs = 'users_jobs';
+    private string $TJobs = 'Jobs';
     
     public function __construct($conn){
         $this->conn = $conn;

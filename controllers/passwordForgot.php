@@ -4,10 +4,7 @@ require_once __DIR__ . '/../database/db.php';
 
 session_start();
 
-function controllerSendError($code, $message) {
-    http_response_code($code);
-    die("<div style='color:red;font-weight:bold'>" . htmlspecialchars($message) . "</div>");
-}
+$errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['passwordForgot'])) {
 
@@ -15,35 +12,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['passwordForgot'])) {
     $securityAnswer = trim($_POST['securityAnswer'] ?? '');
 
     if (empty($email) || empty($securityAnswer)) {
-        controllerSendError(400, "Alle Felder sind erforderlich");
+        $errors['general'] = "Alle Felder sind erforderlich";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['general'] = "Ungültige E-Mail-Adresse";
+    } else {
+        $user = new User($conn);
+        $user->getByEmail($email);
+
+        if (!$user->getUserId()) {
+            $errors['general'] = "E-Mail oder Sicherheitsantwort ist falsch";
+        } else {
+            $inputAnswer = trim($securityAnswer);
+            $storedHash  = $user->getSecurityAnswer();
+
+            if (!password_verify($inputAnswer, $storedHash)) {
+                $errors['general'] = "Sicherheitsantwort falsch";
+            } else {
+                // Create reset session
+                $_SESSION['password_reset'] = [
+                    'email'    => $user->getEmail(),
+                    'verified' => true,
+                    'time'     => time()
+                ];
+
+                header("Location: /views/passwordReset.php", true, 303);
+                exit();
+            }
+        }
     }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        controllerSendError(400, "Ungültige E-Mail-Adresse");
-    }
-
-    $user = new User($conn);
-    $user->getByEmail($email);
-
-    if (!$user->getUserId()) {
-        // we will not reveal whether the email exists or not
-        controllerSendError(404, "E-Mail oder Sicherheitsantwort ist falsch");
-    }
-
-    $inputAnswer = trim($securityAnswer);
-    $storedHash  = $user->getSecurityAnswer();
-
-    if (!password_verify($inputAnswer, $storedHash)) {
-        controllerSendError(400, "Sicherheitsantwort falsch");
-    }
-
-    // Create reset session
-    $_SESSION['password_reset'] = [
-        'email'    => $user->getEmail(),
-        'verified' => true,
-        'time'     => time()
-    ];
-
-    header("Location: /views/passwordReset.php");
-    exit();
 }
+
+require $_SERVER['DOCUMENT_ROOT'] . "/views/passwordForgot.php";
+exit();

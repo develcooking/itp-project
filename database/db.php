@@ -9,6 +9,9 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 $conn = null;
 
+if (!isset($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME'])) {
+    die("ENV-NotSet: Database credentials not configured in .env file");
+}
 try {
     $conn = new mysqli(
         $_ENV['DB_HOST'],

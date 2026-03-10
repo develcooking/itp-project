@@ -17,9 +17,21 @@ Speichern
 
 ### Setup
 Erstelle eine .env Datei mit den folgenden informationen:
+
 ```ini
 DB_HOST=127.0.0.1
 DB_USER=xxx
 DB_PASS=xxx
 DB_NAME=xxx
+```
+
+
+IPv6 : `2001:1640:18e:8000:be24:11ff:fe45:c45f`
+
+# Rolle
+Rollen werden als string ziffern gespeichert es gibt drei optionen:
+```
+0 = Admin
+1 = Leher
+2 = ausbilder
 ```

@@ -1,6 +1,6 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
-include $homepath . "/views/header.php";
+include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 ?>
 
 <div class="flex-grow-1 d-flex justify-content-center align-items-center m-5">
@@ -13,7 +13,13 @@ include $homepath . "/views/header.php";
           <h2 class="fw-bold mb-2">Anmelden</h2>
           <p class="text-muted mb-4">Bitte geben Sie Ihre Zugangsdaten ein.</p>
 
-          <form method="post" class="p-3" action="../controllers/login.php">
+          <?php if (!empty($errors['login'])): ?>
+            <div class="alert alert-warning" role="alert">
+              <?= htmlspecialchars($errors['login']) ?>
+            </div>
+          <?php endif; ?>
+
+          <form method="post" action="../controllers/login.php">
 
             <div class="form-floating mb-3">
               <input type="email" name="email" class="form-control" id="emailLogin" placeholder="E-Mail-Adresse" required>
@@ -61,4 +67,5 @@ include $homepath . "/views/header.php";
 </div>
       </main>
 <script src="/resources/js/formValidation.js"></script>
-<?php include $homepath . "/views/footer.php"; ?>
+
+<?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php";?>
