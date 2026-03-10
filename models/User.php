@@ -295,9 +295,7 @@ class User
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
             'email' => $this->getEmail(),
-//            'password' => $this->getPassword(),
             'role' => $this->getRole(),
-//            'securityAnswer' => $this->getSecurityAnswer(),
             'activated' => $this->getActivated()
         ];
     }
@@ -321,23 +319,29 @@ class User
         return false;
     }
 
-    public function getByUserName($userName)
+    public function userNameExists(string $userName): bool
     {
-        $query = "SELECT * FROM " . $this->table . " WHERE userName = ?";
+        $query = "SELECT COUNT(userName) AS username_count FROM " . $this->table . " WHERE userName = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("s", $userName);
         $stmt->execute();
         $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $this->mapData($row);
-            $stmt->close();
-            return true;
-        }
-
+        $row = $result->fetch_assoc();
         $stmt->close();
-        return false;
+
+        return $row['username_count'] > 0;
+    }
+
+    public function emailExists(string $email): bool
+    {
+    $query = "SELECT COUNT(email) AS email_count FROM " . $this->table . " WHERE email = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+    return $row['email_count'] > 0;
     }
 
 
