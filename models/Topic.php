@@ -58,7 +58,7 @@ class Topic
         );
 
         if ($stmt->execute()) {
-            $this->jobId = $stmt->insert_id;
+            $this->topicId = $stmt->insert_id;
             $stmt->close();
 
             return true;
@@ -86,18 +86,37 @@ class Topic
         $stmt->close();
         return false;
     }
+    public function getByName($topicName)
+    {
+        $query = "SELECT * FROM " . $this->table . " WHERE name = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("s", $topicName);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    public function update($jobId)
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $this->mapData($row);
+            $stmt->close();
+            return true;
+        }
+
+        $stmt->close();
+        return false;
+    }
+
+    public function update($topicId)
     {
         $query = " UPDATE " . $this->table . " 
-        SET name = ?, jobId = ?, userId = ?  WHERE jobId = ?";
+        SET name = ?, jobId = ?, userId = ? WHERE topicId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "sii",
+            "siii",
             $this->name,
             $this->jobId,
-            $this->userId
+            $this->userId,
+            $topicId
         );
 
         if ($stmt->execute()) {
@@ -113,7 +132,7 @@ class Topic
     {
         $query = "DELETE FROM " . $this->table . " WHERE topicId = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $this->jobId);
+        $stmt->bind_param("i", $topicId);
         if ($stmt->execute()) {
             $stmt->close();
             return true;
@@ -121,5 +140,15 @@ class Topic
 
         $stmt->close();
         return false;
+    }
+
+    private function mapData($row)
+    {
+        $this->topicId = $row['topicId'];
+        $this->name = $row['name'];
+        $this->jobId = $row['jobId'];
+        $this->userId = $row['userId'];
+        $this->createdBy = $row['createdBy'];
+        $this->modifiedBy = $row['modifiedBy'];
     }
 }

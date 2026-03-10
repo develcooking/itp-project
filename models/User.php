@@ -4,7 +4,6 @@ class User
 {
     private $conn;
     private ?string $table = 'Users';
-
     private ?int $userId = null;
     private ?string $userName = '';
     private ?string $firstName = '';
@@ -22,101 +21,123 @@ class User
         $this->conn = $db;
     }
 
-    public function getUserId(): ?int {
+    public function getUserId(): ?int
+    {
         return $this->userId;
     }
 
-    public function getUserName(): ?string {
+    public function getUserName(): ?string
+    {
         return $this->userName;
     }
 
-    public function getFirstName(): ?string {
+    public function getFirstName(): ?string
+    {
         return $this->firstName;
     }
 
-    public function getLastName(): ?string {
+    public function getLastName(): ?string
+    {
         return $this->lastName;
     }
 
-    public function getEmail(): ?string {
+    public function getEmail(): ?string
+    {
         return $this->email;
     }
 
-    public function getPassword(): ?string {
+    public function getPassword(): ?string
+    {
         return $this->password;
     }
 
-    public function getRole(): ?string {
+    public function getRole(): ?string
+    {
         return $this->role;
     }
 
-    public function getSecurityAnswer(): ?string {
+    public function getSecurityAnswer(): ?string
+    {
         return $this->securityAnswer;
     }
 
-    public function getActivated(): ?int {
+    public function getActivated(): ?int
+    {
         return $this->activated;
     }
 
-    public function getCreatedBy(): ?int {
+    public function getCreatedBy(): ?int
+    {
         return $this->createdBy;
     }
 
-    public function getModifiedBy(): ?int {
+    public function getModifiedBy(): ?int
+    {
         return $this->modifiedBy;
     }
 
-    public function setUserName(string $userName): self {
+    public function setUserName(string $userName): self
+    {
         $this->userName = $userName;
         return $this;
     }
 
-    public function setFirstName(string $firstName): self {
+    public function setFirstName(string $firstName): self
+    {
         $this->firstName = $firstName;
         return $this;
     }
 
-    public function setLastName(string $lastName): self {
+    public function setLastName(string $lastName): self
+    {
         $this->lastName = $lastName;
         return $this;
     }
 
-    public function setEmail(string $email): self {
+    public function setEmail(string $email): self
+    {
         $this->email = $email;
         return $this;
     }
 
-    public function setPassword(string $password): self {
+    public function setPassword(string $password): self
+    {
         $this->password = $password;
         return $this;
     }
 
-    public function setRole(string $role): self {
+    public function setRole(string $role): self
+    {
         $this->role = $role;
         return $this;
     }
 
-    public function setSecurityAnswer(string $securityAnswer): self {
+    public function setSecurityAnswer(string $securityAnswer): self
+    {
         $this->securityAnswer = $securityAnswer;
         return $this;
     }
 
-    public function setActivated(int $activated): self {
+    public function setActivated(int $activated): self
+    {
         $this->activated = $activated;
         return $this;
     }
 
-    public function setCreatedBy(?int $createdBy): self {
+    public function setCreatedBy(?int $createdBy): self
+    {
         $this->createdBy = $createdBy;
         return $this;
     }
 
-    public function setModifiedBy(?int $modifiedBy): self {
+    public function setModifiedBy(?int $modifiedBy): self
+    {
         $this->modifiedBy = $modifiedBy;
         return $this;
     }
 
-    public function getAll(): array {
+    public function getAll(): array
+    {
         $query = "SELECT * FROM " . $this->table;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -147,7 +168,8 @@ class User
         return $users;
     }
 
-    public function post(): bool {
+    public function post(): bool
+    {
         $query = "INSERT INTO " . $this->table . "
         (userName, firstName, lastName, email, password, role, securityAnswer, activated, createdBy, modifiedBy) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -208,6 +230,23 @@ class User
         $stmt->close();
         return false;
     }
+    public function getUserNameByID($id): ?string {
+        $query = "SELECT userName FROM " . $this->table . " WHERE userid = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $userName =  $row["userName"];
+            $stmt->close();
+            return $userName;
+        }
+
+        $stmt->close();
+        return null;
+    }
 
 
     public function update(int $userId): bool
@@ -218,7 +257,7 @@ class User
 
         $stmt = $this->conn->prepare($query);
 
-        $hashedPassword = password_hash($this->password, PASSWORD_DEFAULT);
+        $password = password_hash($this->password, PASSWORD_DEFAULT);
 
         $stmt->bind_param(
             "sssssssii",
@@ -226,7 +265,7 @@ class User
             $this->firstName,
             $this->lastName,
             $this->email,
-            $hashedPassword,
+            $password,
             $this->role,
             $this->securityAnswer,
             $this->activated,
@@ -256,7 +295,7 @@ class User
     {
         $this->userId = $row['userId'];
         $this->userName = $row['userName'];
-        $this->firstName = $row['firstName'] ?? null;
+        $this->firstName = $row['firstName'];
         $this->lastName = $row['lastName'];
         $this->email = $row['email'];
         $this->password = $row['password'];
@@ -265,14 +304,16 @@ class User
         $this->activated = $row['activated'];
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
-            'id' => $this->userId,
-            'lastName' => $this->lastName,
-            'firstName' => $this->firstName,
-            'email' => $this->email,
-            'role' => $this->role
+            'userId' => $this->getUserId(),
+            'userName' => $this->getUserName(),
+            'firstName' => $this->getFirstName(),
+            'lastName' => $this->getLastName(),
+            'email' => $this->getEmail(),
+            'role' => $this->getRole(),
+            'activated' => $this->getActivated()
         ];
     }
 
@@ -294,6 +335,32 @@ class User
         $stmt->close();
         return false;
     }
+
+    public function userNameExists(string $userName): bool
+    {
+        $query = "SELECT COUNT(userName) AS username_count FROM " . $this->table . " WHERE userName = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("s", $userName);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+
+        return $row['username_count'] > 0;
+    }
+
+    public function emailExists(string $email): bool
+    {
+    $query = "SELECT COUNT(email) AS email_count FROM " . $this->table . " WHERE email = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+    return $row['email_count'] > 0;
+    }
+
 
     private function updateCreatedBy()
     {

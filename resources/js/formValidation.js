@@ -1,4 +1,26 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const userNameInput = document.getElementById('userName');
+    const emailInput = document.getElementById('email');
+
+    if (userNameInput) {
+        userNameInput.addEventListener('input', function() {
+            const errorDiv = this.parentElement.querySelector('.invalidUserName');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+            this.classList.remove('is-invalid');
+        });
+    }
+
+    if (emailInput) {
+        emailInput.addEventListener('input', function() {
+            const errorDiv = this.parentElement.querySelector('.invalidUserName');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+            this.classList.remove('is-invalid');
+        });
+    }
     /* ===========================
        FORM + INPUT REFERENCES
     ============================ */
@@ -21,7 +43,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = getInput("password");
     const confirmpassword = getInput("confirmPassword");
     const securityanswer = getInput("securityAnswer");
-    const emailLogin = getInput("emailLogin");
+    const emaillogin = getInput("emailLogin");
+    const emailforgot = getInput("emailForgot");
+    const passwordReset = getInput("passwordReset");
+    const confirmPasswordReset = getInput("confirmPasswordReset");
 
     /* ===========================
        VALIDATION RULES
@@ -164,17 +189,17 @@ document.addEventListener("DOMContentLoaded", () => {
      * Checks if password and confirm password match
      * @returns {boolean}
      */
-    function validatePasswordMatch() {
-        if (!password || !confirmpassword) return true;
+    function validatePasswordMatch(pw, confirm) {
+    if (!pw || !confirm) return true;
 
-        if (password.value !== confirmpassword.value) {
-            setError(confirmpassword, "Passwörter stimmen nicht überein");
-            return false;
-        }
-
-        setSuccess(confirmpassword);
-        return true;
+    if (pw.value !== confirm.value) {
+        setError(confirm, "Passwörter stimmen nicht überein");
+        return false;
     }
+
+    setSuccess(confirm);
+    return true;
+}
 
     /* ===========================
        LIVE VALIDATION EVENTS
@@ -187,16 +212,33 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Password fields
-    if (password) password.addEventListener("input", () => {
-        validatePassword();
-        validatePasswordMatch();
+    if (password) {
+    password.addEventListener("input", () => {
+        validatePassword(password);
+        validatePasswordMatch(password, confirmpassword);
     });
+}
 
-    if (confirmpassword) confirmpassword.addEventListener("input", validatePasswordMatch);
+if (passwordReset) {
+    passwordReset.addEventListener("input", () => {
+        validatePassword(passwordReset);
+        validatePasswordMatch(passwordReset, confirmPasswordReset);
+    });
+}
 
+if (confirmpassword)
+    confirmpassword.addEventListener("input", () =>
+        validatePasswordMatch(password, confirmpassword)
+    );
+
+if (confirmPasswordReset)
+    confirmPasswordReset.addEventListener("input", () =>
+        validatePasswordMatch(passwordReset, confirmPasswordReset)
+    );
     // Email fields
-    if (email) email.addEventListener("input", validateEmail);
-    if (emailLogin) emailLogin.addEventListener("input", () => validateEmail(emailLogin));
+    if (email) email.addEventListener("input", () => validateEmail(email));
+    if (emaillogin) emaillogin.addEventListener("input", () => validateEmail(emaillogin));
+    if (emailforgot) emailforgot.addEventListener("input", () => validateEmail(emailforgot));
 
     /* ===========================
        FORM SUBMIT VALIDATION
@@ -223,38 +265,26 @@ document.addEventListener("DOMContentLoaded", () => {
        PASSWORD VISIBILITY TOGGLE
     ============================ */
 
-    /**
-     * Setup show/hide password toggle
-     * @param {string} inputId - Password input ID
-     * @param {string} eyeOpenId - Open eye icon ID
-     * @param {string} eyeSlashId - Slash eye icon ID
-     */
-    function setupPasswordToggle(inputId, eyeOpenId, eyeSlashId) {
-        const input = document.getElementById(inputId);
-        const eyeOpen = document.getElementById(eyeOpenId);
-        const eyeSlash = document.getElementById(eyeSlashId);
+document.querySelectorAll(".password-container").forEach(container => {
 
-        if (!input || !eyeOpen || !eyeSlash) return;
+    const input = container.querySelector("input");
+    const eyeOpen = container.querySelector("img[id^='eyeOpen']");
+    const eyeSlash = container.querySelector("img[id^='eyeSlash']");
+    const toggle = container.querySelector(".password-eye");
 
-        // Click container (icon wrapper)
-        const toggleContainer = eyeOpen.parentElement;
+    if (!input || !eyeOpen || !eyeSlash) return;
 
-        toggleContainer.addEventListener("click", () => {
-            if (input.type === "password") {
-                input.type = "text";
-                eyeOpen.style.display = "none";
-                eyeSlash.style.display = "inline";
-            } else {
-                input.type = "password";
-                eyeOpen.style.display = "inline";
-                eyeSlash.style.display = "none";
-            }
-        });
-    }
+    toggle.addEventListener("click", () => {
 
-    // Init toggles
-    setupPasswordToggle("password", "eyeOpen", "eyeSlash");
-    setupPasswordToggle("confirmPassword", "eyeOpenConfirm", "eyeSlashConfirm");
-    setupPasswordToggle("passwordLogin", "eyeOpenLogin", "eyeSlashLogin");
+        const isPassword = input.type === "password";
+
+        input.type = isPassword ? "text" : "password";
+        eyeOpen.style.display = isPassword ? "none" : "inline";
+        eyeSlash.style.display = isPassword ? "inline" : "none";
+
+    });
+
+});
+
 
 });
