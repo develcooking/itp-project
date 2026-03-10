@@ -19,15 +19,32 @@ if (isset($_SESSION['user'])) {
                 <form method="post" action="../controllers/passwordForgot.php">
 
                     <div class="form-floating mb-3">
-                        <input type="email" name="email" class="form-control" id="emailForgot" placeholder="E-Mail-Adresse"
-                               required>
+                        <input
+                        type="email"
+                        name="email"
+                        class="form-control"
+                        id="emailForgot"
+                        value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
+                        placeholder="E-Mail-Adresse"
+                        required>
                         <label for="email">E-Mail-Adresse</label>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="text" name="securityAnswer" class="form-control" id="securityAnswer"
-                               placeholder="Antwort auf Sicherheitsfrage" required>
+                        <input
+                        type="text"
+                        name="securityAnswer"
+                        class="form-control"
+                        id="securityAnswer"
+                        placeholder="Antwort auf Sicherheitsfrage"
+                        value="<?= htmlspecialchars($_POST['securityAnswer'] ?? '') ?>"
+                        required>
                         <label for="securityAnswer">Antwort auf die Sicherheitsfrage</label>
+                        <?php if (!empty($errors['general'])): ?>
+                        <div class="generalError" style="font-size: .875em; color: #dc3545">
+                            <?= htmlspecialchars($errors['general']) ?>
+                        </div>
+                    <?php endif; ?>
                     </div>
 
                     <button class="btn btn-outline-primary btn-lg w-100" type="submit" name="passwordForgot">

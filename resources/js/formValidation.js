@@ -1,29 +1,30 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const userNameInput = document.getElementById('userName');
-    const emailInput = document.getElementById('email');
+    function clearErrorOnInput(inputElement) {
+        if (!inputElement) return;
 
-    if (userNameInput) {
-        userNameInput.addEventListener('input', function() {
-            const errorDiv = this.parentElement.querySelector('.invalidUserName');
-            if (errorDiv) {
-                errorDiv.style.display = 'none';
-            }
+        inputElement.addEventListener('input', function() {
             this.classList.remove('is-invalid');
+
+            const parentDiv = this.parentElement;
+            const errorDivs = parentDiv.querySelectorAll('.invalidUserName,.generalError, .invalid-feedback');
+            errorDivs.forEach(div => div.remove());
+
+            if (this.value.trim() !== '') {
+                const alertError = document.querySelector('.alert-danger');
+                if (alertError) {
+                    alertError.style.display = 'none';
+                }
+            }
         });
     }
 
-    if (emailInput) {
-        emailInput.addEventListener('input', function() {
-            const errorDiv = this.parentElement.querySelector('.invalidUserName');
-            if (errorDiv) {
-                errorDiv.style.display = 'none';
-            }
-            this.classList.remove('is-invalid');
-        });
-    }
-    /* ===========================
-       FORM + INPUT REFERENCES
-    ============================ */
+    document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]').forEach(input => {
+        clearErrorOnInput(input);
+    });
+
+    document.querySelectorAll('textarea, select').forEach(field => {
+        clearErrorOnInput(field);
+    });
 
     /** @type {HTMLFormElement|null} */
     const form = document.querySelector("form[action='../controllers/createNewUser.php']");
