@@ -361,6 +361,20 @@ class User
     return $row['email_count'] > 0;
     }
 
+    public function updateRole(int $userId, string $role): bool
+    {
+        $allowedRoles = ['Ausbilder', 'Lehrer', 'Admin'];
+        if (!in_array($role, $allowedRoles)) {
+            return false;
+        }
+
+        $query = "UPDATE " . $this->table . " SET role = ? WHERE userId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("si", $role, $userId);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
 
     private function updateCreatedBy()
     {

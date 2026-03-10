@@ -187,6 +187,23 @@ select {
   margin: 20px;
 }
 
+/* ===================== ROLE DROPDOWN ===================== */
+.role-dropdown {
+  appearance: auto !important;
+  -webkit-appearance: menulist !important;
+  -moz-appearance: menulist !important;
+  background-color: #fff;
+  border: 1px solid #adb5bd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  margin-left: -4px;
+}
+
 /* ===================== RESPONSIVE ===================== */
 @media(min-width: 768px){
   .footer-container {

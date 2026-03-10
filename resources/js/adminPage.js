@@ -71,6 +71,34 @@ $(document).ready(function() {
         });
     });
 
+    // Rolle ändern per Dropdown
+    $(document).on('change', '.role-dropdown', function() {
+        const dropdown = $(this);
+        const userId = dropdown.data('userId');
+        const newRole = dropdown.val();
+
+        $.ajax({
+            url: '/controllers/admin.php',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'updateRole',
+                userId: userId,
+                role: newRole
+            },
+            success: function(response) {
+                if (!response.success) {
+                    alert('Fehler: ' + response.message);
+                    location.reload();
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Fehler beim Ändern der Rolle: ' + error);
+                location.reload();
+            }
+        });
+    });
+
     // Berufsbereiche Modal
     const jobsModalEl = document.getElementById('jobsModal');
     const jobsModal = new bootstrap.Modal(jobsModalEl);

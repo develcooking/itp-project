@@ -37,7 +37,13 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
                     <td><?= htmlspecialchars($user['firstName'] ?? '') ?></td>
                     <td><?= htmlspecialchars($user['lastName'] ?? '') ?></td>
                     <td><?= htmlspecialchars($user['email'] ?? '') ?></td>
-                    <td><?= htmlspecialchars($user['role'] ?? '') ?></td>
+                    <td>
+                        <select class="role-dropdown" data-user-id="<?= $user['userId'] ?>">
+                            <option value="Lehrer" <?= ($user['role'] ?? '') === 'Lehrer' ? 'selected' : '' ?>>Lehrkraft</option>
+                            <option value="Ausbilder" <?= ($user['role'] ?? '') === 'Ausbilder' ? 'selected' : '' ?>>Ausbilder</option>
+                            <option value="Admin" <?= ($user['role'] ?? '') === 'Admin' ? 'selected' : '' ?>>Admin</option>
+                        </select>
+                    </td>
                     <td><?= $user['createdAt'] ? date('d.m.Y H:i', strtotime($user['createdAt'])) : '' ?></td>
                     <td class="text-nowrap" style="width:1%">
                         <button class="btn btn-success btn-sm me-1 accept-btn" data-user-id="<?= $user['userId'] ?>">Akzeptieren</button>
@@ -72,7 +78,13 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
                     <td><?= htmlspecialchars($user['firstName'] ?? '') ?></td>
                     <td><?= htmlspecialchars($user['lastName'] ?? '') ?></td>
                     <td><?= htmlspecialchars($user['email'] ?? '') ?></td>
-                    <td><?= htmlspecialchars($user['role'] ?? '') ?></td>
+                    <td>
+                        <select class="role-dropdown" data-user-id="<?= $user['userId'] ?>">
+                            <option value="Lehrer" <?= ($user['role'] ?? '') === 'Lehrer' ? 'selected' : '' ?>>Lehrkraft</option>
+                            <option value="Ausbilder" <?= ($user['role'] ?? '') === 'Ausbilder' ? 'selected' : '' ?>>Ausbilder</option>
+                            <option value="Admin" <?= ($user['role'] ?? '') === 'Admin' ? 'selected' : '' ?>>Admin</option>
+                        </select>
+                    </td>
                     <td><?= $user['createdAt'] ? date('d.m.Y H:i', strtotime($user['createdAt'])) : '' ?></td>
                     <td class="text-nowrap" style="width:1%">
                         <button class="btn btn-primary btn-sm jobs-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">
