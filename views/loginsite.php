@@ -13,6 +13,18 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
           <h2 class="fw-bold mb-2">Anmelden</h2>
           <p class="text-muted mb-4">Bitte geben Sie Ihre Zugangsdaten ein.</p>
 
+          <?php if (isset($_GET['deactivated']) && $_GET['deactivated'] == '1'): ?>
+            <div class="alert alert-warning" role="alert">
+              Ihr Konto wurde deaktiviert. Bitte wenden Sie sich an einen Administrator.
+            </div>
+          <?php endif; ?>
+
+          <?php if (!empty($errors['login'])): ?>
+            <div class="invalidUserName">
+              <?= htmlspecialchars($errors['login']) ?>
+            </div>
+          <?php endif; ?>
+
           <form method="post" action="../controllers/login.php">
 
             <div class="form-floating mb-3">

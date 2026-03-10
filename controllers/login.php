@@ -7,8 +7,7 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
-$error = '';
-$success = '';
+$errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['login'])) {
@@ -17,33 +16,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($email) || empty($password)) {
             http_response_code(400);
-            $error = "Email and password are required";
+            $errors['login'] = "E-Mail und Passwort sind erforderlich.";
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             http_response_code(400);
-            $error = "Invalid email format";
+            $errors['login'] = "Ungültiges E-Mail-Format.";
         } else {
             $user = new User($conn);
 
             if ($user->getByEmail($email)) {
                 if (password_verify($password, $user->getPassword())) {
-                    session_regenerate_id(true);
-                    $_SESSION['logged_in'] = true;
-                    $_SESSION['userId'] = $user->getUserId();
-                    $_SESSION['userName'] = $user->getUserName();
-                    $_SESSION['firstName'] = $user->getFirstName();
-                    $_SESSION['lastName'] = $user->getLastName();
-                    $_SESSION['email'] = $user->getEmail();
-                    $_SESSION['role'] = $user->getRole();
+                    if ($user->getActivated() !== 1) {
+                        http_response_code(403);
+                        $errors['login'] = "Ihr Konto ist nicht aktiviert. Bitte wenden Sie sich an einen Administrator.";
+                    } else {
+                        session_regenerate_id(true);
+                        $_SESSION['logged_in'] = true;
+                        $_SESSION['userId'] = $user->getUserId();
+                        $_SESSION['userName'] = $user->getUserName();
+                        $_SESSION['firstName'] = $user->getFirstName();
+                        $_SESSION['lastName'] = $user->getLastName();
+                        $_SESSION['email'] = $user->getEmail();
+                        $_SESSION['role'] = $user->getRole();
 
-                    header("Location: /views/startpage.php");
-                    exit();
+                        header("Location: /views/startpage.php");
+                        exit();
+                    }
                 } else {
                     http_response_code(400);
-                    $error = "Invalid email or password";
+                    $errors['login'] = "Ungültige E-Mail oder Passwort.";
                 }
             } else {
                 http_response_code(400);
-                $error = "Invalid email or password";
+                $errors['login'] = "Ungültige E-Mail oder Passwort.";
             }
         }
     }
@@ -56,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-if (!empty($error)) {
-    echo "<div class='error'>" . htmlspecialchars($error) . "</div>";
+if (!empty($errors)) {
+    require $_SERVER['DOCUMENT_ROOT'] . "/views/loginsite.php";
+    exit();
 }
