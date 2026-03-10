@@ -20,14 +20,6 @@ main {
   justify-content: center;
   align-items: center;
 }
-/* ===================== HEADER ===================== */
-.header {
-  color: #fff;
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
 .hat {
   flex: 1;
