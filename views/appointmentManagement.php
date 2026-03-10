@@ -17,6 +17,7 @@ include $homepath . "/views/header.php";
 
   <div id='calendar'></div>
 </div>
+</main>
 <script src="/resources/js/loadFullCalender.js"></script>
 
 <?php
