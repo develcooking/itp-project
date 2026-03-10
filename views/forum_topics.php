@@ -3,6 +3,10 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 ?>
 
+<!-- Include the Quill library -->
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<!-- Include stylesheet -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 
 <div class="forum-container">
 
@@ -20,6 +24,7 @@ include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 <div class="card m-2">
     <div class="card-body">
         <h5><?= htmlspecialchars($topic['name']) ?></h5>
+        <a href="/controllers/forum.php?name=<?= $bereich['name'] ?>&topic_id=<?= $topic['topicId'] ?>" class="card-link">Zu den Beiträgen</a>
     </div>
 </div>
 
@@ -49,11 +54,32 @@ include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
                         <label for="title" class="form-label">Titel *</label>
                         <input type="text" class="form-control" id="title" name="title" required>
                     </div>
+                                        
+                    <label for="editor" class="form-label">Initiales Beitrag erstellen *</label>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Beitragtitel *</label>
+                        <input type="text" class="form-control" id="description" name="description" required>
+                    </div>
                     
-                    <!--<div class="mb-3">
-                        <label for="description" class="form-label">Beschreibung</label>
-                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                    </div> -->
+                    <div id="editor">
+                        <!-- Hier wird der Quill-Editor initialisiert -->
+                         <input type="hidden" name="content" id="content" required>
+                    </div>
+
+                    <!-- Initialize Quill editor -->
+                    <script>
+                     const quill = new Quill('#editor', {
+                       theme: 'snow'
+                     });
+
+                    const form = document.getElementById("createTopicForm");
+                    
+                    form.onsubmit = function() {
+                        document.getElementById("content").value = quill.root.innerHTML;
+                    };
+                    </script>
+
                 </form> 
             </div>
             

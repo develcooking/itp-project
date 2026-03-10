@@ -6,6 +6,7 @@ class Forum {
     public $userid;
     private $Tusers_jobs = 'users_jobs';
     public $TJobs = 'Jobs';
+    private Post $postModel;
     
     public function __construct($conn){
         $this->conn = $conn;
@@ -59,6 +60,12 @@ class Forum {
         $stmt->bind_param("siiii", $title, $bereich_id, $_SESSION['userId'], $_SESSION['userId'], $_SESSION['userId']);
         $result = $stmt->execute();
         $stmt->close();
+        if ($result === true) {
+            $postModel = new Post($this->conn);
+            //$postModel->post
+            
+            return $result;
+        }
         return $result;
     }
 }
