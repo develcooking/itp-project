@@ -23,12 +23,12 @@ if ($resource === 'topics') {
             if (isset($_GET['id'])) {
                 if ($topic->getById(intval($_GET['id']))) {
                     $data = [
-                        'topicId' => $topic->topicId,
-                        'name' => $topic->name,
-                        'jobId' => $topic->jobId,
-                        'userId' => $topic->userId,
-                        'createdBy' => $topic->createdBy,
-                        'modifiedBy' => $topic->modifiedBy
+                        'topicId' => $topic->getTopicId(),
+                        'name' => $topic->getName(),
+                        'jobId' => $topic->getJobId(),
+                        'userId' => $topic->getUserId(),
+                        'createdBy' => $topic->getCreatedBy(),
+                        'modifiedBy' => $topic->getModifiedBy(),
                     ];
                     sendResponse(true, $data);
                 } else {
@@ -37,12 +37,12 @@ if ($resource === 'topics') {
             } elseif (isset($_GET['name'])) {
                 if ($topic->getByName($_GET['name'])) {
                     $data = [
-                        'topicId' => $topic->topicId,
-                        'name' => $topic->name,
-                        'jobId' => $topic->jobId,
-                        'userId' => $topic->userId,
-                        'createdBy' => $topic->createdBy,
-                        'modifiedBy' => $topic->modifiedBy
+                        'topicId' => $topic->getTopicId(),
+                        'name' => $topic->getName(),
+                        'jobId' => $topic->getJobId(),
+                        'userId' => $topic->getUserId(),
+                        'createdBy' => $topic->getCreatedBy(),
+                        'modifiedBy' => $topic->getModifiedBy(),
                     ];
                     sendResponse(true, $data);
                 } else {
@@ -60,11 +60,11 @@ if ($resource === 'topics') {
             if (!$data || !isset($data['name']) || !isset($data['jobId'])) {
                 sendResponse(false, null, 'Missing title or jobId', 400);
             }
-            $topic->name = $data['name'];
-            $topic->jobId = intval($data['jobId']);
-            $topic->userId = $_SESSION['userId'];
-            $topic->createdBy = $_SESSION['userId'];
-            $topic->modifiedBy = $_SESSION['userId'];
+            $topic->setName($data['name']);
+            $topic->setJobId(intval($data['jobId']));
+            $topic->setUserId($_SESSION['userId']);
+            $topic->setCreatedBy($_SESSION['userId']);
+            $topic->setModifiedBy($_SESSION['userId']);
 
             if ($topic->post()) {
                 sendResponse(true, ['topicId' => $conn->insert_id], 'Topic created successfully', 204);
@@ -80,12 +80,12 @@ if ($resource === 'topics') {
             $id = intval($data['topicId']);
             if (!$topic->getById($id)) sendResponse(false, null, 'Topic not found', 404);
 
-            if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $topic->userId) {
+            if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $topic->getUserId()) {
                 sendResponse(false, null, 'Unauthorized', 401);
             }
 
-            if (isset($data['name'])) $topic->name = $data['name'];
-            if (isset($data['jobId'])) $topic->jobId = intval($data['jobId']);
+            if (isset($data['name'])) $topic->setName($data['name']);
+            if (isset($data['jobId'])) $topic->setJobId(intval($data['jobId']));
 
             if ($topic->update($id)) {
                 sendResponse(true, null, 'Topic updated successfully', 204);
@@ -101,7 +101,7 @@ if ($resource === 'topics') {
             if (!$id) sendResponse(false, null, 'Missing topicId', 400);
             if (!$topic->getById(intval($id))) sendResponse(false, null, 'Topic not found', 404);
 
-            if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $topic->userId) {
+            if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $topic->getUserId()) {
                 sendResponse(false, null, 'Unauthorized', 403);
             }
 
