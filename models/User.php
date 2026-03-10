@@ -295,9 +295,7 @@ class User
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
             'email' => $this->getEmail(),
-//            'password' => $this->getPassword(),
             'role' => $this->getRole(),
-//            'securityAnswer' => $this->getSecurityAnswer(),
             'activated' => $this->getActivated()
         ];
     }
@@ -320,6 +318,32 @@ class User
         $stmt->close();
         return false;
     }
+
+    public function userNameExists(string $userName): bool
+    {
+        $query = "SELECT COUNT(userName) AS username_count FROM " . $this->table . " WHERE userName = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("s", $userName);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+
+        return $row['username_count'] > 0;
+    }
+
+    public function emailExists(string $email): bool
+    {
+    $query = "SELECT COUNT(email) AS email_count FROM " . $this->table . " WHERE email = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+    return $row['email_count'] > 0;
+    }
+
 
     private function updateCreatedBy()
     {
