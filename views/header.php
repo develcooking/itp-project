@@ -16,9 +16,11 @@ if (empty($current_page) || $current_page === '') {
     <title>Ausbildungsportal.net</title>
     <link rel="stylesheet" href="../resources/css/bootstrap.min.css">
     <link rel="stylesheet" href="../resources/css/bootstrap-icons.css">
+    <link rel="stylesheet" href="/resources/css/datatables.min.css">
     <link rel="stylesheet" type="text/css" href="/resources/css/styles.css">
 </head>
 <body>
+     <script src="/resources/js/datatables.min.js"></script>
     <div class="header">
         <a class="hat" href="../index.php" tabindex="-1">
             <h2>Ausbildungsportal.net</h2>

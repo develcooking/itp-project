@@ -44,4 +44,34 @@ class UserJobs {
         $stmt->close();
         return $users;
     }
+
+    // Assign a job to a user
+    public function assign(int $userId, int $jobId, int $createdBy): bool {
+        $sql = "INSERT IGNORE INTO users_jobs (userId, jobId, createdBy, modifiedBy) VALUES (?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("iiii", $userId, $jobId, $createdBy, $createdBy);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
+    // Remove a job from a user
+    public function remove(int $userId, int $jobId): bool {
+        $sql = "DELETE FROM users_jobs WHERE userId = ? AND jobId = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ii", $userId, $jobId);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
+    // Remove all jobs for a user
+    public function removeAllForUser(int $userId): bool {
+        $sql = "DELETE FROM users_jobs WHERE userId = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
 }
