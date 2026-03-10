@@ -8,15 +8,15 @@ if (isset($_SESSION['user'])) {
 }
 ?>
 
-<div class="container min-vh-100 d-flex justify-content-center align-items-center">
+<div class="flex-grow-1 d-flex justify-content-center align-items-center m-5">
     <div class="row w-100 justify-content-center">
-        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 p-3">
 
             <div class="card bg-light shadow p-4 text-center">
 
                 <h2 class="fw-bold mb-2">Passwort zurücksetzen</h2>
 
-                <form method="post" action="../controllers/passwordForgot.php">
+                <form method="post" class="p-3" action="../controllers/passwordForgot.php">
 
                     <div class="form-floating mb-3">
                         <input
@@ -63,5 +63,6 @@ if (isset($_SESSION['user'])) {
         </div>
     </div>
 </div>
+</main>
 <script src="/resources/js/formValidation.js"></script>
 <?php include $homepath . "/views/footer.php"; ?>
