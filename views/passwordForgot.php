@@ -2,7 +2,7 @@
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include $homepath . "/views/header.php";
 
-if (isset($_SESSION['user'])) {
+if (isset($_SESSION['userId'])) {
     header("Location: /index.php");
     exit();
 }

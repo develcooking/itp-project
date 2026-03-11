@@ -3,8 +3,23 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
 
-if (!isset($_SESSION)) {
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
+}
+
+// Session timeout (e.g., 30 minutes = 1800 seconds)
+$timeout_duration = 1800;
+
+if (isset($_SESSION['userId'])) {
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
+        // Session has expired
+        session_unset();
+        session_destroy();
+        header("Location: /views/loginsite.php?expired=1");
+        exit();
+    }
+    // Update last activity time
+    $_SESSION['last_activity'] = time();
 }
 
 $error = '';
@@ -34,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['lastName'] = $user->getLastName();
                     $_SESSION['email'] = $user->getEmail();
                     $_SESSION['role'] = $user->getRole();
+                    $_SESSION['last_activity'] = time(); // Set initial activity time
 
                     header("Location: /views/startpage.php");
                     exit();
@@ -49,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($_POST['logout'])) {
+        session_unset();
         session_destroy();
 
         header("Location: /views/loginsite.php");

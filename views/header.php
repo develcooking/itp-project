@@ -42,13 +42,14 @@ if (empty($current_page) || $current_page === '') {
             <button type="submit" name="logout" class="nav-btn">Abmelden</button>
         </form>
     </nav>
+    <?php else:
+        // List of public pages that don't require authentication
+        $public_pages = ['loginsite', 'createAccount', 'passwordForgot', 'passwordReset', 'successRegister', 'index'];
+        if (!in_array($current_page, $public_pages)) {
+            header("Location: /views/loginsite.php");
+            exit();
+        }
+    ?>
     <?php endif; ?>
 
 <div class="main-container">
-        <!--  -->
-
-
-
-
-
-
