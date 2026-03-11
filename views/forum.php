@@ -19,6 +19,10 @@ $currentJobName = "Berufsbereich";
 $currentTopicName = "";
 
 if ($selectedJobId) {
+    if (!$forumModel->hasAccess($_SESSION['userId'] ?? 0, $selectedJobId)) {
+        header("Location: /views/forum.php?error=no_access");
+        exit();
+    }
     $topics = $forumModel->getTopicsByBereich($selectedJobId);
     // Even if empty, we treat it as an empty topic list
     
@@ -105,7 +109,11 @@ if ($selectedTopicId) {
                                             <small class="text-muted"><?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?></small>
                                         </div>
                                         <div class="post-content p-2">
-                                            <?= $post['content'] ?>
+                                            <?php
+                                            // Allow basic formatting tags but strip everything else (basic XSS protection)
+                                            // Ideally, a library like HTML Purifier should be used here.
+                                            echo strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+                                            ?>
                                         </div>
                                     </div>
                                 </div>

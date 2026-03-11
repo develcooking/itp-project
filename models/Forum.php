@@ -34,6 +34,28 @@ class Forum {
         return $bereiche;
     }
 
+    public function hasAccess(int $userId, int $jobId): bool {
+        $query = "SELECT COUNT(*) as count FROM " . $this->Tusers_jobs . " WHERE userId = ? AND jobId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("ii", $userId, $jobId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        return ($row['count'] ?? 0) > 0;
+    }
+
+    public function isTopicInJob(int $topicId, int $jobId): bool {
+        $query = "SELECT COUNT(*) as count FROM Topics WHERE topicId = ? AND jobId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("ii", $topicId, $jobId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        return ($row['count'] ?? 0) > 0;
+    }
+
     public function getTopicsByBereich(int $bereich_id): array {
 
     $query = "SELECT t.*, u.userName FROM Topics t JOIN Users u ON t.userId = u.userId WHERE t.jobId = ?";
