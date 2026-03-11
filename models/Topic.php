@@ -10,6 +10,7 @@ class Topic
     private int $userId;
     private int $createdBy;
     private int $modifiedBy;
+    private string $userName;
 
     /* #### Set functions #### */
     public function setTopicId($topicId): void
@@ -36,6 +37,10 @@ class Topic
     {
         $this->modifiedBy = $userId;
     }
+    public function setUserName(string $userName): void
+    {
+        $this->userName = $userName;
+    }
     /* #### Get functions #### */
     public function getTopicId(): int
     {
@@ -61,6 +66,10 @@ class Topic
     {
         return $this->modifiedBy;
     }
+    public function getUserName(): string
+    {
+        return $this->userName;
+    }
 
     public function __construct($db)
     {
@@ -69,7 +78,7 @@ class Topic
 
     public function getAll()
     {
-        $query = "SELECT * FROM " . $this->table;
+        $query = "SELECT t.*, u.userName FROM " . $this->table . " t JOIN Users u ON t.userId = u.userId";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -80,6 +89,7 @@ class Topic
                     'name' => $row['name'],
                     'jobId' => $row['jobId'],
                     'userId' => $row['userId'],
+                    'userName' => $row['userName'],
                     'createdAt' => $row['createdAt'],
                     'modifiedAt' => $row['modifiedAt'],
                     'createdBy' => $row['createdBy'],
@@ -121,7 +131,7 @@ class Topic
 
     public function getById($topicId)
     {
-        $query = "SELECT * FROM " . $this->table . " WHERE topicId = ?";
+        $query = "SELECT t.*, u.userName FROM " . $this->table . " t JOIN Users u ON t.userId = u.userId WHERE t.topicId = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $topicId);
         $stmt->execute();
@@ -139,7 +149,7 @@ class Topic
     }
     public function getByName($topicName)
     {
-        $query = "SELECT * FROM " . $this->table . " WHERE name = ?";
+        $query = "SELECT t.*, u.userName FROM " . $this->table . " t JOIN Users u ON t.userId = u.userId WHERE t.name = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("s", $topicName);
         $stmt->execute();
@@ -201,5 +211,6 @@ class Topic
         $this->userId = $row['userId'];
         $this->createdBy = $row['createdBy'];
         $this->modifiedBy = $row['modifiedBy'];
+        $this->userName = $row['userName'] ?? '';
     }
 }

@@ -36,7 +36,7 @@ class Forum {
 
     public function getTopicsByBereich(int $bereich_id): array {
 
-    $query = "SELECT topicId, name FROM Topics WHERE jobId = ?";
+    $query = "SELECT t.*, u.userName FROM Topics t JOIN Users u ON t.userId = u.userId WHERE t.jobId = ?";
 
     $stmt = $this->conn->prepare($query);
     $stmt->bind_param("i", $bereich_id);
