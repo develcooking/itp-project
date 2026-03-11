@@ -41,11 +41,6 @@ if (empty($current_page)) {
 </head>
 <body>
      <script src="/resources/js/datatables.min.js"></script>
-    <div class="header">
-        <a class="hat" href="../index.php" tabindex="-1">
-            <h2>Ausbildungsportal.net</h2>
-        </a>
-
 <?php if (empty($_SESSION['userId'])): ?>
     <!-- Header (logo only) for not logged-in users -->
     <header class="header d-flex align-items-center justify-content-between px-3">
