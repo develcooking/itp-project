@@ -60,7 +60,7 @@ if (empty($current_page)) {
     </a>
     <a href="/views/startpage.php" class="nav-btn-primary border-end <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
     <a href="/views/appointmentManagement.php" class="nav-btn-primary border-end <?= $current_page === 'appointmentManagement' ? 'current' : ''; ?>">Termine</a>
-    <a href="/views/forum.php" class="nav-btn-primary border-end<?= $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
+    <a href="/views/forum.php" class="nav-btn-primary border-end <?= $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
     <?php if ($_SESSION['role'] === 'Admin'): ?>
         <a href="/views/adminPage.php" class="nav-btn-primary border-end <?= $current_page === 'adminPage' ? 'current' : ''; ?>">Admin</a>
     <?php endif; ?>
