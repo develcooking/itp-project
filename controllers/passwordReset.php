@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $user->setPassword($newPassword);
-        $success = $user->update($user->getUserId());
+        $success = $user->updatePasswordByID();
 
         if ($success) {
             // success: clear session

@@ -69,7 +69,7 @@ main {
 
 .nav-btn-primary:hover,
 .nav-btn-primary.current:hover {
-    background-color: var(--btn-Color);
+    background-color: #fbbf03cc;
     color: var(--accentColor);
 }
 

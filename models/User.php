@@ -248,26 +248,48 @@ class User
         return null;
     }
 
+    public function updatePasswordByID(): bool
+    {
+        $query = "UPDATE " . $this->table . " SET password = ? WHERE userid = ?";
+        $stmt = $this->conn->prepare($query);
+
+        $password = password_hash($this->password, PASSWORD_DEFAULT);
+        $stmt->bind_param("si",$password, $this->userId);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
+    public function updateSecureityAnswereByID(): bool
+    {
+        $query = "UPDATE " . $this->table . " SET securityAnswer = ? WHERE userid = ?";
+        $stmt = $this->conn->prepare($query);
+
+        $securityAnswer = password_hash($this->securityAnswer, PASSWORD_DEFAULT);
+        $stmt->bind_param("s", $securityAnswer);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
 
     public function update(int $userId): bool
     {
         $query = "UPDATE " . $this->table . "
-              SET userName = ?, firstName = ?, lastName = ?, email = ?, password = ?, role = ?, securityAnswer = ?, activated = ?
+              SET userName = ?, firstName = ?, lastName = ?, email = ?, role = ?, activated = ?
               WHERE userId = ?";
 
         $stmt = $this->conn->prepare($query);
 
-        $password = password_hash($this->password, PASSWORD_DEFAULT);
+        #$password = password_hash($this->password, PASSWORD_DEFAULT);
 
         $stmt->bind_param(
-            "sssssssii",
+            "sssssii",
             $this->userName,
             $this->firstName,
             $this->lastName,
             $this->email,
-            $password,
+            #$password,
             $this->role,
-            $this->securityAnswer,
+            #$this->securityAnswer,
             $this->activated,
             $userId
         );
@@ -361,6 +383,20 @@ class User
     return $row['email_count'] > 0;
     }
 
+    public function updateRole(int $userId, string $role): bool
+    {
+        $allowedRoles = ['Ausbilder', 'Lehrer', 'Admin'];
+        if (!in_array($role, $allowedRoles)) {
+            return false;
+        }
+
+        $query = "UPDATE " . $this->table . " SET role = ? WHERE userId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("si", $role, $userId);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
 
     private function updateCreatedBy()
     {

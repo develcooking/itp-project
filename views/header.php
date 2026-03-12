@@ -47,7 +47,6 @@ if (empty($current_page)) {
         <a class="hat" href="../index.php">
             <img src="/resources/imgs/logo.jpeg" alt="Ausbildungsportal.net Logo" class="site-logo">
         </a>
-
         <div id="headerspacer"></div>
     </header>
 <?php endif; ?>

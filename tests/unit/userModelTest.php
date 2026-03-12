@@ -225,29 +225,4 @@ class UserModelTest extends TestCase
         $this->assertArrayNotHasKey('securityAnswer', $array);
         $this->assertArrayHasKey('activated', $array);
     }
-
-    
-//->
-//    Gemeint war, dass wir diese Tests grundsätzlich implementieren sollten, dies aber nicht machen
-//    werden, da es sehr zeitaufwändig ist und wir dafür aktuell keine ausreichende Zeit haben.
-//    public function test_It_Should_Return_An_Error_On_Delete_If_The_User_Does_Not_Exist(){}
-//    public function test_It_Should_Return_An_Error_On_Update_If_The_User_Does_Exist(){}
-//    public function test_It_Should_Return_An_Error_On_Get_By_Id_If_The_User_Does_Exist(){}
-//    public function test_It_Should_Return_An_Error_On_Post_If_User_Email_already_exists(){}
-//    public function test_It_Should_Not_Return_Password_Field_On_Get_By_Id(){}
-//    public function test_It_Should_Not_Return_SecurityAnswer_Field_On_Get_By_Id(){}
-//    public function test_It_Should_Successfully_Update_UserName_Field(){}
-//    public function test_It_Should_Successfully_Update_FirstName_Field(){}
-//    public function test_It_Should_Successfully_Update_LastName_Field(){}
-//    public function test_It_Should_Successfully_Update_Email_Field(){}
-//    public function test_It_Should_Successfully_Update_Password_Field(){}
-//    public function test_It_Should_Successfully_Update_Role_Field(){}
-//    public function test_It_Should_Successfully_Update_SecurityAnswer_Field(){}
-
-//->
-//  Testfälle in Bezug auf Pagination, Sorting, Filter und Field Selection sollen ebenfalls
-//  implementiert werden. Falls sich dies jedoch als sehr zeitaufwändig erweist – da diese Tests
-//  auch für andere Modelle entsprechend umgesetzt werden müssen –, sollen zunächst allgemeine
-//  Test-Suites für Pagination, Sorting, Filter und Field Selection erstellt und anschließend für
-//  alle weiteren Modelle angepasst werden.
 }

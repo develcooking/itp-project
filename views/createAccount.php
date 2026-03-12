@@ -222,5 +222,6 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
             </div>
         </div>
     </div>
+                </main>
 <script src="/resources/js/formValidation.js"></script>
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>

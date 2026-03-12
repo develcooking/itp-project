@@ -3,15 +3,21 @@ include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 ?>
 
-<div class="container min-vh-100 d-flex justify-content-center align-items-center">
+<div class="flex-grow-1 d-flex justify-content-center align-items-center m-5">
   <div class="row w-100 justify-content-center">
-    <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 p-3">
       
       <?php if (!isset($_SESSION['user'])): ?>
         <div class="card bg-light shadow p-4 text-center">
 
           <h2 class="fw-bold mb-2">Anmelden</h2>
           <p class="text-muted mb-4">Bitte geben Sie Ihre Zugangsdaten ein.</p>
+
+          <?php if (!empty($errors['login'])): ?>
+            <div class="alert alert-warning" role="alert">
+              <?= htmlspecialchars($errors['login']) ?>
+            </div>
+          <?php endif; ?>
 
           <form method="post" action="../controllers/login.php">
 
@@ -59,6 +65,7 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
     </div>
   </div>
 </div>
+      </main>
 <script src="/resources/js/formValidation.js"></script>
 
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php";?>
