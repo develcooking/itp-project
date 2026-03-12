@@ -168,10 +168,10 @@ if ($selectedTopicId) {
 
 <!-- Modal for creating Topic -->
 <div class="modal fade" id="createTopicModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header text-white" style="background-color: var(--accentColor);">
-                <h5 class="modal-title">Neues Thema erstellen</h5>
+                <h5 class="modal-title">Neues Thema und initiales Beitrag erstellen</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -182,6 +182,17 @@ if ($selectedTopicId) {
                         <label for="topicName" class="form-label">Titel des Themas</label>
                         <input type="text" class="form-control" name="topicName" id="topicName" placeholder="Titel eingeben" required>
                     </div>
+                </form>
+                <!-- Modal for creating initial Post -->
+                <form id="createPostFormInitial" action="/controllers/forum_actions.php" method="POST">
+                    <input type="hidden" name="action" value="createPost">
+                    <input type="hidden" name="topicId" value="<?= $selectedTopicId ?>">
+                    <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
+                    <input type="hidden" name="postContent" id="postContentHiddenInitial">
+                    <div class="mb-3">
+                        <label class="form-label">Ihre Nachricht</label>
+                        <div id="quillEditorInitial" style="height: 200px; background: white;"></div>
+                    </div>
                     <div class="text-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
                         <button type="submit" class="btn text-white" style="background-color: var(--accentColor);">Thema erstellen</button>
@@ -191,6 +202,33 @@ if ($selectedTopicId) {
         </div>
     </div>
 </div>
+
+    <script>
+        const quillInitial = new Quill('#quillEditorInitial', {
+            theme: 'snow',
+            placeholder: 'Schreiben Sie hier Ihre Nachricht...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
+        });
+
+        document.getElementById('createPostFormInitial').onsubmit = function() {
+            const postContentHiddenInitial = document.getElementById('postContentHiddenInitial');
+            postContentHiddenInitial.value = quillInitial.root.innerHTML;
+            console.log(quillInitial.getText().trim());
+            if (quillInitial.getText().trim().length === 0) {
+                alert('Bitte geben Sie eine Nachricht ein.');
+                return false;
+            }
+        };
+    </script>
 
 <!-- Modal for creating Post -->
 <div class="modal fade" id="createPostModal" tabindex="-1">
@@ -246,4 +284,5 @@ if ($selectedTopicId) {
             }
         };
     </script>
+    
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>

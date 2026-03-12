@@ -23,6 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'createTopic':
                 $name = trim($_POST['topicName'] ?? '');
                 $jobId = intval($_POST['jobId'] ?? 0);
+                $content = trim($_POST['postContent'] ?? '');
+                $topicId = intval($_POST['topicId'] ?? 0);
+                $jobId = intval($_POST['jobId'] ?? 0);
                 
                 if (!empty($name) && $jobId > 0) {
                     // Check access
@@ -38,8 +41,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $topic->setCreatedBy($userId);
                     $topic->setModifiedBy($userId);
                     
-                    if ($topic->post()) {
-                        header("Location: /views/forum.php?jobId=$jobId&topicId=" . $topic->getTopicId());
+                    //if ($topic->post()) {
+                    //    header("Location: /views/forum.php?jobId=$jobId&topicId=" . $topic->getTopicId());
+                    //    exit();
+                    //}
+
+                    // Basic XSS protection on input (optional, but good practice)
+                    $content = strip_tags($content, '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+
+                    $post = new Post($conn);
+                    $post->setTopicID($topicId);
+                    $post->setUserId($userId);
+                    $post->setContent($content);
+                    $post->setDescription('');
+                    $post->setReactionNegative(0);
+                    $post->setReactionPositive(0);
+                    $post->setCreatedBy($userId);
+                    $post->setModifiedBy($userId);
+                    
+                    if ($post->post()) {
+                        header("Location: /views/forum.php?jobId=$jobId&topicId=$topicId");
                         exit();
                     }
                 }
