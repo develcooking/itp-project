@@ -191,15 +191,16 @@ class Appointment
     public function update($appointmentId)
     {
         $query = " UPDATE " . $this->table . " 
-        SET title = ?, start = ?, end = ?, description = ? WHERE appointmentId = ?";
+        SET title = ?, start = ?, end = ?, description = ?, jobId = ? WHERE appointmentId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "ssssi",
+            "ssssii",
             $this->title,
             $this->start,
             $this->end,
             $this->description,
+            $this->jobId,
             $appointmentId
         );
 

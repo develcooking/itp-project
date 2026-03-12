@@ -29,7 +29,7 @@ $job = new Job($conn);
         <div class="modal-content">
             <form id="createEvent" method="post" action="../controllers/createEvent.php">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5 text-center" id="calendermanagementModalLabel">Termin erstellen</h1>
+                    <h1 class="modal-title fs-5 text-center" id="calenderCreateModal">Termin erstellen</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body pb-0">
@@ -102,7 +102,86 @@ $job = new Job($conn);
         </div>
     </div>
 </div>
+<!-- Modal Change-->
+<div class="modal fade" id="calenderChageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="calendermanagementModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="createEvent" method="post" action="../controllers/changeEvent.php">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 text-center" id="calenderChageModal">Termin ändern</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pb-0">
+                    <div class="text-center">
+                        <p class="text-muted mb-4">Füllen Sie die Details für die Änderung des Termin aus.</p>
+                    </div>
 
+                    <!-- Titel -->
+                    <div class="form-floating mb-3">
+                        <input type="text" name="changetitle" class="form-control" id="changetitle" placeholder="Name des Termins" required>
+                        <label for="changetitle">Name des Termins</label>
+                    </div>
+
+                    <!-- Start Datum & Zeit -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-md">
+                            <div class="form-floating">
+                                <input type="date" name="changestartdate" class="form-control" id="changestartdate" required value="">
+                                <label for="changestartdate">Start-Datum</label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="form-floating">
+                                <input type="time" name="changestarttime" class="form-control" id="changestarttime" required>
+                                <label for="changestarttime">Start-Uhrzeit</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ende Datum & Zeit -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-md">
+                            <div class="form-floating">
+                                <input type="date" name="changeenddate" class="form-control" id="changeenddate" required value="">
+                                <label for="changeenddate">End-Datum</label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="form-floating">
+                                <input type="time" name="changeendtime" class="form-control" id="changeendtime" required>
+                                <label for="changeendtime">End-Uhrzeit</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Beschreibung -->
+                    <div class="form-floating mb-3">
+                        <input type="text" name="changedescription" class="form-control" id="changedescription" placeholder="Ort oder Beschreibung">
+                        <label for="changedescription">Beschreibung / Ort (z.B. Hauptstraße)</label>
+                    </div>
+
+                    <!-- Berufsbereich Auswahl -->
+                    <div class="form-floating mb-4">
+                        <select name="changejobselection" class="form-select" id="changejobselection" required>
+                            <option value="" disabled selected>Bitte wählen...</option>
+                            <?php foreach ($jobIdsOfUser as $jobId): ?>
+                                <option value="<?= htmlspecialchars($jobId); ?>">
+                                    <?= htmlspecialchars($job->getNameById($jobId)); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="changejobselection">Berufsbereich</label>
+                    </div>
+                </div>
+                <input name="changeappointmentId" id="changeappointmentId" value="" class="invisible h-0 w-0">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                    <button id="modal_submit_btn" type="submit" class="btn btn-primary" aria-disabled="false">Termin speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script src="/resources/js/loadFullCalender.js"></script>
 
 <?php
