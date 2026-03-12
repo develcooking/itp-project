@@ -61,6 +61,28 @@ function updateDateLimits() {
     startdate.removeAttribute('max');
 }
 
+function disableChangeModal() {
+    const form = document.querySelector('#calenderChageModal form');
+    const inputs = form.querySelectorAll('input, select, textarea');
+
+    inputs.forEach(el => {
+        el.disabled = true;
+    });
+
+    document.getElementById("changeModalFooter").style.display = "none";
+}
+
+function enableChangeModal() {
+    const form = document.querySelector('#calenderChageModal form');
+    const inputs = form.querySelectorAll('input, select, textarea');
+
+    inputs.forEach(el => {
+        el.disabled = false;
+    });
+
+    document.getElementById("changeModalFooter").style.display = "flex";
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 
     var calendarEl = document.getElementById('calendar');
@@ -142,7 +164,13 @@ document.addEventListener('DOMContentLoaded', function () {
             // Set the job selection dropdown to the selected jobId
             changejobselection.value = info.event.extendedProps.jobId;
             changeappointmentId.value = info.event.id;
-            console.log(info.event.id);
+            let createdBy = info.event.extendedProps.createdBy;
+
+            if (createdBy != currentUserId && currentUserRole !== "admin") {
+                disableChangeModal();
+            } else {
+                enableChangeModal();
+            }
 
             mychangeModal.show();
         }

@@ -176,8 +176,11 @@ $job = new Job($conn);
         </div>
     </div>
 </div>
+<script>
+    const currentUserId = <?= $_SESSION['userId']; ?>;
+    const currentUserRole = "<?= $_SESSION['role']; ?>";
+</script>
 <script src="/resources/js/loadFullCalender.js"></script>
-
 <?php
 include "footer.php"
 ?>
