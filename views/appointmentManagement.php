@@ -22,7 +22,7 @@ $job = new Job($conn);
         <div class="modal-content">
             <form id="createEvent" method="post" action="../controllers/createEvent.php">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5 text-center" id="calenderCreateModal">Termin erstellen</h1>
+                    <h1 class="modal-title fs-5 text-center" id="calendermanagementModalLabel">Termin erstellen</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body pb-0">
@@ -40,7 +40,7 @@ $job = new Job($conn);
                     <div class="row g-2 mb-3">
                         <div class="col-md">
                             <div class="form-floating">
-                                <input type="date" name="startdate" class="form-control" id="startdate" required value="">
+                                <input type="date" name="startdate" class="form-control" id="startdate" required value="" min="<?php echo date('Y-m-d'); ?>">
                                 <label for="startdate">Start-Datum</label>
                             </div>
                         </div>
@@ -56,13 +56,13 @@ $job = new Job($conn);
                     <div class="row g-2 mb-3">
                         <div class="col-md">
                             <div class="form-floating">
-                                <input type="date" name="enddate" class="form-control" id="enddate" required value="">
+                                <input type="date" name="enddate" class="form-control" id="enddate" required value=""  min="<?php echo date('Y-m-d'); ?>" max="2100-12-31">
                                 <label for="enddate">End-Datum</label>
                             </div>
                         </div>
                         <div class="col-md">
                             <div class="form-floating">
-                                <input type="time" name="endtime" class="form-control" id="endtime" required>
+                                <input type="time" name="endtime" class="form-control" id="endtime" min="00:00" max="23:59" required>
                                 <label for="endtime">End-Uhrzeit</label>
                             </div>
                         </div>
@@ -86,6 +86,7 @@ $job = new Job($conn);
                         </select>
                         <label for="jobselection">Berufsbereich</label>
                     </div>
+                    <div id="dateError" class="alert alert-danger d-none"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>

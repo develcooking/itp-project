@@ -14,6 +14,32 @@ function changeSubBtnStatus(status) {
         }
     }
 }
+
+function validateDateTime() {
+    const startdate = document.getElementById('startdate').value;
+    const starttime = document.getElementById('starttime').value;
+    const enddate = document.getElementById('enddate').value;
+    const endtime = document.getElementById('endtime').value;
+    const errorBox = document.getElementById("dateError");
+
+    if (!startdate || !starttime || !enddate || !endtime) {
+        errorBox.classList.add("d-none");
+        changeSubBtnStatus(false);
+        return;
+    }
+
+    const start = new Date(`${startdate}T${starttime}`);
+    const end = new Date(`${enddate}T${endtime}`);
+
+    if (start >= end) {
+        errorBox.innerText = "Das Enddatum muss nach dem Startdatum liegen!";
+        errorBox.classList.remove("d-none");
+        changeSubBtnStatus(false);
+    } else {
+        errorBox.classList.add("d-none");
+        changeSubBtnStatus(true);
+    }
+}
 function splitdateForChangeModle(datetimestring) {
     const date = new Date(datetimestring);
 
@@ -22,7 +48,21 @@ function splitdateForChangeModle(datetimestring) {
     const hhMm = date.toISOString().split('T')[1].substring(0, 5); // '05:00'
     return [yyyyMmDd, hhMm]
 }
+
+function updateDateLimits() {
+    const startdate = document.getElementById('startdate');
+    const enddate = document.getElementById('enddate');
+
+    // Enddatum darf nicht vor Startdatum liegen
+    enddate.min = startdate.value;
+
+    // Startdatum darf beliebig bleiben
+    // startdate.max entfernen oder ignorieren
+    startdate.removeAttribute('max');
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+
     var calendarEl = document.getElementById('calendar');
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -43,27 +83,36 @@ document.addEventListener('DOMContentLoaded', function () {
             day: 'Tag',
             list: 'Liste'
         },
-
+        
         // calling events from getEvents.php
         events: '../controllers/getEvents.php',
 
 
 
         dateClick: function (info) {
+
+            let clickedDate = new Date(info.dateStr);
+            let today = new Date();
+            today.setHours(0,0,0,0);
+
+            if (clickedDate < today) {
+                return;
+            }
+
             var myModal = new bootstrap.Modal(document.getElementById("calendermanagementModal"));
-
+ 
             // set the startdate and enddate to the user clicked date
-            let startdate= document.getElementById('startdate');
-            let enddate= document.getElementById('enddate');
-            startdate.value = info.dateStr;
-            enddate.value = info.dateStr;
+            let startdate = document.getElementById('startdate');
+            let enddate = document.getElementById('enddate');
+            startdate.value = info.dateStr.substring(0,10);
+            enddate.value = info.dateStr.substring(0,10);
 
-            // check for right format
-            const modal_submit_btn = document.getElementById('modal_submit_btn');
-            startdate.addEventListener("change", (event) => {
-                result.textContent = `You like ${event.target.value}`;
-            });
-            //alert('Termin\n Title: ' + info.event.title + '\n Beschreibung: ' + info.event.extendedProps.description + '\n Beginn: ' + info.event.start + '\n Ende: ' + info.event.end);
+            // Initial limits setzen
+            updateDateLimits();
+
+            // Submit-Button deaktivieren, bis validiert
+            changeSubBtnStatus(false);
+
             myModal.show();
         },
 
@@ -100,4 +149,24 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     calendar.render();
+
+    // Listener für Datumsänderungen
+    const startdateEl = document.getElementById('startdate');
+    const enddateEl = document.getElementById('enddate');
+    const starttimeEl = document.getElementById('starttime');
+    const endtimeEl = document.getElementById('endtime');
+
+    startdateEl.addEventListener('change', function() {
+        updateDateLimits();
+        validateDateTime();
+    });
+
+    enddateEl.addEventListener('change', function() {
+        updateDateLimits();
+        validateDateTime();
+    });
+
+    starttimeEl.addEventListener('change', validateDateTime);
+    endtimeEl.addEventListener('change', validateDateTime);
+
 });

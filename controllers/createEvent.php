@@ -11,7 +11,7 @@ if (!isset($_SESSION['userId'])) {
 $errorMessages = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // create Termin
+    // Get form values
     $title = $_POST['title'];
     $createdBy = $_SESSION['userId'];
     $modifiedBy = $_SESSION['userId'];
@@ -19,6 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $starttime = $_POST['starttime'];
     $enddate = $_POST['enddate'];
     $endtime = $_POST['endtime'];
+    $jobId = $_POST['jobselection'];
+
     if (isset($_POST["description"])) {
         $description = $_POST["description"];
     } else {
@@ -35,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             die("You are not authorized to create events for this professional area.");
         }
     }
-
+    // Build datetime values
     $startDateTime = $startdate . ' ' . $starttime . ':00'; // Ergebnis: "2023-10-27 14:30:00"
     $endDateTime = $enddate . ' ' . $endtime . ':00';
 
@@ -71,10 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // Display error messages
 if (!empty($errorMessages)) {
-    echo "<div style='background-color: red'>";
+    echo "<div style='background-color:red; padding:10px; color:white;'>";
     foreach ($errorMessages as $errorMessage) {
         echo "<p>$errorMessage</p>";
     }
     echo "</div>";
     die();
 }
+?>
