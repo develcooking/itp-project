@@ -254,7 +254,7 @@ class User
         $stmt = $this->conn->prepare($query);
 
         $password = password_hash($this->password, PASSWORD_DEFAULT);
-        $stmt->bind_param("s",$password);
+        $stmt->bind_param("si",$password, $this->userId);
         $ok = $stmt->execute();
         $stmt->close();
         return $ok;
