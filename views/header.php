@@ -36,11 +36,9 @@ if (empty($current_page)) {
     <title>Ausbildungsportal.net</title>
     <link rel="stylesheet" href="../resources/css/bootstrap.min.css">
     <link rel="stylesheet" href="../resources/css/bootstrap-icons.css">
-    <link rel="stylesheet" href="/resources/css/datatables.min.css">
     <link rel="stylesheet" type="text/css" href="/resources/css/styles.css">
 </head>
 <body>
-     <script src="/resources/js/datatables.min.js"></script>
 <?php if (empty($_SESSION['userId'])): ?>
     <!-- Header (logo only) for not logged-in users -->
     <header class="header d-flex align-items-center justify-content-between px-3">
@@ -61,8 +59,9 @@ if (empty($current_page)) {
     <a href="/views/appointmentManagement.php" class="nav-btn-primary border-end <?= $current_page === 'appointmentManagement' ? 'current' : ''; ?>">Termine</a>
     <a href="/views/forum_start.php" class="nav-btn-primary border-end<?= $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
     <?php if ($_SESSION['role'] === 'Admin'): ?>
-        <a href="/views/adminPage.php" class="nav-btn-primary border-end <?= $current_page === 'adminPage' ? 'current' : ''; ?>">Admin</a>
-    <?php endif; ?>
+        <a href="/views/adminPage.php" class="nav-btn-primary border-end <?= $current_page === 'adminPage' ? 'current' : ''; ?>">Benutzerverwaltung</a>
+        <a href="/views/adminJobs.php" class="nav-btn-primary border-end <?= $current_page === 'adminJobs' ? 'current' : ''; ?>">Berufsbereiche</a>
+        <?php endif; ?>
     <form method="post" action="/controllers/login.php" class="nav-logout-form">
         <button type="submit" name="logout" class="btn-outline-primary rounded-0">Abmelden</button>
     </form>

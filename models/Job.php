@@ -50,8 +50,24 @@ class Job
         return $jobs ?? [];
     }
 
+    public function existsByName($name) : bool
+    {
+        $query = "SELECT COUNT(*) as cnt FROM " . $this->table . " WHERE name = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("s", $name);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        return $row['cnt'] > 0;
+    }
+
     public function post() : bool
     {
+        if ($this->existsByName($this->name)) {
+            return false;
+        }
+
         $query = " INSERT INTO " . $this->table . "
         (name, createdBy, modifiedBy ) VALUES (?, ?, ?)";
 
@@ -135,11 +151,12 @@ class Job
         return false;
     }
 
-    public function delete() : bool
+    public function delete($jobId = null) : bool
     {
+        $id = $jobId ?? $this->jobId;
         $query = "DELETE FROM " . $this->table . " WHERE jobId = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $this->jobId);
+        $stmt->bind_param("i", $id);
         if ($stmt->execute()) {
             $stmt->close();
             return true;

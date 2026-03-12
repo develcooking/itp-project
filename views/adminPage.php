@@ -1,8 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
+include './header.php';
 ?>
-
-<?php include './header.php'; ?>
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="../resources/css/datatables.min.css">
     <!-- DataTables JS -->
@@ -114,8 +113,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
     </div>
 </div>
     </div>
-</main>
 
-<?php include './footer.php'; ?>
+<?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>
 
 <script src="/resources/js/adminPage.js"></script>
