@@ -1,5 +1,25 @@
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";?>
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
+
+// Prüfe ob der eingeloggte Nutzer noch aktiviert ist
+if (!empty($_SESSION['userId'])) {
+    $checkUser = new User($conn);
+    if ($checkUser->getById($_SESSION['userId'])) {
+        if ($checkUser->getActivated() !== 1) {
+            session_destroy();
+            header("Location: /views/loginsite.php?deactivated=1");
+            exit();
+        }
+    } else {
+        // User existiert nicht mehr in der DB
+        session_destroy();
+        header("Location: /views/loginsite.php");
+        exit();
+    }
+}
+
 // Get the current page name from the URL
 $current_page = basename($_SERVER['REQUEST_URI'], '.php');
 if (empty($current_page) || $current_page === '') {
@@ -21,35 +41,39 @@ if (empty($current_page) || $current_page === '') {
 </head>
 <body>
      <script src="/resources/js/datatables.min.js"></script>
-    <div class="header">
-        <a class="hat" href="../index.php" tabindex="-1">
-            <h2>Ausbildungsportal.net</h2>
+<?php if (empty($_SESSION['userId'])): ?>
+    <!-- Header (logo only) for not logged-in users -->
+    <header class="header d-flex align-items-center justify-content-between px-3">
+        <a class="hat" href="../index.php">
+            <img src="/resources/imgs/logo.jpeg" alt="Ausbildungsportal.net Logo" class="site-logo">
         </a>
-
         <div id="headerspacer"></div>
-    </div>
+    </header>
+<?php endif; ?>
 
-    <?php if (!empty($_SESSION['userId'])): ?>
-    <nav class="navbar">
-        <a href="/views/startpage.php" class="nav-btn <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
-        <!-- <a href="/views/loginsite.php" class="nav-btn <?=  $current_page === 'loginsite' ? 'current' : ''; ?>">Login</a> -->
-        <a href="/views/appointmentManagement.php" class="nav-btn <?=  $current_page === 'appointmentManagement' ? 'current' : ''; ?>">Termine</a>
-        <a href="/views/forum_start.php" class="nav-btn <?=  $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
-        <?php if ($_SESSION['role'] === 'Admin'): ?>   <!-- Nur Admins dürfen Adminpage sehen  !-->
-        <a href="/views/adminPage.php" class="nav-btn <?= $current_page === 'adminPage' ? 'current' : ''; ?>">Admin</a>
-         <?php endif; ?>
-        <form method="post" action="/controllers/login.php" class="nav-logout-form">
-            <button type="submit" name="logout" class="nav-btn">Abmelden</button>
-        </form>
-    </nav>
-    <?php else:
-        // List of public pages that don't require authentication
-        $public_pages = ['loginsite', 'createAccount', 'passwordForgot', 'passwordReset', 'successRegister', 'index'];
-        if (!in_array($current_page, $public_pages)) {
-            header("Location: /views/loginsite.php");
-            exit();
-        }
-    ?>
+<!-- Navbar (always visible when logged in) -->
+<?php if (!empty($_SESSION['userId'])): ?>
+<nav class="navbar justify-content-start border-2 border-bottom p-0">
+    <a href="../index.php" class="logo border-end">
+        <img src="/resources/imgs/logo.jpeg" alt="Ausbildungsportal.net Logo" class="nav-logo">
+    </a>
+    <a href="/views/startpage.php" class="nav-btn-primary border-end <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
+    <a href="/views/appointmentManagement.php" class="nav-btn-primary border-end <?= $current_page === 'appointmentManagement' ? 'current' : ''; ?>">Termine</a>
+    <a href="/views/forum_start.php" class="nav-btn-primary border-end<?= $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
+    <?php if ($_SESSION['role'] === 'Admin'): ?>
+        <a href="/views/adminPage.php" class="nav-btn-primary border-end <?= $current_page === 'adminPage' ? 'current' : ''; ?>">Admin</a>
     <?php endif; ?>
+    <form method="post" action="/controllers/login.php" class="nav-logout-form">
+        <button type="submit" name="logout" class="btn-outline-primary rounded-0">Abmelden</button>
+    </form>
+</nav>
+<?php endif; ?>
 
-<div class="main-container">
+<div class="main-container align-items-center">
+
+
+
+
+
+
+

@@ -112,6 +112,22 @@ if ($action === 'toggleActivated') {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Invalid user or job ID'], JSON_UNESCAPED_UNICODE);
     }
+} elseif ($action === 'updateRole') {
+    $userId = intval($_POST['userId'] ?? 0);
+    $role = trim($_POST['role'] ?? '');
+
+    if ($userId > 0 && !empty($role)) {
+        $user = new User($conn);
+        if ($user->updateRole($userId, $role)) {
+            echo json_encode(['success' => true, 'message' => 'Rolle aktualisiert'], JSON_UNESCAPED_UNICODE);
+        } else {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Ungültige Rolle oder Fehler beim Aktualisieren'], JSON_UNESCAPED_UNICODE);
+        }
+    } else {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Ungültige Parameter'], JSON_UNESCAPED_UNICODE);
+    }
 } elseif ($action === 'deleteUser') {
     $userId = intval($_POST['userId'] ?? 0);
 
