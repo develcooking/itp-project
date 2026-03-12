@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f291d9c9-880c-4a77-b7f3-0b20c2d803a9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/login.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/login.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/db.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/db.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/loginsite.php" beforeDir="false" afterPath="$PROJECT_DIR$/views/loginsite.php" afterDir="false" />
-    </list>
+    <list default="true" id="f291d9c9-880c-4a77-b7f3-0b20c2d803a9" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -98,7 +93,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "hotfix/login-page-bug-fixes",
+    "git-widget-placeholder": "hotfix/updating-function-reset-password",
     "javascript.preferred.runtime.type.id": "node",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "/Users/aleksandrsmagin/Desktop/itp-project",
