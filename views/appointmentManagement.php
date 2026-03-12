@@ -13,14 +13,7 @@ $job = new Job($conn);
 <script src='../resources/js/fullCalendar.min.js'></script>
 <script src='../resources/js/fullCalendarBootstrapPlugin.js'></script>
 
-<div class="calendar-container">
-  <a href="createEvent.php" class="btn btn-secondary float-end">
-    Termin erstellen
-  </a>
-  
-  <br>
-  <br>
-
+<div class="calendar-container pb-4 pt-4">
   <div id='calendar'></div>
 </div>
 <!-- Modal -->
