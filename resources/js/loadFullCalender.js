@@ -61,26 +61,37 @@ function updateDateLimits() {
     startdate.removeAttribute('max');
 }
 
-function disableChangeModal() {
+function disableChangeModal(creatorName) {
     const form = document.querySelector('#calenderChageModal form');
     const inputs = form.querySelectorAll('input, select, textarea');
+    const changeModalTitle = document.getElementById('changeModalTitle');
+    changeModalTitle.style.display = "none";
+    const calenderChageModalLabel = document.getElementById('calenderChageModalLabel');
+    calenderChageModalLabel.innerText = 'Infos zum Termin';
 
     inputs.forEach(el => {
         el.disabled = true;
     });
 
-    document.getElementById("changeModalFooter").style.display = "none";
+    document.getElementById("modalFooterChangeButtons").style.display = "none";
+    document.getElementById("modalFooterCreatedBy").style.display = "block";
+    document.getElementById("modalFooterCreatedByInput").value = "Erstellt von: " + (creatorName || "Unbekannt");
 }
 
 function enableChangeModal() {
     const form = document.querySelector('#calenderChageModal form');
     const inputs = form.querySelectorAll('input, select, textarea');
+    const changeModalTitle = document.getElementById('changeModalTitle');
+    changeModalTitle.style.display = "block";
+    const calenderChageModalLabel = document.getElementById('calenderChageModalLabel');
+    calenderChageModalLabel.innerText = 'Termin ändern';
 
     inputs.forEach(el => {
         el.disabled = false;
     });
 
-    document.getElementById("changeModalFooter").style.display = "flex";
+    document.getElementById("modalFooterChangeButtons").style.display = "block";
+    document.getElementById("modalFooterCreatedBy").style.display = "none";
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -165,9 +176,10 @@ document.addEventListener('DOMContentLoaded', function () {
             changejobselection.value = info.event.extendedProps.jobId;
             changeappointmentId.value = info.event.id;
             let createdBy = info.event.extendedProps.createdBy;
+            let creatorName = info.event.extendedProps.creatorName;
 
             if (createdBy != currentUserId && currentUserRole !== "admin") {
-                disableChangeModal();
+                disableChangeModal(creatorName);
             } else {
                 enableChangeModal();
             }

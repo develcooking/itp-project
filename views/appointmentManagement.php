@@ -97,16 +97,16 @@ $job = new Job($conn);
     </div>
 </div>
 <!-- Modal Change-->
-<div class="modal fade" id="calenderChageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="calendermanagementModalLabel" aria-hidden="true">
+<div class="modal fade" id="calenderChageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="calenderChageModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="createEvent" method="post" action="../controllers/changeEvent.php">
+            <form id="changeEventForm" method="post" action="../controllers/changeEvent.php">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5 text-center" id="calenderChageModal">Termin ändern</h1>
+                    <h1 class="modal-title fs-5 text-center" id="calenderChageModalLabel">Termin ändern</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body pb-0">
-                    <div class="text-center">
+                    <div class="text-center" id="changeModalTitle">
                         <p class="text-muted mb-4">Füllen Sie die Details für die Änderung des Termin aus.</p>
                     </div>
 
@@ -168,9 +168,14 @@ $job = new Job($conn);
                     </div>
                 </div>
                 <input name="changeappointmentId" id="changeappointmentId" value="" class="invisible h-0 w-0">
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                    <button id="modal_submit_btn" type="submit" class="btn btn-primary" aria-disabled="false">Termin speichern</button>
+                <div class="modal-footer" id="changeModalFooter">
+                    <div id="modalFooterChangeButtons">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                        <button id="modal_submit_btn" type="submit" class="btn btn-primary" aria-disabled="false">Termin speichern</button>
+                    </div>
+                    <div id="modalFooterCreatedBy" class="mx-auto" style="display: none;">
+                        <input type="text" class="form-control disabled" disabled id="modalFooterCreatedByInput" placeholder="Creator" value="Creator Unbekannt">
+                    </div>
                 </div>
             </form>
         </div>

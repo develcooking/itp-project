@@ -60,6 +60,7 @@ foreach ($appointments as $row) {
             'description' => $row['description'],
             'jobId'       => (int)$row['jobId'],
             'createdBy'   => (int)$row['createdBy'],
+            'creatorName' => $row['creatorName'],
         ],
     ];
 }
