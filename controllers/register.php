@@ -1,26 +1,35 @@
 <?php
-session_start();
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
 
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createAccount'])) {
+    validateCsrfOrDie();
     $userName = htmlspecialchars(trim($_POST['userName'] ?? ''));
     $firstName = htmlspecialchars(trim($_POST['firstName'] ?? ''));
     $lastName = htmlspecialchars(trim($_POST['lastName'] ?? ''));
     $email = htmlspecialchars(trim($_POST['email'] ?? ''));
-    $password = htmlspecialchars(trim($_POST['password'] ?? ''));
+    $password = trim($_POST['password'] ?? '');
     $role = htmlspecialchars(trim($_POST['role'] ?? ''));
-    $securityAnswer = htmlspecialchars(trim($_POST['securityAnswer'] ?? ''));
+    $securityAnswer = trim($_POST['securityAnswer'] ?? '');
     $schoolCompany = htmlspecialchars(trim($_POST['school_company'] ?? ''));
 
     if (empty($userName) || empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($role) || empty($securityAnswer)) {
         $errors['general'] = 'Bitte füllen Sie alle Felder aus!';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors['email'] = 'Ungültiges E-Mail-Format!';
-    } elseif (strlen($password) < 6) {
-        $errors['password'] = 'Passwort muss mindestens 6 Zeichen lang sein!';
+    } elseif (strlen($password) < 8) {
+        $errors['password'] = 'Passwort muss mindestens 8 Zeichen lang sein!';
+    } elseif ($password !== $securityAnswer) {
+        $errors['password'] = 'Passwort kann nicht Sicherheitsantwort sein!';
+    } elseif (!preg_match('/[A-Z]/', $password)) {
+        $errors['password'] = 'Passwort muss min ein Großzeichen haben!';
+    } elseif (!preg_match('/[a-z]/', $password)) {
+        $errors['password'] = 'Passwort muss min ein Kleinzeichen haben!';
+    } elseif (!preg_match('/[^A-Za-z0-9]/', $password)) {
+        $errors['password'] = 'Passwort muss min ein Sonderzeichen haben!';
     } else {
         $user = new User($conn);
 
