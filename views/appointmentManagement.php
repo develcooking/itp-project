@@ -5,16 +5,64 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/models/UserJobs.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Job.php";
 
 $user_jobs = new UserJobs($conn);
-$jobIdsOfUser = $user_jobs->getJobsForUserByID($_SESSION['userId']);
-
 $job = new Job($conn);
+$isAdmin = isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin';
+
+if ($isAdmin) {
+    // Admins see all jobs
+    $allJobs = $job->getAll();
+    $jobIdsOfUser = array_column($allJobs, 'jobId');
+} else {
+    $jobIdsOfUser = $user_jobs->getJobsForUserByID($_SESSION['userId']);
+}
 ?>
 
 <script src='../resources/js/fullCalendar.min.js'></script>
 <script src='../resources/js/fullCalendarBootstrapPlugin.js'></script>
 
-<div class="calendar-container pb-4 pt-4">
-  <div id='calendar'></div>
+<div class="container-fluid pb-4 pt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary">
+                    <h5 class="mb-0"><i class="bi bi-funnel"></i> Filter</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Berufsbereich Filter -->
+                    <div class="mb-4">
+                        <label for="filterJob" class="form-label fw-bold">Berufsbereich</label>
+                        <select id="filterJob" class="form-select">
+                            <option value="">Alle Bereiche</option>
+                            <?php foreach ($jobIdsOfUser as $jobId): ?>
+                                <option value="<?= htmlspecialchars($jobId); ?>">
+                                    <?= htmlspecialchars($job->getNameById($jobId)); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <!-- Zeitraum Filter -->
+                    <div class="mb-3">
+                        <label for="filterStartDate" class="form-label fw-bold">Von</label>
+                        <input type="date" id="filterStartDate" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="filterEndDate" class="form-label fw-bold">Bis</label>
+                        <input type="date" id="filterEndDate" class="form-control">
+                    </div>
+                    <button id="resetFilter" class="btn btn-outline-secondary btn-sm w-100 mt-2">Filter zurücksetzen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar -->
+        <div class="col-md-9 col-lg-10">
+            <div class="calendar-container shadow-sm p-3 bg-white rounded">
+                <div id='calendar'></div>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- Modal -->
 <div class="modal fade" id="calendermanagementModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="calendermanagementModalLabel" aria-hidden="true">

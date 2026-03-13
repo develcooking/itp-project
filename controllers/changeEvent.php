@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $startDateTime = $startdate . ' ' . $starttime . ':00'; // Ergebnis: "2023-10-27 14:30:00"
     $endDateTime = $enddate . ' ' . $endtime . ':00';
-    if (strtotime($startDateTime) > strtotime($endDateTime)) {
+    if (strtotime($startDateTime) < strtotime($endDateTime)) {
 
 
         if (empty($title) || empty($userId) || empty($startDateTime) || empty($endDateTime)) {

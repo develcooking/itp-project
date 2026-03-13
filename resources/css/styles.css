@@ -3,6 +3,7 @@
 :root {
   --accentColor: #575756;
   --backgroundWhite: #fff;
+  --bg-color: #fbbf03cc;
 }
 
 /* ===================== BODY ===================== */
@@ -68,7 +69,7 @@ main {
 
 .nav-btn-primary:hover,
 .nav-btn-primary.current:hover {
-    background-color: #fbbf03cc;
+    background-color: var(--bg-color);
     color: var(--accentColor);
 }
 
@@ -103,17 +104,19 @@ border-color: var(--accentColor);
 }
 
 .btn-primary:hover{
-background-color:  #fbbf03cc;
+background-color:  var(--bg-color);
 color:var(--accentColor);
-border-color:  #fbbf03cc;
+border-color:  var(--bg-color);
 }
-
+.bg-primary {
+    background-color: var(--bg-color) !important;
+}
 
 .fc .btn-group .btn.active,
 .fc .fc-today-button {
-  background-color: #fbbf03cc;
+  background-color: var(--bg-color);
   color: var(--accentColor);
-  border-color: #fbbf03cc;
+  border-color: var(--bg-color);
 }
 
 #modal_submit_btn {

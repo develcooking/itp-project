@@ -118,7 +118,19 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         
         // calling events from getEvents.php
-        events: '../controllers/getEvents.php',
+        events: {
+            url: '../controllers/getEvents.php',
+            extraParams: function() {
+                const filterJob = document.getElementById('filterJob');
+                const filterStartDate = document.getElementById('filterStartDate');
+                const filterEndDate = document.getElementById('filterEndDate');
+                return {
+                    jobId: filterJob ? filterJob.value : '',
+                    filterStart: filterStartDate ? filterStartDate.value : '',
+                    filterEnd: filterEndDate ? filterEndDate.value : ''
+                };
+            }
+        },
 
 
 
@@ -189,6 +201,43 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     calendar.render();
+
+    // Filter listeners
+    const filterJob = document.getElementById('filterJob');
+    const filterStartDate = document.getElementById('filterStartDate');
+    const filterEndDate = document.getElementById('filterEndDate');
+    const resetFilter = document.getElementById('resetFilter');
+
+    if (filterJob) {
+        filterJob.addEventListener('change', function() {
+            calendar.refetchEvents();
+        });
+    }
+
+    if (filterStartDate) {
+        filterStartDate.addEventListener('change', function() {
+            if (this.value) {
+                calendar.gotoDate(this.value);
+            }
+            calendar.refetchEvents();
+        });
+    }
+
+    if (filterEndDate) {
+        filterEndDate.addEventListener('change', function() {
+            calendar.refetchEvents();
+        });
+    }
+
+    if (resetFilter) {
+        resetFilter.addEventListener('click', function() {
+            if (filterJob) filterJob.value = "";
+            if (filterStartDate) filterStartDate.value = "";
+            if (filterEndDate) filterEndDate.value = "";
+            calendar.gotoDate(new Date());
+            calendar.refetchEvents();
+        });
+    }
 
     // Listener für Datumsänderungen
     const startdateEl = document.getElementById('startdate');

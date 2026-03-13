@@ -37,11 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             die("You are not authorized to create events for this professional area.");
         }
     }
+    if (strtolower($_SESSION['role']) == 'ausbilder'){
+        die('You are not authorized to create events');
+    }
     // Build datetime values
     $startDateTime = $startdate . ' ' . $starttime . ':00'; // Ergebnis: "2023-10-27 14:30:00"
     $endDateTime = $enddate . ' ' . $endtime . ':00';
 
-    if (strtotime($startDateTime) > strtotime($endDateTime)) {
+    if (strtotime($startDateTime) < strtotime($endDateTime)) {
         if (empty($title) || empty($createdBy) || empty($startDateTime) || empty($endDateTime)) {
             http_response_code(400);
             array_push($errorMessages, "Bitte füllen Sie alle Felder aus!");
