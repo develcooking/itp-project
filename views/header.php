@@ -1,23 +1,8 @@
-<?php include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";?>
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
-require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
 
-// Prüfe ob der eingeloggte Nutzer noch aktiviert ist
-if (!empty($_SESSION['userId'])) {
-    $checkUser = new User($conn);
-    if ($checkUser->getById($_SESSION['userId'])) {
-        if ($checkUser->getActivated() !== 1) {
-            session_destroy();
-            header("Location: /views/loginsite.php?deactivated=1");
-            exit();
-        }
-    } else {
-        // User existiert nicht mehr in der DB
-        session_destroy();
-        header("Location: /views/loginsite.php");
-        exit();
-    }
+if (!isset($_SESSION)) {
+    session_start();
 }
 
 // Get the current page name from the URL

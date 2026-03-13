@@ -1,8 +1,10 @@
 <?php
-session_start();
-if (!isset($_SESSION['userId'])) {
-  header('Location: ' . "/views/loginsite.php");
-} else {
-    header('Location: ' . "/views/startpage.php");
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
+
+if (!empty($_SESSION['userId'])) {
+    header("Location: /views/startpage.php");
+    exit();
 }
-?>
+
+header("Location: /views/loginsite.php");
+exit();
