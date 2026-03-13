@@ -67,7 +67,6 @@ include './header.php';
                 <th>Email</th>
                 <th>Rolle</th>
                 <th>Wann</th>
-                <th class="w-auto">Berufsbereiche</th>
                 <th class="w-auto">Aktionen</th>
             </tr>
             </thead>
@@ -87,11 +86,9 @@ include './header.php';
                     </td>
                     <td><?= $user['createdAt'] ? date('d.m.Y H:i', strtotime($user['createdAt'])) : '' ?></td>
                     <td class="text-nowrap" style="width:1%">
-                        <button class="btn btn-primary btn-sm jobs-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">
+                        <button class="btn btn-primary btn-sm me-1 jobs-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">
                             Berufsbereiche
                         </button>
-                    </td>
-                    <td class="text-nowrap" style="width:1%">
                         <button class="btn btn-danger btn-sm delete-user-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">
                             Löschen
                         </button>
