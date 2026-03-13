@@ -51,7 +51,7 @@ class UsersSeeder
             ]
         ];
 
-        $randomUsers = $this->generateRandomUsers(100);
+        $randomUsers = $this->generateRandomUsers(10);
 
         $allUsers = array_merge($fixedUsers, $randomUsers);
 
