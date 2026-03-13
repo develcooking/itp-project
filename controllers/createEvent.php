@@ -60,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
             if ($appointmentmodel->post()) {
-                http_response_code(response_code: 201);
                 #echo "Termin erfolgreich erstellt!";
                 header("Location: " . "../views/appointmentManagement.php");
             } else {
