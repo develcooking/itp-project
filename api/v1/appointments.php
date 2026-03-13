@@ -55,6 +55,7 @@ switch ($method) {
         checkLoggedIn();
         $data = getJsonInput();
         if (!$data || !isset($data['title']) || !isset($data['jobId'])) {
+            canCreateAppointment($data['jobId']);
             sendResponse(false, null, 'Invalid input or missing title/jobId', 400);
         }
 
@@ -79,6 +80,7 @@ switch ($method) {
         if (!$data || !isset($data['appointmentId'])) {
             sendResponse(false, null, 'Invalid input or missing appointmentId', 400);
         }
+        hasAccessToJob($data['jobId']);
 
         $id = intval($data['appointmentId']);
         if (!$appointment->getById($id)) {

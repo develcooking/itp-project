@@ -16,20 +16,30 @@ if (!isset($_SESSION)) session_start();
 $method = $_SERVER['REQUEST_METHOD'];
 $job = new Job($conn);
 
+if (!is_numeric($_GET['id'])) {
+    sendResponse(false, null, 'JobId is not numeric!', 400);
+}
 switch ($method) {
     case 'GET':
         if (isset($_GET['id'])) {
-            if ($job->getById(intval($_GET['id']))) {
-                $data = [
-                    'jobId' => $_GET['id'],
-                    'name' => $job->getNameById(intval($_GET['id']))
-                ];
-                sendResponse(true, $data);
-            } else {
-                sendResponse(false, null, 'Job not found', 404);
+            if (hasAccessToJob($_GET['id'])) {
+                if ($job->getById(intval($_GET['id']))) {
+                    $data = [
+                        'jobId' => $_GET['id'],
+                        'name' => $job->getNameById(intval($_GET['id']))
+                    ];
+                    sendResponse(true, $data, '', 200);
+                } else {
+                    sendResponse(false, null, 'Job not found', 404);
+                }
             }
         } else {
-            sendResponse(true, $job->getAll());
+            if (checkAdmin()) {
+                sendResponse(true, $job->getAll(), '', 200);
+            } else {
+                sendResponse(false, null, 'Forbidden: Admin access required', 403);
+            }
+
         }
         break;
 

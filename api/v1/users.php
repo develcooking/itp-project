@@ -11,11 +11,11 @@ include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
 include_once __DIR__ . "/api_helper.php";
 
-if (!isset($_SESSION)) session_start();
-
 $method = $_SERVER['REQUEST_METHOD'];
 $user = new User($conn);
 
+// Only Admins can use this api endpoint
+checkAdmin();
 switch ($method) {
     case 'GET':
         if (isset($_GET['id'])) {
@@ -25,14 +25,11 @@ switch ($method) {
                 sendResponse(false, null, 'User not found', 404);
             }
         } else {
-            // For now, only admin can list all users
-            checkAdmin();
             sendResponse(true, $user->getAll());
         }
         break;
 
     case 'POST':
-        checkAdmin();
         $data = getJsonInput();
         if (!$data) sendResponse(false, null, 'Invalid JSON input', 400);
 
@@ -83,7 +80,6 @@ switch ($method) {
         break;
 
     case 'DELETE':
-        checkAdmin();
         $data = getJsonInput();
         $id = $data['userId'] ?? $_GET['id'] ?? null;
         
