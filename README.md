@@ -23,7 +23,9 @@ DB_HOST=127.0.0.1
 DB_USER=xxx
 DB_PASS=xxx
 DB_NAME=xxx
+APP_ENV=production
 ```
+Wenn APP_ENV nicht `development` ist, werden sql errors nicht angezeigt.
 
 
 IPv6 : `2001:1640:18e:8000:be24:11ff:fe45:c45f`

@@ -6,7 +6,11 @@ $dotenv->load();
 $homepath = $_SERVER['DOCUMENT_ROOT'];
 
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+if ($_ENV['APP_ENV'] != 'development') {
+    ini_set('display_errors', 0);
+} else {
+    ini_set('display_errors', 1);
+}
 $conn = null;
 
 if (!isset($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME'])) {
