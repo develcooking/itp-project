@@ -33,7 +33,7 @@ $action = $_POST['action'] ?? '';
 
 switch ($action) {
     case 'createJob':
-        $name = trim($_POST['name'] ?? '');
+        $name = htmlspecialchars(trim(($_POST['name'] ?? '')));
 
         if (empty($name)) {
             http_response_code(400);
