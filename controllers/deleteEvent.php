@@ -28,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     // delete appointment by id
     if ($appointmentmodel->delete($appointmentId)) {
-        http_response_code(response_code: 201);
         header("Location: " . "../views/appointmentManagement.php");
     } else {
         http_response_code(500);
