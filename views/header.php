@@ -62,9 +62,21 @@ if (empty($current_page) || $current_page === '') {
         <a href="/views/adminPage.php" class="nav-btn-primary border-end <?= $current_page === 'adminPage' ? 'current' : ''; ?>">Benutzerverwaltung</a>
         <a href="/views/adminJobs.php" class="nav-btn-primary border-end <?= $current_page === 'adminJobs' ? 'current' : ''; ?>">Berufsbereiche</a>
         <?php endif; ?>
-    <form method="post" action="/controllers/login.php" class="nav-logout-form">
-        <button type="submit" name="logout" class="btn-outline-primary rounded-0">Abmelden</button>
-    </form>
+    <div class="btn-group nav-logout-form" role="group">
+        <a href="/views/profile.php" class="btn btn-outline-primary rounded-0 nav-account-btn">
+            <i class="bi bi-person-circle me-1"></i> Account
+        </a>
+        <button type="button" class="btn btn-outline-primary rounded-0 dropdown-toggle dropdown-toggle-split nav-account-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="visually-hidden">Menü öffnen</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end nav-account-dropdown">
+            <li>
+                <form method="post" action="/controllers/login.php" class="m-0">
+                    <button type="submit" name="logout" class="dropdown-item nav-logout-btn">Abmelden</button>
+                </form>
+            </li>
+        </ul>
+    </div>
 </nav>
 <?php endif; ?>
 

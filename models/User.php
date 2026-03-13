@@ -383,6 +383,16 @@ class User
     return $row['email_count'] > 0;
     }
 
+    public function updateProfile(int $userId): bool
+    {
+        $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ? WHERE userId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("ssssi", $this->userName, $this->firstName, $this->lastName, $this->email, $userId);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
+
     public function updateRole(int $userId, string $role): bool
     {
         $allowedRoles = ['Ausbilder', 'Lehrer', 'Admin'];
