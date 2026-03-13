@@ -63,7 +63,7 @@ switch ($action) {
 
     case 'updateJob':
         $jobId = intval($_POST['jobId'] ?? 0);
-        $name = trim($_POST['name'] ?? '');
+        $name = htmlspecialchars(trim($_POST['name'] ?? ''));
 
         if ($jobId <= 0 || empty($name)) {
             http_response_code(400);
