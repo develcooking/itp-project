@@ -228,7 +228,7 @@ class Appointment
     {
         $query = "DELETE FROM " . $this->table . " WHERE appointmentId = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $this->appointmentId);
+        $stmt->bind_param("i", $appointmentId);
         if ($stmt->execute()) {
             $stmt->close();
             return true;
