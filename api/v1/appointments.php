@@ -25,7 +25,7 @@ switch ($method) {
             if ($appointment->getById(intval($_GET['id']))) {
                 // Check access
                 if (!$forumModel->hasAccess($userId, $appointment->getJobId()) && $_SESSION['role'] !== 'Admin') {
-                    sendResponse(false, null, 'Unauthorized', 403);
+                    sendResponse(false, null, 'Forbidden', 403);
                 }
                 
                 $data = [
