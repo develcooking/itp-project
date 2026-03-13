@@ -1,4 +1,4 @@
-<?php include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";?>
+<?php include $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";?>
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
@@ -22,13 +22,13 @@ if (!empty($_SESSION['userId'])) {
 
 // Get the current page name from the URL
 $current_page = basename($_SERVER['REQUEST_URI'], '.php');
-if (empty($current_page)) {
+if (empty($current_page) || $current_page === '') {
     $current_page = 'index';
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="de-DE">
+<html land="de-DE">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

@@ -38,6 +38,14 @@ $events = [];
 
 foreach ($appointments as $row) {
 
+    if ($startParam && $row['start'] < $startParam) {
+        continue;
+    }
+
+    if ($endParam && $row['start'] > $endParam) {
+        continue;
+    }
+
     if (!in_array((int)$row['jobId'], $userJobIds, true)) {
         continue;
     }
@@ -52,6 +60,7 @@ foreach ($appointments as $row) {
             'description' => $row['description'],
             'jobId'       => (int)$row['jobId'],
             'createdBy'   => (int)$row['createdBy'],
+            'creatorName' => $row['creatorName'],
         ],
     ];
 }

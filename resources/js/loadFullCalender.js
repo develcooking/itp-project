@@ -1,4 +1,101 @@
+function changeSubBtnStatus(status) {
+    if (status) {
+        const modal_submit_btn = document.getElementById('modal_submit_btn');
+        if (status === true) {
+            if (modal_submit_btn.classList.contains('disabled')) {
+                modal_submit_btn.classList.remove('disabled');
+            }
+            modal_submit_btn.setAttribute("aria-disabled", "false");
+        } else {
+            if (!modal_submit_btn.classList.contains('disabled')) {
+                modal_submit_btn.classList.add('disabled');
+            }
+            modal_submit_btn.setAttribute("aria-disabled", "true");
+        }
+    }
+}
+
+function validateDateTime() {
+    const startdate = document.getElementById('startdate').value;
+    const starttime = document.getElementById('starttime').value;
+    const enddate = document.getElementById('enddate').value;
+    const endtime = document.getElementById('endtime').value;
+    const errorBox = document.getElementById("dateError");
+
+    if (!startdate || !starttime || !enddate || !endtime) {
+        errorBox.classList.add("d-none");
+        changeSubBtnStatus(false);
+        return;
+    }
+
+    const start = new Date(`${startdate}T${starttime}`);
+    const end = new Date(`${enddate}T${endtime}`);
+
+    if (start >= end) {
+        errorBox.innerText = "Das Enddatum muss nach dem Startdatum liegen!";
+        errorBox.classList.remove("d-none");
+        changeSubBtnStatus(false);
+    } else {
+        errorBox.classList.add("d-none");
+        changeSubBtnStatus(true);
+    }
+}
+function splitdateForChangeModle(datetimestring) {
+    const date = new Date(datetimestring);
+
+// Formatierung der Date-Objekte
+    const yyyyMmDd = date.toISOString().split('T')[0]; // '2014-01-12'
+    const hhMm = date.toISOString().split('T')[1].substring(0, 5); // '05:00'
+    return [yyyyMmDd, hhMm]
+}
+
+function updateDateLimits() {
+    const startdate = document.getElementById('startdate');
+    const enddate = document.getElementById('enddate');
+
+    // Enddatum darf nicht vor Startdatum liegen
+    enddate.min = startdate.value;
+
+    // Startdatum darf beliebig bleiben
+    // startdate.max entfernen oder ignorieren
+    startdate.removeAttribute('max');
+}
+
+function disableChangeModal(creatorName) {
+    const form = document.querySelector('#calenderChageModal form');
+    const inputs = form.querySelectorAll('input, select, textarea');
+    const changeModalTitle = document.getElementById('changeModalTitle');
+    changeModalTitle.style.display = "none";
+    const calenderChageModalLabel = document.getElementById('calenderChageModalLabel');
+    calenderChageModalLabel.innerText = 'Infos zum Termin';
+
+    inputs.forEach(el => {
+        el.disabled = true;
+    });
+
+    document.getElementById("modalFooterChangeButtons").style.display = "none";
+    document.getElementById("modalFooterCreatedBy").style.display = "block";
+    document.getElementById("modalFooterCreatedByInput").value = "Erstellt von: " + (creatorName || "Unbekannt");
+}
+
+function enableChangeModal() {
+    const form = document.querySelector('#calenderChageModal form');
+    const inputs = form.querySelectorAll('input, select, textarea');
+    const changeModalTitle = document.getElementById('changeModalTitle');
+    changeModalTitle.style.display = "block";
+    const calenderChageModalLabel = document.getElementById('calenderChageModalLabel');
+    calenderChageModalLabel.innerText = 'Termin ändern';
+
+    inputs.forEach(el => {
+        el.disabled = false;
+    });
+
+    document.getElementById("modalFooterChangeButtons").style.display = "block";
+    document.getElementById("modalFooterCreatedBy").style.display = "none";
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+
     var calendarEl = document.getElementById('calendar');
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -19,15 +116,97 @@ document.addEventListener('DOMContentLoaded', function () {
             day: 'Tag',
             list: 'Liste'
         },
-
+        
         // calling events from getEvents.php
         events: '../controllers/getEvents.php',
 
 
-        eventClick: function (info) {
-            alert('Termin\n Title: ' + info.event.title + '\n Beschreibung: ' + info.event.extendedProps.description + '\n Beginn: ' + info.event.start + '\n Ende: ' + info.event.end);
+
+        dateClick: function (info) {
+
+            let clickedDate = new Date(info.dateStr);
+            let today = new Date();
+            today.setHours(0,0,0,0);
+
+            if (clickedDate < today) {
+                return;
+            }
+
+            var myModal = new bootstrap.Modal(document.getElementById("calendermanagementModal"));
+ 
+            // set the startdate and enddate to the user clicked date
+            let startdate = document.getElementById('startdate');
+            let enddate = document.getElementById('enddate');
+            startdate.value = info.dateStr.substring(0,10);
+            enddate.value = info.dateStr.substring(0,10);
+
+            // Initial limits setzen
+            updateDateLimits();
+
+            // Submit-Button deaktivieren, bis validiert
+            changeSubBtnStatus(false);
+
+            myModal.show();
+        },
+
+        eventClick: function(info) {
+            var mychangeModal = new bootstrap.Modal(document.getElementById("calenderChageModal"));
+            let changestartdate = document.getElementById('changestartdate');
+            let changestarttime = document.getElementById('changestarttime');
+            let changeenddate = document.getElementById('changeenddate');
+            let changeendtime = document.getElementById('changeendtime');
+            let changetitle = document.getElementById('changetitle');
+            let changedescription = document.getElementById('changedescription');
+            let changejobselection = document.getElementById('changejobselection');
+            let changeappointmentId = document.getElementById('changeappointmentId');
+
+            // Split start and end date and time
+            let starttimearray = splitdateForChangeModle(info.event.start);
+            changestartdate.value = starttimearray[0];
+            changestarttime.value = starttimearray[1];
+            let endtimearray = splitdateForChangeModle(info.event.end);
+            changeenddate.value = endtimearray[0];
+            changeendtime.value = endtimearray[1];
+
+            // Set the title and description
+            changetitle.value = info.event.title;
+            changedescription.value = info.event.extendedProps.description;
+
+            // Set the job selection dropdown to the selected jobId
+            changejobselection.value = info.event.extendedProps.jobId;
+            changeappointmentId.value = info.event.id;
+            let createdBy = info.event.extendedProps.createdBy;
+            let creatorName = info.event.extendedProps.creatorName;
+
+            if (createdBy != currentUserId && currentUserRole !== "admin") {
+                disableChangeModal(creatorName);
+            } else {
+                enableChangeModal();
+            }
+
+            mychangeModal.show();
         }
     });
 
     calendar.render();
+
+    // Listener für Datumsänderungen
+    const startdateEl = document.getElementById('startdate');
+    const enddateEl = document.getElementById('enddate');
+    const starttimeEl = document.getElementById('starttime');
+    const endtimeEl = document.getElementById('endtime');
+
+    startdateEl.addEventListener('change', function() {
+        updateDateLimits();
+        validateDateTime();
+    });
+
+    enddateEl.addEventListener('change', function() {
+        updateDateLimits();
+        validateDateTime();
+    });
+
+    starttimeEl.addEventListener('change', validateDateTime);
+    endtimeEl.addEventListener('change', validateDateTime);
+
 });

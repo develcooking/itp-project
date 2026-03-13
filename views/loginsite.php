@@ -7,7 +7,13 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
   <div class="row w-100 justify-content-center">
     <div class="col-12 col-sm-10 col-md-8 col-lg-6 p-3">
       
-      <?php if (!isset($_SESSION['user'])): ?>
+      <?php if (isset($_GET['expired']) && $_GET['expired'] == 1): ?>
+        <div class="alert alert-warning text-center mb-4">
+            Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.
+        </div>
+      <?php endif; ?>
+
+      <?php if (!isset($_SESSION['userId'])): ?>
         <div class="card bg-light shadow p-4 text-center">
 
           <h2 class="fw-bold mb-2">Anmelden</h2>
@@ -58,7 +64,7 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
       <?php else: ?>
         <form method="post" action="">
           <button class="btn btn-outline-primary btn-lg w-100" type="submit" name="logout">
-            Logout (<?= htmlspecialchars($_SESSION['user']); ?>)
+            Logout (<?= htmlspecialchars($_SESSION['userName']); ?>)
           </button>
         </form>
       <?php endif; ?>

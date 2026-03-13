@@ -12,10 +12,16 @@ class Appointment
     private ?string $description;
     private ?int $createdBy;
     private ?int $modifiedBy;
+    private ?string $creatorName;
 
     public function __construct($db)
     {
         $this->conn = $db;
+    }
+
+    public function getCreatorName(): ?string
+    {
+        return $this->creatorName;
     }
 
     public function getAppointmentId(): ?int
@@ -102,7 +108,8 @@ class Appointment
 
     public function getAll()
     {
-        $query = "SELECT * FROM " . $this->table;
+        $query = "SELECT a.*, u.userName as creatorName FROM " . $this->table . " a 
+                  LEFT JOIN Users u ON a.createdBy = u.userId";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -118,7 +125,8 @@ class Appointment
                     'createdAt' => $row['createdAt'],
                     'modifiedAt' => $row['modifiedAt'],
                     'createdBy' => $row['createdBy'],
-                    'modifiedBy' => $row['modifiedBy']
+                    'modifiedBy' => $row['modifiedBy'],
+                    'creatorName' => $row['creatorName']
                 ];
             }
         }
@@ -160,7 +168,9 @@ class Appointment
 
     public function getById($appointmentId)
     {
-        $query = "SELECT * FROM " . $this->table . " WHERE appointmentId = ?";
+        $query = "SELECT a.*, u.userName as creatorName FROM " . $this->table . " a 
+                  LEFT JOIN Users u ON a.createdBy = u.userId 
+                  WHERE a.appointmentId = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $appointmentId);
         $stmt->execute();
@@ -185,21 +195,23 @@ class Appointment
         $this->description = $row['description'];
         $this->createdBy = $row['createdBy'];
         $this->modifiedBy = $row['modifiedBy'];
+        $this->creatorName = $row['creatorName'] ?? null;
     }
 
 
     public function update($appointmentId)
     {
         $query = " UPDATE " . $this->table . " 
-        SET title = ?, start = ?, end = ?, description = ? WHERE appointmentId = ?";
+        SET title = ?, start = ?, end = ?, description = ?, jobId = ? WHERE appointmentId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "ssssi",
+            "ssssii",
             $this->title,
             $this->start,
             $this->end,
             $this->description,
+            $this->jobId,
             $appointmentId
         );
 

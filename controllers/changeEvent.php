@@ -1,4 +1,5 @@
 <?php
+
 require_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Appointment.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/UserJobs.php";
@@ -11,52 +12,67 @@ if (!isset($_SESSION['userId'])) {
 $errorMessages = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Get form values
-    $title = $_POST['title'];
-    $createdBy = $_SESSION['userId'];
-    $modifiedBy = $_SESSION['userId'];
-    $startdate = $_POST['startdate'];
-    $starttime = $_POST['starttime'];
-    $enddate = $_POST['enddate'];
-    $endtime = $_POST['endtime'];
-    $jobId = $_POST['jobselection'];
+    // create Termin
 
-    if (isset($_POST["description"])) {
-        $description = $_POST["description"];
+    $title = htmlspecialchars($_POST['changetitle']);
+    $userId = $_SESSION['userId'];
+    $startdate = htmlspecialchars($_POST['changestartdate']);
+    $starttime = htmlspecialchars($_POST['changestarttime']);
+    $enddate = htmlspecialchars($_POST['changeenddate']);
+    $endtime = htmlspecialchars($_POST['changeendtime']);
+    $appointmentId = htmlspecialchars($_POST['changeappointmentId']);
+    if (isset($_POST["changedescription"])) {
+        $description = htmlspecialchars($_POST["changedescription"]);
     } else {
         $description = '';
     }
-    $jobId = $_POST['jobselection'];
+    $jobId = htmlspecialchars($_POST['changejobselection']);
+    if (!is_numeric($jobId)) {
+        die("Invalid job id");
+    }
+    if (!is_numeric($appointmentId)) {
+        die("Invalid appointment id");
+    }
 
-    // Authorization check: Is the user assigned to this job?
+    $appointmentmodel = new Appointment($conn);
+    if (!$appointmentmodel->getById($appointmentId)) {
+        http_response_code(404);
+        die("Appointment not found");
+    }
+
     if (strtolower($_SESSION['role']) != 'admin'){
+        // Only the creator can change it, exapt admin
+        if ($appointmentmodel->getCreatedBy() !== $userId) {
+            http_response_code(403);
+            die("You are not authorized to change this event. Only the creator can modify it.");
+        }
+
+        // Is  user assigned to job
         $userJobs = new UserJobs($conn);
-        $allowedJobs = $userJobs->getJobsForUserByID($createdBy);
+        $allowedJobs = $userJobs->getJobsForUserByID($userId);
         if (!in_array($jobId, $allowedJobs)) {
             http_response_code(403);
-            die("You are not authorized to create events for this professional area.");
+            die("You are not authorized for this professional area.");
         }
     }
-    // Build datetime values
+
     $startDateTime = $startdate . ' ' . $starttime . ':00'; // Ergebnis: "2023-10-27 14:30:00"
     $endDateTime = $enddate . ' ' . $endtime . ':00';
-
     if (strtotime($startDateTime) > strtotime($endDateTime)) {
-        if (empty($title) || empty($createdBy) || empty($startDateTime) || empty($endDateTime)) {
+
+
+        if (empty($title) || empty($userId) || empty($startDateTime) || empty($endDateTime)) {
             http_response_code(400);
             array_push($errorMessages, "Bitte füllen Sie alle Felder aus!");
         } else {
-            $appointmentmodel = new Appointment($conn);
             $appointmentmodel->setTitle($title);
             $appointmentmodel->setJobId($jobId);
             $appointmentmodel->setStart($startDateTime);
             $appointmentmodel->setEnd($endDateTime);
             $appointmentmodel->setDescription($description);
-            $appointmentmodel->setCreatedBy($createdBy);
-            $appointmentmodel->setModifiedBy($modifiedBy);
+            $appointmentmodel->setModifiedBy($userId);
 
-
-            if ($appointmentmodel->post()) {
+            if ($appointmentmodel->update($appointmentId)) {
                 http_response_code(response_code: 201);
                 #echo "Termin erfolgreich erstellt!";
                 header("Location: " . "../views/appointmentManagement.php");
@@ -73,11 +89,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // Display error messages
 if (!empty($errorMessages)) {
-    echo "<div style='background-color:red; padding:10px; color:white;'>";
+    echo "<div style='background-color: red'>";
     foreach ($errorMessages as $errorMessage) {
         echo "<p>$errorMessage</p>";
     }
     echo "</div>";
     die();
 }
-?>

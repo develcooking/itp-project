@@ -7,7 +7,8 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
-$errors = [];
+$error = '';
+$success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['login'])) {
@@ -48,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($_POST['logout'])) {
+        session_unset();
         session_destroy();
 
         header("Location: /views/loginsite.php");
