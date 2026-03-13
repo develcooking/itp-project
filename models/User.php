@@ -13,6 +13,7 @@ class User
     private ?string $role = '';
     private ?string $securityAnswer = '';
     private ?int $activated = null;
+    private ?string $schoolCompany = null;
     private ?int $createdBy = null;
     private ?int $modifiedBy = null;
 
@@ -64,6 +65,11 @@ class User
     public function getActivated(): ?int
     {
         return $this->activated;
+    }
+
+    public function getSchoolCompany(): ?string
+    {
+        return $this->schoolCompany;
     }
 
     public function getCreatedBy(): ?int
@@ -124,6 +130,12 @@ class User
         return $this;
     }
 
+    public function setSchoolCompany(?string $schoolCompany): self
+    {
+        $this->schoolCompany = $schoolCompany;
+        return $this;
+    }
+
     public function setCreatedBy(?int $createdBy): self
     {
         $this->createdBy = $createdBy;
@@ -156,6 +168,7 @@ class User
                     'role' => $row['role'],
                     'securityAnswer' => $row['securityAnswer'],
                     'activated' => $row['activated'],
+                    'school_company' => $row['school_company'],
                     'createdAt' => $row['createdAt'],
                     'modifiedAt' => $row['modifiedAt'],
                     'createdBy' => $row['createdBy'],
@@ -171,8 +184,8 @@ class User
     public function post(): bool
     {
         $query = "INSERT INTO " . $this->table . "
-        (userName, firstName, lastName, email, password, role, securityAnswer, activated, createdBy, modifiedBy) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        (userName, firstName, lastName, email, password, role, securityAnswer, school_company, activated, createdBy, modifiedBy) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
 
@@ -181,7 +194,7 @@ class User
         $modifiedBy = $this->modifiedBy ?? null;
 
         $stmt->bind_param(
-            "sssssssiii",
+            "ssssssssiii",
             $this->userName,
             $this->firstName,
             $this->lastName,
@@ -189,6 +202,7 @@ class User
             $password,
             $this->role,
             $this->securityAnswer,
+            $this->schoolCompany,
             $this->activated,
             $createdBy,
             $modifiedBy
@@ -274,22 +288,19 @@ class User
     public function update(int $userId): bool
     {
         $query = "UPDATE " . $this->table . "
-              SET userName = ?, firstName = ?, lastName = ?, email = ?, role = ?, activated = ?
+              SET userName = ?, firstName = ?, lastName = ?, email = ?, role = ?, school_company = ?, activated = ?
               WHERE userId = ?";
 
         $stmt = $this->conn->prepare($query);
 
-        #$password = password_hash($this->password, PASSWORD_DEFAULT);
-
         $stmt->bind_param(
-            "sssssii",
+            "ssssssii",
             $this->userName,
             $this->firstName,
             $this->lastName,
             $this->email,
-            #$password,
             $this->role,
-            #$this->securityAnswer,
+            $this->schoolCompany,
             $this->activated,
             $userId
         );
@@ -324,6 +335,7 @@ class User
         $this->role = $row['role'];
         $this->securityAnswer = $row['securityAnswer'];
         $this->activated = $row['activated'];
+        $this->schoolCompany = $row['school_company'] ?? null;
     }
 
     public function toArray(): array
@@ -335,7 +347,8 @@ class User
             'lastName' => $this->getLastName(),
             'email' => $this->getEmail(),
             'role' => $this->getRole(),
-            'activated' => $this->getActivated()
+            'activated' => $this->getActivated(),
+            'school_company' => $this->getSchoolCompany()
         ];
     }
 
@@ -385,9 +398,9 @@ class User
 
     public function updateProfile(int $userId): bool
     {
-        $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ? WHERE userId = ?";
+        $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ?, school_company = ? WHERE userId = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("ssssi", $this->userName, $this->firstName, $this->lastName, $this->email, $userId);
+        $stmt->bind_param("sssssi", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $userId);
         $ok = $stmt->execute();
         $stmt->close();
         return $ok;
