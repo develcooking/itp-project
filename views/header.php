@@ -62,9 +62,21 @@ if (empty($current_page) || $current_page === '') {
         <a href="/views/adminPage.php" class="nav-btn-primary border-end <?= $current_page === 'adminPage' ? 'current' : ''; ?>">Benutzerverwaltung</a>
         <a href="/views/adminJobs.php" class="nav-btn-primary border-end <?= $current_page === 'adminJobs' ? 'current' : ''; ?>">Berufsbereiche</a>
         <?php endif; ?>
-    <form method="post" action="/controllers/login.php" class="nav-logout-form">
-        <button type="submit" name="logout" class="btn-outline-primary rounded-0">Abmelden</button>
-    </form>
+    <div class="btn-group nav-logout-form" role="group">
+        <a href="/views/profile.php" class="btn btn-outline-primary rounded-0" style="display:flex;align-items:center;justify-content:center;padding:0 15px;border:none;background:var(--accentColor);color:white;text-decoration:none;cursor:pointer;">
+            <i class="bi bi-person-circle me-1"></i> Account
+        </a>
+        <button type="button" class="btn btn-outline-primary rounded-0 dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" style="display:flex;align-items:center;justify-content:center;padding:0 10px;border:none;border-left:1px solid rgba(255,255,255,0.3);background:var(--accentColor);color:white;cursor:pointer;">
+            <span class="visually-hidden">Menü öffnen</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end p-0 rounded-0 border-0" style="min-width:0;width:100%;">
+            <li>
+                <form method="post" action="/controllers/login.php" class="m-0">
+                    <button type="submit" name="logout" class="dropdown-item text-white text-center" style="background:var(--accentColor);padding:8px 15px;">Abmelden</button>
+                </form>
+            </li>
+        </ul>
+    </div>
 </nav>
 <?php endif; ?>
 
