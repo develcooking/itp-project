@@ -96,6 +96,32 @@ main {
     cursor: pointer;
 }
 
+.btn-primary{
+background-color: var(--accentColor);
+color:white;
+border-color: var(--accentColor);
+}
+
+.btn-primary:hover{
+background-color:  #fbbf03cc;
+color:var(--accentColor);
+border-color:  #fbbf03cc;
+}
+
+
+.fc .btn-group .btn.active,
+.fc .fc-today-button {
+  background-color: #fbbf03cc;
+  color: var(--accentColor);
+  border-color: #fbbf03cc;
+}
+
+#modal_submit_btn {
+  background-color: #ffdb6fcc;
+  border-color: #ffdb6fcc;
+  color: var(--accentColor);
+}
+
 
 /* ===================== BUTTON & INPUTS ===================== */
 button,
