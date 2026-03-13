@@ -9,12 +9,13 @@ class Post
     private int $postId;
     private int $topicId;
     private int $userId;
-    private int $content;
-    private int $description;
+    private string $content;
+    private string $description;
     private int $reaction_negative;
     private int $reaction_positive;
     private int $createdBy;
     private int $modifiedBy;
+    private string $userName = '';
 
     public function __construct($db)
     {
@@ -48,6 +49,9 @@ class Post
     public function setModifiedBy($modifiedBy) :void {
         $this->modifiedBy = $modifiedBy;
     }
+    public function setUserName(string $userName): void {
+        $this->userName = $userName;
+    }
     /* #### Get functions #### */
     public function getPostId():int {
         return $this->postId;
@@ -76,10 +80,43 @@ class Post
     public function getModifiedBy():int {
         return $this->modifiedBy;
     }
+    public function getUserName():string {
+        return $this->userName;
+    }
+
+    public function getByTopicId($topicId)
+    {
+        $query = "SELECT p.*, u.userName FROM " . $this->table . " p JOIN Users u ON p.userId = u.userId WHERE p.topicId = ? ORDER BY p.createdAt ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $topicId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $posts = [];
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $posts[] = [
+                    'postId' => $row['postId'],
+                    'topicId' => $row['topicId'],
+                    'userId' => $row['userId'],
+                    'userName' => $row['userName'],
+                    'content' => $row['content'],
+                    'description' => $row['description'],
+                    'reaction_negative' => $row['reaction_negative'],
+                    'reaction_positive' => $row['reaction_positive'],
+                    'createdAt' => $row['createdAt'],
+                    'modifiedAt' => $row['modifiedAt'],
+                    'createdBy' => $row['createdBy'],
+                    'modifiedBy' => $row['modifiedBy']
+                ];
+            }
+        }
+        $stmt->close();
+        return $posts;
+    }
 
     public function getAll()
     {
-        $query = "SELECT * FROM " . $this->table;
+        $query = "SELECT p.*, u.userName FROM " . $this->table . " p JOIN Users u ON p.userId = u.userId";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -89,6 +126,7 @@ class Post
                     'postId' => $row['postId'],
                     'topicId' => $row['topicId'],
                     'userId' => $row['userId'],
+                    'userName' => $row['userName'],
                     'content' => $row['content'],
                     'description' => $row['description'],
                     'reaction_negative' => $row['reaction_negative'],
@@ -137,7 +175,7 @@ class Post
 
     public function getById($postId)
     {
-        $query = "SELECT * FROM " . $this->table . " WHERE postId = ?";
+        $query = "SELECT p.*, u.userName FROM " . $this->table . " p JOIN Users u ON p.userId = u.userId WHERE p.postId = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $postId);
         $stmt->execute();
@@ -203,6 +241,7 @@ class Post
         $this->reaction_positive = $row['reaction_positive'];
         $this->createdBy = $row['createdBy'];
         $this->modifiedBy = $row['modifiedBy'];
+        $this->userName = $row['userName'] ?? '';
     }
 
 

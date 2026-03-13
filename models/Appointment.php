@@ -135,6 +135,34 @@ class Appointment
         return $appointments ?? [];
     }
 
+    public function getForUserJobs(int $userId): array
+    {
+        $query = "SELECT a.* FROM " . $this->table . " a 
+                  JOIN users_jobs uj ON a.jobId = uj.jobId 
+                  WHERE uj.userId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $appointments = [];
+        while ($row = $result->fetch_assoc()) {
+            $appointments[] = [
+                'appointmentId' => $row['appointmentId'],
+                'title' => $row['title'],
+                'jobId' => $row['jobId'],
+                'start' => $row['start'],
+                'end' => $row['end'],
+                'description' => $row['description'],
+                'createdAt' => $row['createdAt'],
+                'modifiedAt' => $row['modifiedAt'],
+                'createdBy' => $row['createdBy'],
+                'modifiedBy' => $row['modifiedBy']
+            ];
+        }
+        $stmt->close();
+        return $appointments;
+    }
+
     public function post(): bool
     {
         $query = " INSERT INTO " . $this->table . "
