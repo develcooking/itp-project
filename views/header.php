@@ -13,7 +13,7 @@ if (empty($current_page) || $current_page === '') {
 ?>
 
 <!DOCTYPE html>
-<html land="de-DE">
+<html lang="de-DE">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +28,14 @@ if (empty($current_page) || $current_page === '') {
     <!-- Header (logo only) for not logged-in users -->
     <header class="header d-flex align-items-center justify-content-between px-3">
         <a class="hat" href="../index.php">
+            <?php
+            $sitesWithTransperency = ['loginsite', 'createAccount', 'passwordReset', 'passwordForgot'];
+            if (in_array($current_page, $sitesWithTransperency)):
+            ?>
+            <img src="/resources/imgs/logo-transperent.png" alt="Ausbildungsportal.net Logo" class="site-logo">
+            <?php else: ?>
             <img src="/resources/imgs/logo.jpeg" alt="Ausbildungsportal.net Logo" class="site-logo">
+            <?php endif; ?>
         </a>
         <div id="headerspacer"></div>
     </header>
@@ -65,7 +72,7 @@ if (empty($current_page) || $current_page === '') {
 </nav>
 <?php endif; ?>
 
-<div class="main-container align-items-center">
+<main class="main-container align-items-center">
 
 
 
