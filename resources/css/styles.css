@@ -97,6 +97,36 @@ main {
     cursor: pointer;
 }
 
+.nav-account-btn {
+    text-decoration: none;
+}
+
+.nav-account-toggle {
+    padding: 0 10px;
+    border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.nav-account-dropdown {
+    min-width: 0;
+    width: 100%;
+    padding: 0;
+    border-radius: 0;
+    border: none;
+}
+
+.nav-logout-btn {
+    background-color: var(--accentColor);
+    color: white;
+    text-align: center;
+    padding: 8px 15px;
+}
+
+.nav-logout-btn:hover,
+.nav-logout-btn:focus {
+    background-color: #fbbf03cc;
+    color: var(--accentColor);
+}
+
 .btn-primary{
 background-color: var(--accentColor);
 color:white;
@@ -221,11 +251,14 @@ select {
 /* ===================== Forum ===========================*/
 .card-forum{
   width: 20%;
-  /*display:inline-block;*/
   display: flex;
   justify-content: space-between;
   padding: 20px;
   box-sizing: border-box;
+}
+.forum-container {
+  min-height: 75vh;
+  margin: 10px;
 }
 
 /* ===================== Calendar ===================== */
@@ -261,8 +294,8 @@ select {
 .btn-outline-primary:hover,
 .btn-outline-primary:focus,
 .btn-outline-primary:active {
-  background-color: #fbbf03;
-  border-color: #fbbf03;
+  background-color: var(--btn-Color);
+  border-color: var(--btn-Color);
   color: var(--accentColor)
 }
 
@@ -270,9 +303,14 @@ a {
   color: var(--accentColor);
   text-decoration: none;
 }
-
+.btn-form-sub {
+    background-color: var(--btn-Color);
+}
+.btn-form-sub:hover {
+    background-color: var(--btn-Color);
+}
 a:hover {
-  color: #fbbf03;
+  color: var(--btn-Color);
 }
 
 .logo-container {

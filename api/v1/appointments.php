@@ -9,17 +9,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Appointment.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Forum.php"; // For hasAccess method
 include_once __DIR__ . "/api_helper.php";
 
 if (!isset($_SESSION)) session_start();
 
 $method = $_SERVER['REQUEST_METHOD'];
 $appointment = new Appointment($conn);
+$forumModel = new Forum($conn);
+$userId = $_SESSION['userId'] ?? 0;
 
 switch ($method) {
     case 'GET':
         if (isset($_GET['id'])) {
             if ($appointment->getById(intval($_GET['id']))) {
+                // Check access
+                if (!$forumModel->hasAccess($userId, $appointment->getJobId()) && $_SESSION['role'] !== 'Admin') {
+                    sendResponse(false, null, 'Forbidden', 403);
+                }
+                
                 $data = [
                     'appointmentId' => $appointment->getAppointmentId(),
                     'jobId' => $appointment->getJobId(),
@@ -35,7 +43,11 @@ switch ($method) {
                 sendResponse(false, null, 'Appointment not found', 404);
             }
         } else {
-            sendResponse(true, $appointment->getAll());
+            if ($_SESSION['role'] === 'Admin') {
+                sendResponse(true, $appointment->getAll());
+            } else {
+                sendResponse(true, $appointment->getForUserJobs($userId));
+            }
         }
         break;
 

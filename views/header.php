@@ -1,23 +1,8 @@
-<?php include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";?>
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
-require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
 
-// Prüfe ob der eingeloggte Nutzer noch aktiviert ist
-if (!empty($_SESSION['userId'])) {
-    $checkUser = new User($conn);
-    if ($checkUser->getById($_SESSION['userId'])) {
-        if ($checkUser->getActivated() !== 1) {
-            session_destroy();
-            header("Location: /views/loginsite.php?deactivated=1");
-            exit();
-        }
-    } else {
-        // User existiert nicht mehr in der DB
-        session_destroy();
-        header("Location: /views/loginsite.php");
-        exit();
-    }
+if (!isset($_SESSION)) {
+    session_start();
 }
 
 // Get the current page name from the URL
@@ -57,14 +42,26 @@ if (empty($current_page) || $current_page === '') {
     </a>
     <a href="/views/startpage.php" class="nav-btn-primary border-end <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
     <a href="/views/appointmentManagement.php" class="nav-btn-primary border-end <?= $current_page === 'appointmentManagement' ? 'current' : ''; ?>">Termine</a>
-    <a href="/views/forum_start.php" class="nav-btn-primary border-end<?= $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
+    <a href="/views/forum.php" class="nav-btn-primary border-end <?= $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
     <?php if ($_SESSION['role'] === 'Admin'): ?>
         <a href="/views/adminPage.php" class="nav-btn-primary border-end <?= $current_page === 'adminPage' ? 'current' : ''; ?>">Benutzerverwaltung</a>
         <a href="/views/adminJobs.php" class="nav-btn-primary border-end <?= $current_page === 'adminJobs' ? 'current' : ''; ?>">Berufsbereiche</a>
         <?php endif; ?>
-    <form method="post" action="/controllers/login.php" class="nav-logout-form">
-        <button type="submit" name="logout" class="btn-outline-primary rounded-0">Abmelden</button>
-    </form>
+    <div class="btn-group nav-logout-form" role="group">
+        <a href="/views/profile.php" class="btn btn-outline-primary rounded-0 nav-account-btn">
+            <i class="bi bi-person-circle me-1"></i> Account
+        </a>
+        <button type="button" class="btn btn-outline-primary rounded-0 dropdown-toggle dropdown-toggle-split nav-account-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="visually-hidden">Menü öffnen</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end nav-account-dropdown">
+            <li>
+                <form method="post" action="/controllers/login.php" class="m-0">
+                    <button type="submit" name="logout" class="dropdown-item nav-logout-btn">Abmelden</button>
+                </form>
+            </li>
+        </ul>
+    </div>
 </nav>
 <?php endif; ?>
 

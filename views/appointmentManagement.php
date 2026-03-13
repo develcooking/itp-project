@@ -221,6 +221,7 @@ if ($isAdmin) {
                 <div class="modal-footer" id="changeModalFooter">
                     <div id="modalFooterChangeButtons">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                        <button id="modal_delete_btn" type="submit" class="btn btn-danger" formaction="../controllers/deleteEvent.php" onclick="return confirm('Möchten Sie diesen Termin wirklich löschen?')">Löschen</button>
                         <button id="modal_submit_btn" type="submit" class="btn btn-primary" aria-disabled="false">Termin speichern</button>
                     </div>
                     <div id="modalFooterCreatedBy" class="mx-auto" style="display: none;">

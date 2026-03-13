@@ -1,6 +1,12 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
+
+if (!empty($_SESSION['userId'])) {
+    header("Location: /views/startpage.php");
+    exit();
+}
 
 ?>
 

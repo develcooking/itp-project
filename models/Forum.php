@@ -1,0 +1,92 @@
+<?php
+
+class Forum {
+    
+    private $conn;
+    private int $userid;
+    private string $Tusers_jobs = 'users_jobs';
+    private string $TJobs = 'Jobs';
+    
+    public function __construct($conn){
+        $this->conn = $conn;
+    }
+    
+    public function getBereiche(): array {
+
+        $userid = $_SESSION['userId'] ?? null;
+
+        if (empty($userid)) {
+            return [];
+        }
+
+        $query = "SELECT j.* FROM " . $this->Tusers_jobs . " uj JOIN " . $this->TJobs . " j ON uj.jobId = j.jobId WHERE uj.userId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $userid);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $bereiche = [];
+        while ($row = $result->fetch_assoc()) {
+            $bereiche[] = $row;
+        }
+
+        $stmt->close();
+        return $bereiche;
+    }
+
+    public function hasAccess(int $userId, int $jobId): bool {
+        $query = "SELECT COUNT(*) as count FROM " . $this->Tusers_jobs . " WHERE userId = ? AND jobId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("ii", $userId, $jobId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        return ($row['count'] ?? 0) > 0;
+    }
+
+    public function isTopicInJob(int $topicId, int $jobId): bool {
+        $query = "SELECT COUNT(*) as count FROM Topics WHERE topicId = ? AND jobId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("ii", $topicId, $jobId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        return ($row['count'] ?? 0) > 0;
+    }
+
+    public function getTopicsByBereich(int $bereich_id): array {
+
+    $query = "SELECT t.*, u.userName FROM Topics t JOIN Users u ON t.userId = u.userId WHERE t.jobId = ?";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $bereich_id);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $topics = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $topics[] = $row;
+    }
+
+    $stmt->close();
+    return $topics;
+    }
+
+    public function createTopic(int $bereich_id, string $title): bool {
+        $query = "INSERT INTO Topics (name, jobId, userId, createdBy, modifiedBy) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("siiii", $title, $bereich_id, $_SESSION['userId'], $_SESSION['userId'], $_SESSION['userId']);
+        $result = $stmt->execute();
+        $stmt->close();
+        if ($result === true) {
+            $postModel = new Post($this->conn);
+            //$postModel->post
+            
+            return $result;
+        }
+        return $result;
+    }
+}
