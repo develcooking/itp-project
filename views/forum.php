@@ -198,7 +198,7 @@ if ($selectedTopicId) {
     </div>
 </div>
 
-    <script src="/resources/js/postCreateEditor.js"></script>
+     <script src="/resources/js/postCreateEditor.js"></script>
 
 <!-- Modal for creating Post -->
 <div class="modal fade" id="createPostModal" tabindex="-1">
@@ -227,7 +227,5 @@ if ($selectedTopicId) {
         </div>
     </div>
 </div>
-
-    <script src="/resources/js/postCreateEditor.js"></script>
     
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>
