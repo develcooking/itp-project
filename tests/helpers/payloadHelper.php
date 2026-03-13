@@ -30,4 +30,25 @@ class PayloadHelper {
 
         return array_merge($defaults, $overrides);
     }
+
+    public static function createJob(array $overrides = []) {
+        $faker = self::getFaker();
+            $defaults = [
+                'name' => $faker->unique()->jobTitle() . ' ' . $faker->randomNumber(4),
+                'createdBy' => 1,
+                'modifiedBy' => 1
+            ];
+        return array_merge($defaults, $overrides);
+    }
+
+
+    public static function createUserJob(array $overrides = []) {
+        $defaults = [
+            'userId' => 1,
+            'jobId' => 1,
+            'createdBy' => 1
+        ];
+
+        return array_merge($defaults, $overrides);
+    }
 }
