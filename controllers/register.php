@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createAccount'])) {
     $password = htmlspecialchars(trim($_POST['password'] ?? ''));
     $role = htmlspecialchars(trim($_POST['role'] ?? ''));
     $securityAnswer = htmlspecialchars(trim($_POST['securityAnswer'] ?? ''));
+    $schoolCompany = htmlspecialchars(trim($_POST['school_company'] ?? ''));
 
     if (empty($userName) || empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($role) || empty($securityAnswer)) {
         $errors['general'] = 'Bitte füllen Sie alle Felder aus!';
@@ -35,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createAccount'])) {
             $user->setPassword($password);
             $user->setRole($role);
             $user->setSecurityAnswer(password_hash($securityAnswer, PASSWORD_DEFAULT));
+            $user->setSchoolCompany($schoolCompany);
             $user->setActivated(0);
             $user->setCreatedBy(null);
             $user->setModifiedBy(null);

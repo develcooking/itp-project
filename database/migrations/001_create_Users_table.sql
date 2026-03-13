@@ -9,6 +9,7 @@ CREATE TABLE `Users` (
   `password` char(60) NOT NULL,
   `role` enum('Ausbilder','Lehrer','Admin') NOT NULL,
   `securityAnswer` char(60) NOT NULL,
+  `school_company` varchar(255) DEFAULT NULL,
   `activated` tinyint(1) NOT NULL DEFAULT 0,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modifiedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

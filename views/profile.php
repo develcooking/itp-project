@@ -104,6 +104,17 @@ if (!isset($user)) {
                             <?php endif; ?>
                         </div>
 
+                        <div class="form-floating mb-3">
+                            <input
+                            type="text"
+                            name="school_company"
+                            id="school_company"
+                            class="form-control"
+                            placeholder="Schule / Betrieb"
+                            value="<?= htmlspecialchars($user->getSchoolCompany() ?? '') ?>">
+                            <label for="school_company">Schule / Betrieb</label>
+                        </div>
+
                         <button class="btn btn-outline-primary btn-lg w-100 mt-3" type="submit" name="saveProfile">
                             Speichern
                         </button>

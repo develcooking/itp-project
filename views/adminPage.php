@@ -25,6 +25,7 @@ include './header.php';
                 <th>Nachname</th>
                 <th>Email</th>
                 <th>Rolle</th>
+                <th>Schule/Betrieb</th>
                 <th>Wann</th>
                 <th class="w-auto">Aktionen</th>
             </tr>
@@ -43,6 +44,7 @@ include './header.php';
                             <option value="Admin" <?= ($user['role'] ?? '') === 'Admin' ? 'selected' : '' ?>>Admin</option>
                         </select>
                     </td>
+                    <td><?= htmlspecialchars($user['school_company'] ?? '') ?></td>
                     <td><?= $user['createdAt'] ? date('d.m.Y H:i', strtotime($user['createdAt'])) : '' ?></td>
                     <td class="text-nowrap" style="width:1%">
                         <button class="btn btn-success btn-sm me-1 accept-btn" data-user-id="<?= $user['userId'] ?>">Akzeptieren</button>
@@ -66,6 +68,7 @@ include './header.php';
                 <th>Nachname</th>
                 <th>Email</th>
                 <th>Rolle</th>
+                <th>Schule/Betrieb</th>
                 <th>Wann</th>
                 <th class="w-auto">Aktionen</th>
             </tr>
@@ -84,6 +87,7 @@ include './header.php';
                             <option value="Admin" <?= ($user['role'] ?? '') === 'Admin' ? 'selected' : '' ?>>Admin</option>
                         </select>
                     </td>
+                    <td><?= htmlspecialchars($user['school_company'] ?? '') ?></td>
                     <td><?= $user['createdAt'] ? date('d.m.Y H:i', strtotime($user['createdAt'])) : '' ?></td>
                     <td class="text-nowrap" style="width:1%">
                         <button class="btn btn-primary btn-sm me-1 jobs-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">

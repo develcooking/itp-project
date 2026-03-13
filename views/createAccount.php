@@ -146,6 +146,17 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
                                 </select>
                             </div>
 
+                            <div class="form-floating mb-3">
+                                <input
+                                type="text"
+                                name="school_company"
+                                id="school_company"
+                                class="form-control"
+                                placeholder="Schule / Betrieb"
+                                value="<?= htmlspecialchars($_POST['school_company'] ?? '') ?>">
+                                <label for="school_company">Schule / Betrieb</label>
+                            </div>
+
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="checkbox" id="datenschutzCheck" name="datenschutz" required>
                                 <label class="form-check-label" for="datenschutzCheck">
