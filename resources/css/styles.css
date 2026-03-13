@@ -96,6 +96,36 @@ main {
     cursor: pointer;
 }
 
+.nav-account-btn {
+    text-decoration: none;
+}
+
+.nav-account-toggle {
+    padding: 0 10px;
+    border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.nav-account-dropdown {
+    min-width: 0;
+    width: 100%;
+    padding: 0;
+    border-radius: 0;
+    border: none;
+}
+
+.nav-logout-btn {
+    background-color: var(--accentColor);
+    color: white;
+    text-align: center;
+    padding: 8px 15px;
+}
+
+.nav-logout-btn:hover,
+.nav-logout-btn:focus {
+    background-color: #fbbf03cc;
+    color: var(--accentColor);
+}
+
 .btn-primary{
 background-color: var(--accentColor);
 color:white;
