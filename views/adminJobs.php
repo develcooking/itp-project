@@ -19,13 +19,13 @@ $allBerufsbereiche = $job->getAll();
 
     <!-- Berufsbereich erstellen -->
     <div class="card bg-white shadow p-4 mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex justify-content-between align-items-center">
             <h2 class="h5 fw-semibold mb-0">Neuen Berufsbereich anlegen</h2>
             <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#createJobCollapse" aria-expanded="false" aria-controls="createJobCollapse">
                 <i class="bi bi-plus-lg"></i> Erstellen
             </button>
         </div>
-        <div class="collapse" id="createJobCollapse">
+        <div class="collapse mt-3" id="createJobCollapse">
             <form id="createJobForm" class="row g-2 align-items-end">
                 <div class="col-12 col-md-8">
                     <label for="newJobName" class="form-label">Name des Berufsbereichs</label>

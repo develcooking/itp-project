@@ -151,12 +151,11 @@ class Job
         return false;
     }
 
-    public function delete($jobId = null) : bool
+    public function delete($jobId) : bool
     {
-        $id = $jobId ?? $this->jobId;
         $query = "DELETE FROM " . $this->table . " WHERE jobId = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $id);
+        $stmt->bind_param("i", $jobId);
         if ($stmt->execute()) {
             $stmt->close();
             return true;
