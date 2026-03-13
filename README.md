@@ -16,6 +16,8 @@ Key: den kopierten Schlüssel einfügen
 Speichern
 
 ### Setup
+Lies für initiales Setup: [Setup.md](docs/Setup.md)
+
 Erstelle eine .env Datei mit den folgenden informationen:
 
 ```ini
