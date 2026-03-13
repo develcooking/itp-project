@@ -182,12 +182,7 @@ if ($selectedTopicId) {
                         <label for="topicName" class="form-label">Titel des Themas</label>
                         <input type="text" class="form-control" name="topicName" id="topicName" placeholder="Titel eingeben" required>
                     </div>
-                    <!-- </form> -->
                 <!-- Modal for creating initial Post -->
-                    <!-- <form id="createPostFormInitial" action="/controllers/forum_actions.php" method="POST"> -->
-                    <!--<input type="hidden" name="action" value="createPost"> -->
-                    <!--<input type="hidden" name="topicId" value="<?= $selectedTopicId ?>"> -->
-                    <!--<input type="hidden" name="jobId" value="<?= $selectedJobId ?>"> -->
                     <input type="hidden" name="postContent" id="postContentHiddenInitial">
                     <div class="mb-3">
                         <label class="form-label">Ihre Nachricht</label>
@@ -203,33 +198,7 @@ if ($selectedTopicId) {
     </div>
 </div>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const quillInitial = new Quill('#quillEditorInitial', {
-            theme: 'snow',
-            placeholder: 'Schreiben Sie hier Ihre Nachricht...',
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['blockquote', 'code-block'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['link'],
-                    ['clean']
-                ]
-            }
-        });
-
-        document.getElementById('createTopicForm').onsubmit = function() {
-            const postContentHiddenInitial = document.getElementById('postContentHiddenInitial');
-            postContentHiddenInitial.value = quillInitial.root.innerHTML;
-            if (quillInitial.getText().trim().length === 0) {
-                alert('Bitte geben Sie eine Nachricht ein.');
-                return false;
-            }
-        };
-    });
-    </script>
+    <script src="/resources/js/postCreateEditor.js"></script>
 
 <!-- Modal for creating Post -->
 <div class="modal fade" id="createPostModal" tabindex="-1">
@@ -259,31 +228,6 @@ if ($selectedTopicId) {
     </div>
 </div>
 
-    <script>
-        const quill = new Quill('#quillEditor', {
-            theme: 'snow',
-            placeholder: 'Schreiben Sie hier Ihre Nachricht...',
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['blockquote', 'code-block'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['link'],
-                    ['clean']
-                ]
-            }
-        });
-
-        document.getElementById('createPostForm').onsubmit = function() {
-            const postContentHidden = document.getElementById('postContentHidden');
-            postContentHidden.value = quill.root.innerHTML;
-            
-            if (quill.getText().trim().length === 0) {
-                alert('Bitte geben Sie eine Nachricht ein.');
-                return false;
-            }
-        };
-    </script>
+    <script src="/resources/js/postCreateEditor.js"></script>
     
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>
