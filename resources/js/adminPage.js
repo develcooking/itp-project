@@ -167,4 +167,31 @@ $(document).ready(function() {
             }
         });
     });
+
+    // Aktivierten Benutzer löschen
+    $(document).on('click', '.delete-user-btn', function() {
+        const btn = $(this);
+        const userId = btn.data('userId');
+        const userName = btn.data('username');
+        const row = btn.closest('tr');
+
+        if (!confirm('Benutzer "' + userName + '" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden!')) return;
+
+        $.ajax({
+            url: '/controllers/admin.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'deleteUser', userId: userId },
+            success: function(response) {
+                if (response.success) {
+                    $('#usersTable').DataTable().row(row).remove().draw();
+                } else {
+                    alert('Fehler: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('Fehler beim Löschen des Benutzers.');
+            }
+        });
+    });
 });

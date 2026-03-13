@@ -68,6 +68,7 @@ include './header.php';
                 <th>Rolle</th>
                 <th>Wann</th>
                 <th class="w-auto">Berufsbereiche</th>
+                <th class="w-auto">Aktionen</th>
             </tr>
             </thead>
             <tbody>
@@ -88,6 +89,11 @@ include './header.php';
                     <td class="text-nowrap" style="width:1%">
                         <button class="btn btn-primary btn-sm jobs-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">
                             Berufsbereiche
+                        </button>
+                    </td>
+                    <td class="text-nowrap" style="width:1%">
+                        <button class="btn btn-danger btn-sm delete-user-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">
+                            Löschen
                         </button>
                     </td>
                 </tr>
