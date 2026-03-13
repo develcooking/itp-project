@@ -175,19 +175,19 @@ if ($selectedTopicId) {
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form action="/controllers/forum_actions.php" method="POST">
+                <form id="createTopicForm" action="/controllers/forum_actions.php" method="POST">
                     <input type="hidden" name="action" value="createTopic">
                     <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
                     <div class="mb-3">
                         <label for="topicName" class="form-label">Titel des Themas</label>
                         <input type="text" class="form-control" name="topicName" id="topicName" placeholder="Titel eingeben" required>
                     </div>
-                </form>
+                    <!-- </form> -->
                 <!-- Modal for creating initial Post -->
-                <form id="createPostFormInitial" action="/controllers/forum_actions.php" method="POST">
-                    <input type="hidden" name="action" value="createPost">
-                    <input type="hidden" name="topicId" value="<?= $selectedTopicId ?>">
-                    <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
+                    <!-- <form id="createPostFormInitial" action="/controllers/forum_actions.php" method="POST"> -->
+                    <!--<input type="hidden" name="action" value="createPost"> -->
+                    <!--<input type="hidden" name="topicId" value="<?= $selectedTopicId ?>"> -->
+                    <!--<input type="hidden" name="jobId" value="<?= $selectedJobId ?>"> -->
                     <input type="hidden" name="postContent" id="postContentHiddenInitial">
                     <div class="mb-3">
                         <label class="form-label">Ihre Nachricht</label>
@@ -204,6 +204,7 @@ if ($selectedTopicId) {
 </div>
 
     <script>
+    document.addEventListener("DOMContentLoaded", function() {
         const quillInitial = new Quill('#quillEditorInitial', {
             theme: 'snow',
             placeholder: 'Schreiben Sie hier Ihre Nachricht...',
@@ -219,15 +220,15 @@ if ($selectedTopicId) {
             }
         });
 
-        document.getElementById('createPostFormInitial').onsubmit = function() {
+        document.getElementById('createTopicForm').onsubmit = function() {
             const postContentHiddenInitial = document.getElementById('postContentHiddenInitial');
             postContentHiddenInitial.value = quillInitial.root.innerHTML;
-            console.log(quillInitial.getText().trim());
             if (quillInitial.getText().trim().length === 0) {
                 alert('Bitte geben Sie eine Nachricht ein.');
                 return false;
             }
         };
+    });
     </script>
 
 <!-- Modal for creating Post -->
