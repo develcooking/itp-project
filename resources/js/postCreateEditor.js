@@ -21,8 +21,6 @@ document.addEventListener("DOMContentLoaded", function() {
             return false;
         }
     };
-});
-
     const quill = new Quill('#quillEditor', {
         theme: 'snow',
         placeholder: 'Schreiben Sie hier Ihre Nachricht...',
@@ -46,3 +44,5 @@ document.addEventListener("DOMContentLoaded", function() {
             return false;
         }
     };
+});
+
