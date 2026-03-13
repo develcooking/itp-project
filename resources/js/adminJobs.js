@@ -65,10 +65,16 @@ $(document).ready(function() {
     $(document).on('click', '.save-btn', function() {
         const row = $(this).closest('tr');
         const jobId = row.data('jobId');
+        const original = row.find('.job-name-display').text().trim();
         const newName = row.find('.job-name-input').val().trim();
 
         if (!newName) {
             alert('Der Name darf nicht leer sein.');
+            return;
+        }
+
+        if (newName === original) {
+            row.find('.cancel-btn').trigger('click');
             return;
         }
 
