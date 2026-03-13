@@ -64,6 +64,7 @@ if ($isAdmin) {
         </div>
     </div>
 </div>
+<?php if (strtolower($_SESSION['role']) != 'ausbilder'): ?>
 <!-- Modal -->
 <div class="modal fade" id="calendermanagementModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="calendermanagementModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -144,6 +145,7 @@ if ($isAdmin) {
         </div>
     </div>
 </div>
+<?php endif; ?>
 <!-- Modal Change-->
 <div class="modal fade" id="calenderChageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="calenderChageModalLabel" aria-hidden="true">
     <div class="modal-dialog">
