@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/db.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/database/db.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserJobs.php';
 function sendResponse($success, $data = null, $message = null, $code = 200) {
     http_response_code($code);

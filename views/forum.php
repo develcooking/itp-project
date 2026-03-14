@@ -111,8 +111,8 @@ if ($selectedTopicId) {
                                         <div class="post-content p-2">
                                             <?php
                                             // Allow basic formatting tags but strip everything else (basic XSS protection)
-                                            // Ideally, a library like HTML Purifier should be used here.
-                                            echo strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+                                            require_once $_SERVER['DOCUMENT_ROOT'] . '/middleware/HtmlSanitizer.php';
+                                            echo HtmlSanitizer::sanitize($post['content']);
                                             ?>
                                         </div>
                                     </div>

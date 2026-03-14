@@ -10,3 +10,4 @@ composer.lock
 .idea/workspace.xml
 .ai/
 .vscode/
+.vscode/settings.json

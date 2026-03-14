@@ -235,8 +235,8 @@ if ($isAdmin) {
     </div>
 </div>
 <script>
-    const currentUserId = <?= $_SESSION['userId']; ?>;
-    const currentUserRole = "<?= $_SESSION['role']; ?>";
+    const currentUserId = <?= json_encode($_SESSION['userId'] ?? 0); ?>;
+    const currentUserRole = <?= json_encode($_SESSION['role'] ?? ''); ?>;
 </script>
 <script src="/resources/js/loadFullCalender.js"></script>
 <?php
