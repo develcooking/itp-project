@@ -21,6 +21,9 @@ class HtmlSanitizer {
                 $config->set('HTML.TargetBlank', true);
                 $config->set('AutoFormat.RemoveEmpty', true);
                 
+                // Disable persistent caching to fix "directory not writable" issues
+                $config->set('Cache.DefinitionImpl', null);
+                
                 self::$purifier = new HTMLPurifier($config);
             }
         }
