@@ -11,21 +11,30 @@ $postModel = new Post($conn);
 
 $selectedJobId = isset($_GET['jobId']) ? intval($_GET['jobId']) : null;
 $selectedTopicId = isset($_GET['topicId']) ? intval($_GET['topicId']) : null;
+$searchTerm = isset($_GET['search']) ? trim($_GET['search']) : null;
 
-$bereiche = $forumModel->getBereiche();
+$isAdmin = isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin';
+
+if ($isAdmin) {
+    // Admins see all Berufsbereiche
+    $bereiche = $forumModel->getallBereiche();
+} else {
+    $bereiche = $forumModel->getBereiche();
+}
 $topics = [];
 $posts = [];
 $currentJobName = "Berufsbereich";
 $currentTopicName = "";
 
 if ($selectedJobId) {
-    if (!$forumModel->hasAccess($_SESSION['userId'] ?? 0, $selectedJobId)) {
-        header("Location: /views/forum.php?error=no_access");
-        exit();
+    if (!$isAdmin) {
+        if (!$forumModel->hasAccess($_SESSION['userId'] ?? 0, $selectedJobId)) {
+            header("Location: /views/forum.php?error=no_access");
+            exit();
+        }
     }
-    $topics = $forumModel->getTopicsByBereich($selectedJobId);
+    $topics = $forumModel->getTopicsByBereich($selectedJobId, $searchTerm);
     // Even if empty, we treat it as an empty topic list
-    
     foreach ($bereiche as $b) {
         if ($b['jobId'] == $selectedJobId) {
             $currentJobName = $b['name'];
@@ -111,8 +120,8 @@ if ($selectedTopicId) {
                                         <div class="post-content p-2">
                                             <?php
                                             // Allow basic formatting tags but strip everything else (basic XSS protection)
-                                            require_once $_SERVER['DOCUMENT_ROOT'] . '/middleware/HtmlSanitizer.php';
-                                            echo HtmlSanitizer::sanitize($post['content']);
+                                            // Ideally, a library like HTML Purifier should be used here.
+                                            echo strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
                                             ?>
                                         </div>
                                     </div>
@@ -129,9 +138,17 @@ if ($selectedTopicId) {
                                 <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentJobName) ?></li>
                             </ol>
                         </nav>
-                        <button class="btn btn-sm btn-form-sub" data-bs-toggle="modal" data-bs-target="#createTopicModal">
-                            <i class="bi bi-plus-circle me-1"></i> Neues Thema
-                        </button>
+                        <?php // search field ?>
+                        <div class="d-flex align-items-center">
+                            <form class="d-flex me-3" method="GET" action="">
+                                <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
+                                <input class="form-control form-control-sm me-2" type="search" name="search" placeholder="Suche..." aria-label="Search" value="<?= htmlspecialchars($searchTerm ?? '') ?>">
+                                <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                            </form>
+                            <button class="btn btn-sm btn-form-sub" data-bs-toggle="modal" data-bs-target="#createTopicModal">
+                                <i class="bi bi-plus-circle me-1"></i> Neues Thema
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body p-0">
                         <?php if (empty($topics)): ?>
@@ -139,7 +156,7 @@ if ($selectedTopicId) {
                         <?php else: ?>
                             <div class="list-group list-group-flush">
                                 <?php foreach ($topics as $topic): ?>
-                                    <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>" class="list-group-item list-group-item-action py-3">
+                                    <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>" class="list-group-item list-group-item-action p-3">
                                         <div class="d-flex w-100 justify-content-between align-items-center">
                                             <h6 class="mb-1 fw-bold"><i class="bi bi-chat-left-text me-2 text-primary"></i><?= htmlspecialchars($topic['name']) ?></h6>
                                             <div class="d-flex align-items-center">
@@ -147,6 +164,18 @@ if ($selectedTopicId) {
                                                 <i class="bi bi-arrow-right text-muted"></i>
                                             </div>
                                         </div>
+
+                                        <?php // search results?>
+                                        <?php if (isset($topic['matching_posts']) && !empty($topic['matching_posts'])): ?>
+                                            <div class="mt-2 ps-3 border-start border-3" style="border-color: var(--accentColor) !important;">
+                                                <small class="text-muted d-block mb-1"><i class="bi bi-search me-1"></i>Gefunden in Beiträgen:</small>
+                                                <?php foreach ($topic['matching_posts'] as $match): ?>
+                                                    <div class="mb-1 small text-dark-emphasis fst-italic">
+                                                        "&hellip;<?= htmlspecialchars($match['content_snippet']) ?>&hellip;"
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
                                     </a>
                                 <?php endforeach; ?>
                             </div>
