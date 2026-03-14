@@ -35,6 +35,7 @@ if (!isset($user)) {
                     <?php endif; ?>
 
                     <form method="post" action="/controllers/profile.php">
+                        <?php echo getCsrfTokenInput(); ?>
 
                         <div class="form-floating mb-3">
                             <input

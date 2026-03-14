@@ -1,4 +1,5 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Appointment.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/UserJobs.php";

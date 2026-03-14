@@ -47,4 +47,3 @@ function hasAccessToJob($jobId) : bool {
     }
     return true;
 }
-$conn->close();

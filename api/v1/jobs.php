@@ -7,11 +7,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
-include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Job.php";
-include_once __DIR__ . "/api_helper.php";
-
-if (!isset($_SESSION)) session_start();
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Job.php";
+require_once __DIR__ . "/api_helper.php";
 
 $method = $_SERVER['REQUEST_METHOD'];
 $job = new Job($conn);

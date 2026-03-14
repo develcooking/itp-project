@@ -6,7 +6,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createAccount'])) {
-    validateCsrfOrDie();
     $userName = htmlspecialchars(trim($_POST['userName'] ?? ''));
     $firstName = htmlspecialchars(trim($_POST['firstName'] ?? ''));
     $lastName = htmlspecialchars(trim($_POST['lastName'] ?? ''));

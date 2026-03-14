@@ -176,6 +176,7 @@ if ($selectedTopicId) {
             </div>
             <div class="modal-body">
                 <form id="createTopicForm" action="/controllers/forum_actions.php" method="POST">
+                    <?php echo getCsrfTokenInput(); ?>
                     <input type="hidden" name="action" value="createTopic">
                     <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
                     <div class="mb-3">
@@ -210,6 +211,7 @@ if ($selectedTopicId) {
             </div>
             <div class="modal-body">
                 <form id="createPostForm" action="/controllers/forum_actions.php" method="POST">
+                    <?php echo getCsrfTokenInput(); ?>
                     <input type="hidden" name="action" value="createPost">
                     <input type="hidden" name="topicId" value="<?= $selectedTopicId ?>">
                     <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
