@@ -33,6 +33,21 @@ class Forum {
         $stmt->close();
         return $bereiche;
     }
+    public function getallBereiche(): array {
+
+        $query = "SELECT * FROM " . $this->TJobs ;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $bereiche = [];
+        while ($row = $result->fetch_assoc()) {
+            $bereiche[] = $row;
+        }
+
+        $stmt->close();
+        return $bereiche;
+    }
 
     public function hasAccess(int $userId, int $jobId): bool {
         $query = "SELECT COUNT(*) as count FROM " . $this->Tusers_jobs . " WHERE userId = ? AND jobId = ?";
