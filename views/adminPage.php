@@ -2,10 +2,6 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/controllers/adminPage.php';
 include './header.php';
 ?>
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="../resources/css/datatables.min.css">
-    <!-- DataTables JS -->
-    <script src="../resources/js/datatables.min.js"></script>
 
     <div class="container-fluid px-3">
 
@@ -122,5 +118,8 @@ include './header.php';
     </div>
 
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>
-
+<script src="../resources/js/datatables.min.js"></script>
 <script src="/resources/js/adminPage.js"></script>
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="../resources/css/datatables.min.css">
+<!-- DataTables JS -->

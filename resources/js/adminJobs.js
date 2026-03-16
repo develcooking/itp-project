@@ -2,7 +2,7 @@ $(document).ready(function() {
     $('#jobsTable').DataTable({
         order: [[0, 'asc']],
         language: {
-            url: 'https://cdn.datatables.net/plug-ins/2.0.0/i18n/de-DE.json'
+            url: '/resources/js/datatables-de-DE.json'
         },
         columnDefs: [
             { orderable: false, targets: 1 }
