@@ -244,5 +244,108 @@ class Post
         $this->userName = $row['userName'] ?? '';
     }
 
+public function addPositiveReaction($postId)
+{
+    $sql = "UPDATE Posts SET reaction_positive = reaction_positive + 1 WHERE postId = ?";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bind_param("i", $postId);
+    $stmt->execute();
+    $stmt->close();
+}
 
+public function addNegativeReaction($postId)
+{
+    $sql = "UPDATE Posts SET reaction_negative = reaction_negative + 1 WHERE postId = ?";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bind_param("i", $postId);
+    $stmt->execute();
+    $stmt->close();
+}
+public function reactionPositiveDecrement($postId)
+{
+    $sql = "UPDATE Posts SET reaction_positive = reaction_positive - 1 WHERE postId = ? AND reaction_positive > 0";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bind_param("i", $postId);
+    $stmt->execute();
+    $stmt->close();
+}
+
+public function reactionNegativeDecrement($postId)
+{
+    $sql = "UPDATE Posts SET reaction_negative = reaction_negative - 1 WHERE postId = ? AND reaction_negative > 0";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bind_param("i", $postId);
+    $stmt->execute();
+    $stmt->close();
+}
+public function vote($postId, $userId, $type)
+{
+    if (!in_array($type, ['up','down'])) return false;
+
+    // Check current vote
+    $query = "SELECT voteType FROM user_reactions WHERE userId = ? AND postId = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("ii", $userId, $postId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $currentVote = $row['voteType'];
+
+        if ($currentVote === $type) {
+            // Same vote → switch to noreaction
+            $update = "UPDATE user_reactions SET voteType = 'noreaction' WHERE userId = ? AND postId = ?";
+            $stmt = $this->conn->prepare($update);
+            $stmt->bind_param("ii", $userId, $postId);
+            $stmt->execute();
+            $stmt->close();
+
+            // Decrement counter
+            if ($type === 'up') {
+                $this->reactionPositiveDecrement($postId);
+            } else {
+                $this->reactionNegativeDecrement($postId);
+            }
+
+            return true;
+        }
+
+        // Different vote → switch vote
+        $update = "UPDATE user_reactions SET voteType = ? WHERE userId = ? AND postId = ?";
+        $stmt = $this->conn->prepare($update);
+        $stmt->bind_param("sii", $type, $userId, $postId);
+        $stmt->execute();
+        $stmt->close();
+
+        // Update counters
+        if ($type === 'up') {
+            $this->addPositiveReaction($postId);
+            $this->reactionNegativeDecrement($postId);
+        } else {
+            $this->addNegativeReaction($postId);
+            $this->reactionPositiveDecrement($postId);
+        }
+
+        return true;
+    }
+
+    $stmt->close();
+
+    // No previous vote → insert row
+    $insert = "INSERT INTO user_reactions (userId, postId, voteType) VALUES (?, ?, ?)";
+    $stmt = $this->conn->prepare($insert);
+    $stmt->bind_param("iis", $userId, $postId, $type);
+    $stmt->execute();
+    $stmt->close();
+
+    // Increment counter
+    if ($type === 'up') {
+        $this->addPositiveReaction($postId);
+    } else {
+        $this->addNegativeReaction($postId);
+    }
+
+    return true;
+}
 }
