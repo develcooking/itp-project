@@ -12,20 +12,28 @@ $postModel = new Post($conn);
 $selectedJobId = isset($_GET['jobId']) ? intval($_GET['jobId']) : null;
 $selectedTopicId = isset($_GET['topicId']) ? intval($_GET['topicId']) : null;
 
-$bereiche = $forumModel->getBereiche();
+$isAdmin = isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin';
+
+if ($isAdmin) {
+    // Admins see all Berufsbereiche
+    $bereiche = $forumModel->getallBereiche();
+} else {
+    $bereiche = $forumModel->getBereiche();
+}
 $topics = [];
 $posts = [];
 $currentJobName = "Berufsbereich";
 $currentTopicName = "";
 
 if ($selectedJobId) {
-    if (!$forumModel->hasAccess($_SESSION['userId'] ?? 0, $selectedJobId)) {
-        header("Location: /views/forum.php?error=no_access");
-        exit();
+    if (!$isAdmin) {
+        if (!$forumModel->hasAccess($_SESSION['userId'] ?? 0, $selectedJobId)) {
+            header("Location: /views/forum.php?error=no_access");
+            exit();
+        }
     }
     $topics = $forumModel->getTopicsByBereich($selectedJobId);
     // Even if empty, we treat it as an empty topic list
-    
     foreach ($bereiche as $b) {
         if ($b['jobId'] == $selectedJobId) {
             $currentJobName = $b['name'];
