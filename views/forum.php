@@ -59,7 +59,7 @@ if ($selectedTopicId) {
 <div class="container-fluid mt-4 forum-container">
     <div class="row">
         <!-- Sidebar: Berufsbereiche -->
-        <div class="col-md-3">
+        <div class="col-md-3" >
             <div class="card shadow-sm">
                 <div class="card-header text-white" style="background-color: var(--accentColor);">
                     <h5 class="mb-0">Berufsbereiche</h5>
@@ -102,7 +102,7 @@ if ($selectedTopicId) {
                             <div class="p-5 text-center text-muted">Noch keine Beiträge in diesem Thread.</div>
                         <?php else: ?>
                             <?php foreach ($posts as $post): ?>
-                                <div class="card mb-3 border-0 shadow-sm">
+                                <div class="card mb-3 border-0 shadow-sm" id="post-<?= $post['postId'] ?>">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between mb-2">
                                             <span class="fw-bold text-primary"><i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?></span>
@@ -227,5 +227,30 @@ if ($selectedTopicId) {
         </div>
     </div>
 </div>
+
+<script>
+// Автоскролл к посту при переходе с startpage
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.location.hash) {
+        const element = document.querySelector(window.location.hash);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.classList.add('highlight-post');
+            setTimeout(() => element.classList.remove('highlight-post'), 2000);
+        }
+    }
+});
+</script>
+
+<style>
+.highlight-post {
+    animation: highlight 2s ease-in-out;
+}
+
+@keyframes highlight {
+    0%, 100% { background-color: transparent; }
+    50% { background-color: rgba(13, 110, 253, 0.1); }
+}
+</style>
     
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>

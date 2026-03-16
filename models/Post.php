@@ -244,5 +244,94 @@ class Post
         $this->userName = $row['userName'] ?? '';
     }
 
+    /**
+ * Получить последний пост из каждого topic в berufsbereiche пользователя
+ * @param int $userId
+ * @param int $jobLimit Максимум berufsbereiche (4)
+ * @return array
+ */
+public function getRecentForUserJobs(int $userId, int $jobLimit = 4): array
+{
+    // Получаем последний пост из самого нового topic для каждого Job
+    $query = "SELECT 
+                p.postId,
+                p.topicId,
+                p.userId,
+                p.content,
+                p.description,
+                p.createdAt,
+                t.name as topicName,
+                t.createdAt as topicCreatedAt,
+                t.jobId,
+                j.name as jobName,
+                u.userName,
+                u.firstName,
+                u.lastName
+              FROM " . $this->table . " p
+              INNER JOIN Topics t ON p.topicId = t.topicId
+              INNER JOIN Jobs j ON t.jobId = j.jobId
+              INNER JOIN users_jobs uj ON j.jobId = uj.jobId
+              INNER JOIN Users u ON p.userId = u.userId
+              WHERE uj.userId = ?
+              AND p.postId = (
+                  SELECT p2.postId 
+                  FROM Posts p2 
+                  WHERE p2.topicId = t.topicId 
+                  ORDER BY p2.createdAt DESC 
+                  LIMIT 1
+              )
+              ORDER BY t.createdAt DESC";
+    
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $postsByJob = [];
+    $jobCount = [];
+    
+    while ($row = $result->fetch_assoc()) {
+        $jobId = $row['jobId'];
+        
+        // Ограничиваем количество berufsbereiche до $jobLimit
+        if (!isset($jobCount[$jobId])) {
+            if (count($jobCount) >= $jobLimit) {
+                continue;
+            }
+            $jobCount[$jobId] = 0;
+        }
+        
+        // Берём только 1 topic на berufsbereich (самый новый)
+        if ($jobCount[$jobId] >= 1) {
+            continue;
+        }
+        
+        if (!isset($postsByJob[$jobId])) {
+            $postsByJob[$jobId] = [
+                'jobId' => $jobId,
+                'jobName' => $row['jobName'],
+                'posts' => []
+            ];
+        }
+        
+        $postsByJob[$jobId]['posts'][] = [
+            'postId' => $row['postId'],
+            'topicId' => $row['topicId'],
+            'topicName' => $row['topicName'],
+            'content' => $row['content'],
+            'description' => $row['description'],
+            'userName' => $row['userName'],
+            'firstName' => $row['firstName'],
+            'lastName' => $row['lastName'],
+            'createdAt' => $row['createdAt'],
+            'topicCreatedAt' => $row['topicCreatedAt']
+        ];
+        
+        $jobCount[$jobId]++;
+    }
+    
+    $stmt->close();
+    return array_values($postsByJob);
+}
 
 }

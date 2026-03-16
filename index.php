@@ -2,7 +2,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 
 if (!empty($_SESSION['userId'])) {
-    header("Location: /views/startpage.php");
+    header("Location: /controllers/startpage.php");
     exit();
 }
 

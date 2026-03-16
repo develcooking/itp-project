@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_SESSION['email'] = $user->getEmail();
                         $_SESSION['role'] = $user->getRole();
 
-                        header("Location: /views/startpage.php");
+                        header("Location: /controllers/startpage.php");
                         exit();
                     }
                 } else {
