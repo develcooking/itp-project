@@ -1,6 +1,4 @@
-<?php
-?>
-
+</main>
 <footer class="footer">
     <script src="../resources/js/neko.js"></script>
     <div class="footer-container">
@@ -15,3 +13,5 @@
 </footer>
 <script src="/resources/js/popper.min.js"></script>
 <script src="/resources/js/bootstrap.min.js"></script>
+</body>
+</html>

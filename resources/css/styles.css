@@ -13,6 +13,7 @@ body {
   min-height: 100vh;          
   display: flex;
   flex-direction: column;
+  background-image: url("../imgs/bg-netz.jpg");
 }
 
 main {
@@ -40,6 +41,7 @@ main {
     display: flex;
     align-items: stretch;      
     height: 70px;
+    background-color: #fff;
     border-bottom: 2px solid #ffffff33;
 }
 
@@ -100,7 +102,10 @@ main {
 .nav-account-btn {
     text-decoration: none;
 }
-
+nav-account-btn:hover,
+nav-account-toggle:hover {
+    background-color: #737373;
+}
 .nav-account-toggle {
     padding: 0 10px;
     border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
