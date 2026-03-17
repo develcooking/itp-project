@@ -21,6 +21,7 @@ if ($isAdmin) {
 } else {
     $bereiche = $forumModel->getBereiche();
 }
+
 $topics = [];
 $posts = [];
 $currentJobName = "Berufsbereich";
@@ -35,6 +36,7 @@ if ($selectedJobId) {
     }
     $topics = $forumModel->getTopicsByBereich($selectedJobId, $searchTerm);
     // Even if empty, we treat it as an empty topic list
+    
     foreach ($bereiche as $b) {
         if ($b['jobId'] == $selectedJobId) {
             $currentJobName = $b['name'];
@@ -334,4 +336,6 @@ if ($selectedTopicId) {
     </div>
 </div>
     
+<script src="/resources/js/postCreateEditor.js"></script>
+
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>
