@@ -36,15 +36,20 @@ switch ($method) {
                     'end' => $appointment->getEnd(),
                     'description' => $appointment->getDescription(),
                     'createdBy' => $appointment->getCreatedBy(),
-                    'modifiedBy' => $appointment->getModifiedBy()
+                    'modifiedBy' => $appointment->getModifiedBy(),
+                    'recurrenceType' => $appointment->getRecurrenceType(),
+                    'recurrenceInterval' => $appointment->getRecurrenceInterval(),
+                    'recurrenceUntil' => $appointment->getRecurrenceUntil()
                 ];
                 sendResponse(true, $data);
             } else {
                 sendResponse(false, null, 'Appointment not found', 404);
             }
         } else {
+            $start = $_GET['start'] ?? null;
+            $end = $_GET['end'] ?? null;
             if ($_SESSION['role'] === 'Admin') {
-                sendResponse(true, $appointment->getAll());
+                sendResponse(true, $appointment->getAll(null, $start, $end));
             } else {
                 sendResponse(true, $appointment->getForUserJobs($userId));
             }
@@ -65,7 +70,10 @@ switch ($method) {
                     ->setEnd($data['end'] ?? date('Y-m-d H:i:s'))
                     ->setDescription(HtmlSanitizer::sanitize($data['description'] ?? ''))
                     ->setCreatedBy($_SESSION['userId'])
-                    ->setModifiedBy($_SESSION['userId']);
+                    ->setModifiedBy($_SESSION['userId'])
+                    ->setRecurrenceType($data['recurrenceType'] ?? 'none')
+                    ->setRecurrenceInterval(intval($data['recurrenceInterval'] ?? 1))
+                    ->setRecurrenceUntil($data['recurrenceUntil'] ?? null);
 
         if ($appointment->post()) {
             sendResponse(true, ['appointmentId' => $conn->insert_id], 'Appointment created successfully', 201);
@@ -103,6 +111,9 @@ switch ($method) {
         if (isset($data['end'])) $appointment->setEnd($data['end']);
         if (isset($data['description'])) $appointment->setDescription(HtmlSanitizer::sanitize($data['description']));
         if (isset($data['jobId'])) $appointment->setJobId(intval($data['jobId']));
+        if (isset($data['recurrenceType'])) $appointment->setRecurrenceType($data['recurrenceType']);
+        if (isset($data['recurrenceInterval'])) $appointment->setRecurrenceInterval(intval($data['recurrenceInterval']));
+        if (isset($data['recurrenceUntil'])) $appointment->setRecurrenceUntil($data['recurrenceUntil']);
 
         if ($appointment->update($id)) {
             sendResponse(true, null, 'Appointment updated successfully', 204);

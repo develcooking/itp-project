@@ -136,6 +136,31 @@ if ($isAdmin) {
                         </select>
                         <label for="jobselection">Berufsbereich</label>
                     </div>
+
+                    <!-- Recurrence -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select name="recurrence_type" class="form-select" id="recurrence_type">
+                                    <option value="none">Keine Wiederholung</option>
+                                    <option value="weekly">Wöchentlich</option>
+                                    <option value="monthly">Monatlich</option>
+                                </select>
+                                <label for="recurrence_type">Wiederholung</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" name="recurrence_interval" class="form-control" id="recurrence_interval" value="1" min="1">
+                                <label for="recurrence_interval">Alle X Wochen/Monate</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="date" name="recurrence_until" class="form-control" id="recurrence_until" min="<?php echo date('Y-m-d'); ?>">
+                        <label for="recurrence_until">Wiederholen bis</label>
+                    </div>
+
                     <div id="dateError" class="alert alert-danger d-none"></div>
                 </div>
                 <div class="modal-footer">
@@ -217,6 +242,30 @@ if ($isAdmin) {
                             <?php endforeach; ?>
                         </select>
                         <label for="changejobselection">Berufsbereich</label>
+                    </div>
+
+                    <!-- Recurrence -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select name="changerecurrence_type" class="form-select" id="changerecurrence_type">
+                                    <option value="none">Keine Wiederholung</option>
+                                    <option value="weekly">Wöchentlich</option>
+                                    <option value="monthly">Monatlich</option>
+                                </select>
+                                <label for="changerecurrence_type">Wiederholung</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" name="changerecurrence_interval" class="form-control" id="changerecurrence_interval" value="1" min="1">
+                                <label for="changerecurrence_interval">Alle X Wochen/Monate</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="date" name="changerecurrence_until" class="form-control" id="changerecurrence_until" min="<?php echo date('Y-m-d'); ?>">
+                        <label for="changerecurrence_until">Wiederholen bis</label>
                     </div>
                 </div>
                 <input name="changeappointmentId" id="changeappointmentId" value="" class="invisible h-0 w-0">
