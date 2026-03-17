@@ -40,7 +40,7 @@ function getCsrfTokenInput() {
  * @param string|null $token The token to verify. If null, it checks $_POST['csrf_token'] or X-CSRF-TOKEN header.
  * @return bool True if valid, false otherwise.
  */
-function verifyCsrfToken($token = null) {
+function verifyCsrfToken($token) {
     if ($token === null) {
         if (isset($_POST['csrf_token'])) {
             $token = $_POST['csrf_token'];
@@ -56,11 +56,9 @@ function verifyCsrfToken($token = null) {
     return hash_equals($_SESSION['csrf_token'], $token);
 }
 
-/**
- * Validates CSRF token and exits with error if invalid for state-changing requests.
- */
+//-> $stateChangingMethods = ['POST', 'PUT', 'DELETE', 'PATCH']; nacharbeiten für POST, aktuell die methode wird weggenommen
 function validateCsrfOrDie() {
-    $stateChangingMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
+    $stateChangingMethods = ['PUT', 'DELETE', 'PATCH'];
     if (in_array($_SERVER['REQUEST_METHOD'], $stateChangingMethods)) {
         if (!verifyCsrfToken()) {
             http_response_code(403);

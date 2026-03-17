@@ -163,6 +163,7 @@ if ($selectedTopicId) {
                         </form>
 
                         </div>
+<<<<<<< HEAD
                             </div>
                         </div>
 
@@ -176,6 +177,8 @@ if ($selectedTopicId) {
                 </button>
             </div>
 
+=======
+>>>>>>> 0f8218ca88cd576f149da68659e7c3a356d65dd4
                 <?php elseif ($selectedJobId): ?>
                     <!-- Threads View (Topics) -->
                     <div class="card-header d-flex justify-content-between align-items-center bg-light">
@@ -225,9 +228,22 @@ if ($selectedTopicId) {
                                     </a>
                                 <?php endforeach; ?>
                             </div>
-                        <?php endif; ?>
-                    </div>
+                        </div>
 
+<<<<<<< HEAD
+=======
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+            <div class="card-footer bg-light d-flex justify-content-end align-items-center gap-2">
+                <button class="btn btn-form-sub" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                    <i class="bi bi-reply me-1"></i> Antworten
+                </button>
+            </div>
+
+
+>>>>>>> 0f8218ca88cd576f149da68659e7c3a356d65dd4
         <?php elseif ($selectedJobId): ?>
             <!-- Threads View (Topics) -->
             <div class="card-header d-flex justify-content-between align-items-center bg-light">
@@ -337,6 +353,9 @@ if ($selectedTopicId) {
     </div>
 </div>
     
+<<<<<<< HEAD
 <script src="/resources/js/postCreateEditor.js"></script>
 
+=======
+>>>>>>> 0f8218ca88cd576f149da68659e7c3a356d65dd4
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>

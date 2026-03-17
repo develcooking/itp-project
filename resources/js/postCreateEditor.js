@@ -44,8 +44,11 @@ document.addEventListener("DOMContentLoaded", function() {
             return false;
         }
     };
+<<<<<<< HEAD
 });
 
+=======
+>>>>>>> 0f8218ca88cd576f149da68659e7c3a356d65dd4
 
  document.querySelectorAll('.vote-form').forEach(form => {
     form.addEventListener('submit', function(e) {
@@ -84,4 +87,8 @@ document.addEventListener("DOMContentLoaded", function() {
             icon.style.color = '';
         });
     });
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 0f8218ca88cd576f149da68659e7c3a356d65dd4
