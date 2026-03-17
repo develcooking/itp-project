@@ -35,6 +35,7 @@ if (!isset($user)) {
                     <?php endif; ?>
 
                     <form method="post" action="/controllers/profile.php">
+                        <?php echo getCsrfTokenInput(); ?>
 
                         <div class="form-floating mb-3">
                             <input
@@ -102,6 +103,17 @@ if (!isset($user)) {
                                     <?= htmlspecialchars($errors['email']) ?>
                                 </div>
                             <?php endif; ?>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input
+                            type="text"
+                            id="role"
+                            class="form-control"
+                            placeholder="Rolle"
+                            value="<?= htmlspecialchars($user->getRole()) ?>"
+                            disabled>
+                            <label for="role">Rolle</label>
                         </div>
 
                         <div class="form-floating mb-3">

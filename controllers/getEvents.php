@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 require_once $homepath . "/models/UserJobs.php";
 require_once $homepath . "/models/Job.php";
@@ -24,7 +25,6 @@ if (isset($_GET['filterEnd']) && $_GET['filterEnd'] !== '') {
 
 $filterJobId = isset($_GET['jobId']) && $_GET['jobId'] !== '' ? (int)$_GET['jobId'] : null;
 
-session_start();
 if (!isset($_SESSION['userId'])) {
     http_response_code(401);
     echo json_encode([]);

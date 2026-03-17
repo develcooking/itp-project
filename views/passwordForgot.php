@@ -17,6 +17,7 @@ if (isset($_SESSION['userId'])) {
                 <h2 class="fw-bold mb-2">Passwort zurücksetzen</h2>
 
                 <form method="post" class="p-3" action="../controllers/passwordForgot.php">
+                    <?php echo getCsrfTokenInput(); ?>
 
                     <div class="form-floating mb-3">
                         <input
@@ -55,7 +56,7 @@ if (isset($_SESSION['userId'])) {
                 <hr class="my-4">
 
                 <p class="mb-0">
-                    <a href="loginsite.php" class="fw-bold text-decoration-none">Zurück zur Anmeldung</a>
+                    <a href="/views/loginsite.php" class="fw-bold text-decoration-none">Zurück zur Anmeldung</a>
                 </p>
 
             </div>

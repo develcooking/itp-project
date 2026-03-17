@@ -1,7 +1,7 @@
 <?php
 // This is only a test file
 // Remove all session variables
-session_start();
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 session_unset();
 
 // Destroy the session

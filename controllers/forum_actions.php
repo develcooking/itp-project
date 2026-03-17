@@ -1,14 +1,11 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Forum.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Topic.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Post.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/app/services/TopicPostNotificationService.php";
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
 if (!isset($_SESSION['userId'])) {
     header("Location: /views/loginsite.php");
@@ -19,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         $forumModel = new Forum($conn);
         $userId = $_SESSION['userId'];
+        $isAdmin = isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin';
 
         switch ($_POST['action']) {
             case 'createTopic':
@@ -29,10 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $jobId = intval($_POST['jobId'] ?? 0);
                 
                 if (!empty($name) && $jobId > 0) {
-                    // Check access
-                    if (!$forumModel->hasAccess($userId, $jobId)) {
-                        header("Location: /views/forum.php?error=no_access");
-                        exit();
+                    if (!$isAdmin) {
+                        // Check access
+                        if (!$forumModel->hasAccess($userId, $jobId)) {
+                            header("Location: /views/forum.php?error=no_access");
+                            exit();
+                        }
                     }
 
                     $topic = new Topic($conn);
@@ -73,10 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $jobId = intval($_POST['jobId'] ?? 0);
                 
                 if (!empty($content) && $topicId > 0) {
-                    // Check access to jobId
-                    if (!$forumModel->hasAccess($userId, $jobId)) {
-                        header("Location: /views/forum.php?error=no_access");
-                        exit();
+                    if (!$isAdmin) {
+                        // Check access to jobId
+                        if (!$forumModel->hasAccess($userId, $jobId)) {
+                            header("Location: /views/forum.php?error=no_access");
+                            exit();
+                        }
                     }
 
                     // Ensure topic is in this job
@@ -85,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         exit();
                     }
 
-                    // Basic XSS protection on input (optional, but good practice)
+                    // XSS protection on input
                     $content = strip_tags($content, '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
 
                     $post = new Post($conn);

@@ -7,29 +7,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
-include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Job.php";
-include_once __DIR__ . "/api_helper.php";
-
-if (!isset($_SESSION)) session_start();
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Job.php";
+require_once __DIR__ . "/api_helper.php";
 
 $method = $_SERVER['REQUEST_METHOD'];
 $job = new Job($conn);
 
+if (!is_numeric($_GET['id'])) {
+    sendResponse(false, null, 'JobId is not numeric!', 400);
+}
 switch ($method) {
     case 'GET':
         if (isset($_GET['id'])) {
-            if ($job->getById(intval($_GET['id']))) {
-                $data = [
-                    'jobId' => $_GET['id'],
-                    'name' => $job->getNameById(intval($_GET['id']))
-                ];
-                sendResponse(true, $data);
-            } else {
-                sendResponse(false, null, 'Job not found', 404);
+            if (hasAccessToJob($_GET['id'])) {
+                if ($job->getById(intval($_GET['id']))) {
+                    $data = [
+                        'jobId' => $_GET['id'],
+                        'name' => $job->getNameById(intval($_GET['id']))
+                    ];
+                    sendResponse(true, $data, '', 200);
+                } else {
+                    sendResponse(false, null, 'Job not found', 404);
+                }
             }
         } else {
-            sendResponse(true, $job->getAll());
+            if (checkAdmin()) {
+                sendResponse(true, $job->getAll(), '', 200);
+            } else {
+                sendResponse(false, null, 'Forbidden: Admin access required', 403);
+            }
+
         }
         break;
 

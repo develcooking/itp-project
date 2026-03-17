@@ -70,6 +70,7 @@ if ($isAdmin) {
     <div class="modal-dialog">
         <div class="modal-content">
             <form id="createEvent" method="post" action="../controllers/createEvent.php">
+                <?php echo getCsrfTokenInput(); ?>
                 <div class="modal-header">
                     <h1 class="modal-title fs-5 text-center" id="calendermanagementModalLabel">Termin erstellen</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -151,6 +152,7 @@ if ($isAdmin) {
     <div class="modal-dialog">
         <div class="modal-content">
             <form id="changeEventForm" method="post" action="../controllers/changeEvent.php">
+                <?php echo getCsrfTokenInput(); ?>
                 <div class="modal-header">
                     <h1 class="modal-title fs-5 text-center" id="calenderChageModalLabel">Termin ändern</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -233,8 +235,8 @@ if ($isAdmin) {
     </div>
 </div>
 <script>
-    const currentUserId = <?= $_SESSION['userId']; ?>;
-    const currentUserRole = "<?= $_SESSION['role']; ?>";
+    const currentUserId = <?= json_encode($_SESSION['userId'] ?? 0); ?>;
+    const currentUserRole = <?= json_encode($_SESSION['role'] ?? ''); ?>;
 </script>
 <script src="/resources/js/loadFullCalender.js"></script>
 <?php
