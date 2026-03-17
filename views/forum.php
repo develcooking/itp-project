@@ -53,25 +53,12 @@ if ($selectedTopicId) {
 ?>
     <link href="../resources/css/quill.snow.css" rel="stylesheet" />
     <script src="../resources/js/quill.js"></script>
-    <style>
-        /* Styles for rendered Quill content in the forum */
-        .post-content blockquote {
-            border-left: 4px solid #ccc;
-            margin-bottom: 5px;
-            margin-top: 5px;
-            padding-left: 16px;
-            font-style: italic;
-        }
-        .post-content h1 { font-size: 2em; font-weight: bold; }
-        .post-content h2 { font-size: 1.5em; font-weight: bold; }
-        .post-content h3 { font-size: 1.17em; font-weight: bold; }
-    </style>
 <div class="container-fluid mt-4 forum-container">
     <div class="row">
         <!-- Sidebar: Berufsbereiche -->
         <div class="col-md-3">
             <div class="card shadow-sm">
-                <div class="card-header text-white" style="background-color: var(--accentColor);">
+                <div class="card-header text-white forum-accent-header">
                     <h5 class="mb-0">Berufsbereiche</h5>
                 </div>
                 <div class="list-group list-group-flush">
@@ -79,9 +66,8 @@ if ($selectedTopicId) {
                         <div class="p-3 text-center text-muted">Keine Bereiche verfügbar.</div>
                     <?php else: ?>
                         <?php foreach ($bereiche as $bereich): ?>
-                            <a href="?jobId=<?= $bereich['jobId'] ?>" 
-                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center <?= $selectedJobId == $bereich['jobId'] ? 'active' : '' ?>"
-                               <?= $selectedJobId == $bereich['jobId'] ? 'style="background-color: var(--accentColor); border-color: var(--accentColor);"' : '' ?>>
+                                     <a href="?jobId=<?= $bereich['jobId'] ?>" 
+                                         class="list-group-item list-group-item-action d-flex justify-content-between align-items-center <?= $selectedJobId == $bereich['jobId'] ? 'active forum-bereich-active' : '' ?>">
                                 <?= htmlspecialchars($bereich['name']) ?>
                                 <i class="bi bi-chevron-right small <?= $selectedJobId == $bereich['jobId'] ? '' : 'text-muted' ?>"></i>
                             </a>
@@ -118,15 +104,23 @@ if ($selectedTopicId) {
                 $upIcon = ($userVote === 'up') ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up';
                 $downIcon = ($userVote === 'down') ? 'bi-hand-thumbs-down-fill' : 'bi-hand-thumbs-down';
 
-                $upColor = ($userVote === 'up') ? 'green' : '#6c757d';
-                $downColor = ($userVote === 'down') ? 'red' : '#6c757d';
+                $upVoteClass = ($userVote === 'up') ? 'forum-vote-up' : 'forum-vote-neutral';
+                $downVoteClass = ($userVote === 'down') ? 'forum-vote-down' : 'forum-vote-neutral';
                 ?>
 
                 <div class="card mb-3 border-0 shadow-sm">
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-2">
-                            <span class="fw-bold text-primary">
-                                <i class="bi bi-person-circle me-1"></i>
+                            <span class="fw-bold text-primary d-flex align-items-center gap-2">
+                                <?php if (!empty($post['hasProfileImage'])): ?>
+                                    <img
+                                        src="/controllers/profileImage.php?userId=<?= (int)$post['userId'] ?>"
+                                        alt="Profilbild von <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>"
+                                        class="forum-post-avatar rounded-circle border"
+                                        onerror="this.onerror=null;this.src='/resources/imgs/icon.png';">
+                                <?php else: ?>
+                                    <i class="bi bi-person-circle forum-post-avatar-icon" aria-label="Standard Profilbild"></i>
+                                <?php endif; ?>
                                 <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
                             </span>
                             <small class="text-muted">
@@ -144,7 +138,7 @@ if ($selectedTopicId) {
                         <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
 
                         <button class="btn btn-sm btn-light">
-                        <i class="bi <?= $upIcon ?>" style="color: <?= $upColor ?>; font-size:18px;"></i>
+                        <i class="bi <?= $upIcon ?> forum-vote-icon <?= $upVoteClass ?>"></i>
                         <span><?= $post['reaction_positive'] ?></span>
                         </button>
 
@@ -156,7 +150,7 @@ if ($selectedTopicId) {
                         <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
 
                         <button class="btn btn-sm btn-light">
-                        <i class="bi <?= $downIcon ?>" style="color: <?= $downColor ?>; font-size:18px;"></i>
+                        <i class="bi <?= $downIcon ?> forum-vote-icon <?= $downVoteClass ?>"></i>
                         <span><?= $post['reaction_negative'] ?></span>
                         </button>
 
@@ -213,7 +207,7 @@ if ($selectedTopicId) {
 
                                         <?php // search results?>
                                         <?php if (isset($topic['matching_posts']) && !empty($topic['matching_posts'])): ?>
-                                            <div class="mt-2 ps-3 border-start border-3" style="border-color: var(--accentColor) !important;">
+                                            <div class="mt-2 ps-3 border-start border-3 forum-search-match-border">
                                                 <small class="text-muted d-block mb-1"><i class="bi bi-search me-1"></i>Gefunden in Beiträgen:</small>
                                                 <?php foreach ($topic['matching_posts'] as $match): ?>
                                                     <div class="mb-1 small text-dark-emphasis fst-italic">
@@ -263,7 +257,7 @@ if ($selectedTopicId) {
         <?php else: ?>
             <!-- Default View -->
             <div class="card-body text-center d-flex flex-column justify-content-center flex-grow-1">
-                <i class="bi bi-chat-dots" style="font-size: 4rem; color: #dee2e6;"></i>
+                <i class="bi bi-chat-dots forum-empty-icon"></i>
                 <h4 class="mt-3">Willkommen im Forum</h4>
                 <p class="text-muted">Bitte wählen Sie einen Berufsbereich aus der Liste links aus, um die Threads zu sehen.</p>
             </div>
@@ -277,7 +271,7 @@ if ($selectedTopicId) {
 <div class="modal fade" id="createTopicModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header text-white" style="background-color: var(--accentColor);">
+            <div class="modal-header text-white forum-accent-header">
                 <h5 class="modal-title">Neues Thema und initiales Beitrag erstellen</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -294,11 +288,11 @@ if ($selectedTopicId) {
                     <input type="hidden" name="postContent" id="postContentHiddenInitial">
                     <div class="mb-3">
                         <label class="form-label">Ihre Nachricht</label>
-                        <div id="quillEditorInitial" style="height: 200px; background: white;"></div>
+                        <div id="quillEditorInitial" class="forum-quill-editor"></div>
                     </div>
                     <div class="text-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                        <button type="submit" class="btn text-white" style="background-color: var(--accentColor);">Thema erstellen</button>
+                        <button type="submit" class="btn text-white forum-accent-btn">Thema erstellen</button>
                     </div>
                 </form>
             </div>
@@ -312,7 +306,7 @@ if ($selectedTopicId) {
 <div class="modal fade" id="createPostModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header text-white" style="background-color: var(--accentColor);">
+            <div class="modal-header text-white forum-accent-header">
                 <h5 class="modal-title">Antworten</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -325,11 +319,11 @@ if ($selectedTopicId) {
                     <input type="hidden" name="postContent" id="postContentHidden">
                     <div class="mb-3">
                         <label class="form-label">Ihre Nachricht</label>
-                        <div id="quillEditor" style="height: 200px; background: white;"></div>
+                        <div id="quillEditor" class="forum-quill-editor"></div>
                     </div>
                     <div class="text-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                        <button type="submit" class="btn text-white" style="background-color: var(--accentColor);">Antwort absenden</button>
+                        <button type="submit" class="btn text-white forum-accent-btn">Antwort absenden</button>
                     </div>
                 </form>
             </div>

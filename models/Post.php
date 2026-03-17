@@ -16,6 +16,7 @@ class Post
     private int $createdBy;
     private int $modifiedBy;
     private string $userName = '';
+    private ?bool $profileImageColumnsAvailable = null;
 
     public function __construct($db)
     {
@@ -86,10 +87,15 @@ class Post
 
         public function getByTopicId($topicId, $userId)   
          {
+            $selectProfileImageState = $this->hasProfileImageColumns()
+                ? ", (u.profileImage IS NOT NULL) AS hasProfileImage"
+                : ", 0 AS hasProfileImage";
+
             $query = "
             SELECT 
                 p.*,
-                u.userName,
+                u.userName
+                {$selectProfileImageState},
 
                 SUM(CASE WHEN ur.voteType = 'up' THEN 1 ELSE 0 END) AS reaction_positive,
                 SUM(CASE WHEN ur.voteType = 'down' THEN 1 ELSE 0 END) AS reaction_negative,
@@ -118,6 +124,7 @@ class Post
                     'topicId' => $row['topicId'],
                     'userId' => $row['userId'],
                     'userName' => $row['userName'],
+                    'hasProfileImage' => ((int)($row['hasProfileImage'] ?? 0)) === 1,
                     'content' => $row['content'],
                     'description' => $row['description'],
                     'reaction_negative' => $row['reaction_negative'],
@@ -261,6 +268,19 @@ class Post
         $this->createdBy = $row['createdBy'];
         $this->modifiedBy = $row['modifiedBy'];
         $this->userName = $row['userName'] ?? '';
+    }
+
+    private function hasProfileImageColumns(): bool
+    {
+        if ($this->profileImageColumnsAvailable !== null) {
+            return $this->profileImageColumnsAvailable;
+        }
+
+        $query = "SHOW COLUMNS FROM Users LIKE 'profileImage'";
+        $result = $this->conn->query($query);
+        $this->profileImageColumnsAvailable = $result && $result->num_rows > 0;
+
+        return $this->profileImageColumnsAvailable;
     }
 
 public function vote($postId, $userId, $type)
