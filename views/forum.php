@@ -130,7 +130,7 @@ if ($selectedTopicId) {
                 ?>
 
                 <div class="card mb-3 border-0 shadow-sm">
-                    <div class="card-body">
+                    <div class="card-body m-2">
                         <div class="d-flex justify-content-between mb-2">
                             <span class="fw-bold text-primary d-flex align-items-center gap-2">
                                 <?php if (!empty($post['hasProfileImage'])): ?>
@@ -148,7 +148,7 @@ if ($selectedTopicId) {
                                 <?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?>
                             </small>
                         </div>
-                        <div class="post-content p-2">
+                        <div class="post-content">
                             <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
                         </div>
 
@@ -219,7 +219,7 @@ if ($selectedTopicId) {
                                 <?php foreach ($topics as $topic): ?>
                                     <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>" class="list-group-item list-group-item-action p-3">
                                         <div class="d-flex w-100 justify-content-between align-items-center">
-                                            <h6 class="mb-1 fw-bold"><i class="bi bi-chat-left-text me-2 text-primary"></i><?= htmlspecialchars($topic['name']) ?></h6>
+                                            <h6 class="mb-1 fw-bold"><i class="bi bi-chat-left-text-fill me-2"></i><?= htmlspecialchars($topic['name']) ?></h6>
                                             <div class="d-flex align-items-center">
                                                 <small class="text-muted me-3">Erstellt von: <?= htmlspecialchars($topic['userName'] ?? 'Unbekannt') ?></small>
                                                 <i class="bi bi-arrow-right text-muted"></i>
