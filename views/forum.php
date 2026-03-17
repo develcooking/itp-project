@@ -37,8 +37,8 @@ if ($selectedJobId) {
 if ($selectedTopicId) {
     if ($topicModel->getById($selectedTopicId)) {
         $currentTopicName = $topicModel->getName();
-        $posts = $postModel->getByTopicId($selectedTopicId);
-    }
+        $posts = $postModel->getByTopicId($selectedTopicId, $_SESSION['userId']);  
+        }
 }
 ?>
     <link href="../resources/css/quill.snow.css" rel="stylesheet" />
@@ -101,49 +101,66 @@ if ($selectedTopicId) {
                     </div>
                 <?php else: ?>
                     <?php foreach ($posts as $post): ?>
-                        <div class="card mb-3 border-0 shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="fw-bold text-primary">
-                                        <i class="bi bi-person-circle me-1"></i>
-                                        <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
-                                    </span>
-                                    <small class="text-muted">
-                                        <?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?>
-                                    </small>
-                                </div>
-                                <div class="post-content p-2">
-                                    <?php
-                                    // Allow basic formatting tags but strip everything else (basic XSS protection)
-                                            // Ideally, a library like HTML Purifier should be used here.
-                                    echo strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
-                                    ?>
-                                </div>
+
+                <?php
+                $userVote = $post['voteType'] ?? 'noreaction';
+
+                $upIcon = ($userVote === 'up') ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up';
+                $downIcon = ($userVote === 'down') ? 'bi-hand-thumbs-down-fill' : 'bi-hand-thumbs-down';
+
+                $upColor = ($userVote === 'up') ? 'green' : '#6c757d';
+                $downColor = ($userVote === 'down') ? 'red' : '#6c757d';
+                ?>
+
+                <div class="card mb-3 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold text-primary">
+                                <i class="bi bi-person-circle me-1"></i>
+                                <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
+                            </span>
+                            <small class="text-muted">
+                                <?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?>
+                            </small>
+                        </div>
+                        <div class="post-content p-2">
+                            <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-3">
+
+                        <form method="POST" action="/controllers/forum_actions.php">
+                        <input type="hidden" name="action" value="voteUp">
+                        <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+
+                        <button class="btn btn-sm btn-light">
+                        <i class="bi <?= $upIcon ?>" style="color: <?= $upColor ?>; font-size:18px;"></i>
+                        <span><?= $post['reaction_positive'] ?></span>
+                        </button>
+
+                        </form>
+
+
+                        <form method="POST" action="/controllers/forum_actions.php">
+                        <input type="hidden" name="action" value="voteDown">
+                        <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+
+                        <button class="btn btn-sm btn-light">
+                        <i class="bi <?= $downIcon ?>" style="color: <?= $downColor ?>; font-size:18px;"></i>
+                        <span><?= $post['reaction_negative'] ?></span>
+                        </button>
+
+                        </form>
+
+                        </div>
                             </div>
                         </div>
+
                     <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
+                    <?php endif; ?>
+                </div>
 
             <div class="card-footer bg-light d-flex justify-content-end align-items-center gap-2">
-                <form method="POST" action="/controllers/forum_actions.php">
-        <input type="hidden" name="action" value="voteUp">
-        <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
-        <button class="btn btn-sm btn-light">
-            <img src="/resources/imgs/hand-thumbs-up.svg" width="16">
-            <?= $post['reaction_positive'] ?>
-        </button>
-    </form>
-
-    <form method="POST" action="/controllers/forum_actions.php">
-        <input type="hidden" name="action" value="voteDown">
-        <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
-        <button class="btn btn-sm btn-light">
-    <img src="/resources/imgs/hand-thumbs-down.svg" width="16">
-    <?= $post['reaction_negative'] ?>
-</button>
-    </form>
-
                 <button class="btn btn-form-sub" data-bs-toggle="modal" data-bs-target="#createPostModal">
                     <i class="bi bi-reply me-1"></i> Antworten
                 </button>
@@ -230,33 +247,34 @@ if ($selectedTopicId) {
     <script src="/resources/js/postCreateEditor.js"></script>
 
 <!-- Modal for creating Post -->
-<div class="modal fade" id="createPostModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header text-white" style="background-color: var(--accentColor);">
-                <h5 class="modal-title">Antworten</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="createPostForm" action="/controllers/forum_actions.php" method="POST">
-                    <input type="hidden" name="action" value="createPost">
-                    <input type="hidden" name="topicId" value="<?= $selectedTopicId ?>">
-                    <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
-                    <input type="hidden" name="postContent" id="postContentHidden">
-                    <div class="mb-3">
-                        <label class="form-label">Ihre Nachricht</label>
-                        <div id="quillEditor" style="height: 200px; background: white;"></div>
-                    </div>
-                    <div class="text-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                        <button type="submit" class="btn text-white" style="background-color: var(--accentColor);">Antwort absenden</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+<div class="d-flex gap-2 mt-3">
+
+    <!-- Upvote button -->
+    <form method="POST" action="/controllers/forum_actions.php" class="vote-form">
+        <input type="hidden" name="action" value="voteUp">
+        <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+        <button type="submit" class="btn btn-sm btn-light vote-btn">
+            <svg class="thumb-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M6 0L10 6H6L6 0Z"/> <!-- replace with actual thumbs-up path -->
+            </svg>
+            <span class="vote-count"><?= $post['reaction_positive'] ?></span>
+        </button>
+    </form>
+
+    <!-- Downvote button -->
+    <form method="POST" action="/controllers/forum_actions.php" class="vote-form">
+        <input type="hidden" name="action" value="voteDown">
+        <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+        <button type="submit" class="btn btn-sm btn-light vote-btn">
+            <svg class="thumb-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M10 0L6 6H10L10 0Z"/> <!-- replace with actual thumbs-down path -->
+            </svg>
+            <span class="vote-count"><?= $post['reaction_negative'] ?></span>
+        </button>
+    </form>
+
 </div>
 
-    <script src="/resources/js/postCreateEditor.js"></script>
-    
+<script src="/resources/js/postCreateEditor.js"></script>    
+
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>

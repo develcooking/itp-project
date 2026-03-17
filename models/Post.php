@@ -84,17 +84,36 @@ class Post
         return $this->userName;
     }
 
-    public function getByTopicId($topicId)
-    {
-        $query = "SELECT p.*, u.userName FROM " . $this->table . " p JOIN Users u ON p.userId = u.userId WHERE p.topicId = ? ORDER BY p.createdAt ASC";
+        public function getByTopicId($topicId, $userId)   
+         {
+            $query = "
+            SELECT 
+                p.*,
+                u.userName,
+
+                SUM(CASE WHEN ur.voteType = 'up' THEN 1 ELSE 0 END) AS reaction_positive,
+                SUM(CASE WHEN ur.voteType = 'down' THEN 1 ELSE 0 END) AS reaction_negative,
+
+                MAX(CASE WHEN ur.userId = ? THEN ur.voteType ELSE NULL END) AS voteType
+
+            FROM Posts p
+            JOIN Users u ON p.userId = u.userId
+            LEFT JOIN user_reactions ur ON p.postId = ur.postId
+
+            WHERE p.topicId = ?
+
+            GROUP BY p.postId
+            ORDER BY p.createdAt ASC
+            ";        
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $topicId);
+        $stmt->bind_param("ii", $userId, $topicId);
         $stmt->execute();
         $result = $stmt->get_result();
         $posts = [];
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $posts[] = [
+                    'voteType' => $row['voteType'] ?? 'noreaction',
                     'postId' => $row['postId'],
                     'topicId' => $row['topicId'],
                     'userId' => $row['userId'],
@@ -244,40 +263,6 @@ class Post
         $this->userName = $row['userName'] ?? '';
     }
 
-public function addPositiveReaction($postId)
-{
-    $sql = "UPDATE Posts SET reaction_positive = reaction_positive + 1 WHERE postId = ?";
-    $stmt = $this->conn->prepare($sql);
-    $stmt->bind_param("i", $postId);
-    $stmt->execute();
-    $stmt->close();
-}
-
-public function addNegativeReaction($postId)
-{
-    $sql = "UPDATE Posts SET reaction_negative = reaction_negative + 1 WHERE postId = ?";
-    $stmt = $this->conn->prepare($sql);
-    $stmt->bind_param("i", $postId);
-    $stmt->execute();
-    $stmt->close();
-}
-public function reactionPositiveDecrement($postId)
-{
-    $sql = "UPDATE Posts SET reaction_positive = reaction_positive - 1 WHERE postId = ? AND reaction_positive > 0";
-    $stmt = $this->conn->prepare($sql);
-    $stmt->bind_param("i", $postId);
-    $stmt->execute();
-    $stmt->close();
-}
-
-public function reactionNegativeDecrement($postId)
-{
-    $sql = "UPDATE Posts SET reaction_negative = reaction_negative - 1 WHERE postId = ? AND reaction_negative > 0";
-    $stmt = $this->conn->prepare($sql);
-    $stmt->bind_param("i", $postId);
-    $stmt->execute();
-    $stmt->close();
-}
 public function vote($postId, $userId, $type)
 {
     if (!in_array($type, ['up','down'])) return false;
@@ -300,14 +285,6 @@ public function vote($postId, $userId, $type)
             $stmt->bind_param("ii", $userId, $postId);
             $stmt->execute();
             $stmt->close();
-
-            // Decrement counter
-            if ($type === 'up') {
-                $this->reactionPositiveDecrement($postId);
-            } else {
-                $this->reactionNegativeDecrement($postId);
-            }
-
             return true;
         }
 
@@ -318,33 +295,17 @@ public function vote($postId, $userId, $type)
         $stmt->execute();
         $stmt->close();
 
-        // Update counters
-        if ($type === 'up') {
-            $this->addPositiveReaction($postId);
-            $this->reactionNegativeDecrement($postId);
-        } else {
-            $this->addNegativeReaction($postId);
-            $this->reactionPositiveDecrement($postId);
-        }
-
         return true;
     }
 
     $stmt->close();
 
-    // No previous vote → insert row
+    // No previous vote → insert new row
     $insert = "INSERT INTO user_reactions (userId, postId, voteType) VALUES (?, ?, ?)";
     $stmt = $this->conn->prepare($insert);
     $stmt->bind_param("iis", $userId, $postId, $type);
     $stmt->execute();
     $stmt->close();
-
-    // Increment counter
-    if ($type === 'up') {
-        $this->addPositiveReaction($postId);
-    } else {
-        $this->addNegativeReaction($postId);
-    }
 
     return true;
 }
