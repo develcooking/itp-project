@@ -26,7 +26,7 @@ if (!empty($_SESSION['userId'])) {
                                       </div>
                                   <?php endif; ?>
                         <form method="post" action="../controllers/register.php">
-
+                            <?php echo getCsrfTokenInput(); ?>
                             <div class="form-floating mb-3">
                                 <input
                                 type="text"
@@ -194,6 +194,7 @@ if (!empty($_SESSION['userId'])) {
                         <p class="text-muted mb-4">Sie sind bereits als <?= htmlspecialchars($_SESSION['userName']); ?> angemeldet.</p>
                         <a href="/views/dashboard.php" class="btn btn-primary btn-lg w-100 mb-2">Zum Dashboard</a>
                         <form method="post" action="../controllers/login.php">
+                            <?php echo getCsrfTokenInput(); ?>
                             <button class="btn btn-outline-danger btn-lg w-100" type="submit" name="logout">
                                 Abmelden
                             </button>

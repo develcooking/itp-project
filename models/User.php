@@ -279,7 +279,7 @@ class User
         $stmt = $this->conn->prepare($query);
 
         $securityAnswer = password_hash($this->securityAnswer, PASSWORD_DEFAULT);
-        $stmt->bind_param("s", $securityAnswer);
+        $stmt->bind_param("si", $securityAnswer, $this->userId);
         $ok = $stmt->execute();
         $stmt->close();
         return $ok;

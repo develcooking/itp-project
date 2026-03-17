@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 
 if (empty($_SESSION['password_reset']) || $_SESSION['password_reset']['verified'] !== true) {
     header("Location: /views/passwordForgot.php");
@@ -30,6 +30,7 @@ unset($_SESSION['reset_error']);
                 <?php endif; ?>
 
                 <form method="post" class="p-3" action="/controllers/passwordReset.php">
+                    <?php echo getCsrfTokenInput(); ?>
                     <div class="form-floating mb-3 position-relative password-container">
                                 <input type="password" name="newPassword" class="form-control pe-5" id="passwordReset" placeholder="Passwort" required>
                                 <label for="password">Passwort</label>

@@ -32,6 +32,7 @@ if (!empty($_SESSION['userId'])) {
           <?php endif; ?>
 
           <form method="post" action="../controllers/login.php">
+            <?php echo getCsrfTokenInput(); ?>
 
             <div class="form-floating mb-3">
               <input type="email" name="email" class="form-control" id="emailLogin" placeholder="E-Mail-Adresse" required>
@@ -69,6 +70,7 @@ if (!empty($_SESSION['userId'])) {
         </div>
       <?php else: ?>
         <form method="post" action="">
+          <?php echo getCsrfTokenInput(); ?>
           <button class="btn btn-outline-primary btn-lg w-100" type="submit" name="logout">
             Logout (<?= htmlspecialchars($_SESSION['userName']); ?>)
           </button>

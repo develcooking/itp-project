@@ -119,8 +119,8 @@ if ($selectedTopicId) {
                                         <div class="post-content p-2">
                                             <?php
                                             // Allow basic formatting tags but strip everything else (basic XSS protection)
-                                            // Ideally, a library like HTML Purifier should be used here.
-                                            echo strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+                                            require_once $_SERVER['DOCUMENT_ROOT'] . '/middleware/HtmlSanitizer.php';
+                                            echo HtmlSanitizer::sanitize($post['content']);
                                             ?>
                                         </div>
                                     </div>
@@ -184,6 +184,7 @@ if ($selectedTopicId) {
             </div>
             <div class="modal-body">
                 <form id="createTopicForm" action="/controllers/forum_actions.php" method="POST">
+                    <?php echo getCsrfTokenInput(); ?>
                     <input type="hidden" name="action" value="createTopic">
                     <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
                     <div class="mb-3">
@@ -218,6 +219,7 @@ if ($selectedTopicId) {
             </div>
             <div class="modal-body">
                 <form id="createPostForm" action="/controllers/forum_actions.php" method="POST">
+                    <?php echo getCsrfTokenInput(); ?>
                     <input type="hidden" name="action" value="createPost">
                     <input type="hidden" name="topicId" value="<?= $selectedTopicId ?>">
                     <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
