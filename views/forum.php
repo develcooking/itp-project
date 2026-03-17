@@ -81,7 +81,7 @@ if ($selectedTopicId) {
                         <?php foreach ($bereiche as $bereich): ?>
                             <a href="?jobId=<?= $bereich['jobId'] ?>" 
                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center <?= $selectedJobId == $bereich['jobId'] ? 'active' : '' ?>"
-                               <?= $selectedJobId == $bereich['jobId'] ? 'style="background-color: var(--accentColor); border-color: var(--accentColor);"' : '' ?>>
+                               <?= $selectedJobId == $bereich['jobId'] ? 'style="background-color: var(--orangeLight); border-color: var(--accentColor);"' : '' ?>>
                                 <?= htmlspecialchars($bereich['name']) ?>
                                 <i class="bi bi-chevron-right small <?= $selectedJobId == $bereich['jobId'] ? '' : 'text-muted' ?>"></i>
                             </a>
