@@ -29,10 +29,10 @@ $allBerufsbereiche = $job->getAll();
             <form id="createJobForm" class="row g-2 align-items-end">
                 <div class="col-12 col-md-8">
                     <label for="newJobName" class="form-label">Name des Berufsbereichs</label>
-                    <input type="text" class="form-control" id="newJobName" name="name" required placeholder="z.B. Informatik, Elektrotechnik...">
+                    <input type="text" class="form-control create-job-control" id="newJobName" name="name" required placeholder="z.B. Informatik, Elektrotechnik...">
                 </div>
                 <div class="col-12 col-md-4">
-                    <button class="btn btn-primary w-100" type="submit">Berufsbereich erstellen</button>
+                    <button class="btn btn-primary w-100 create-job-control" type="submit">Berufsbereich erstellen</button>
                 </div>
             </form>
         </div>
