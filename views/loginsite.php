@@ -51,7 +51,7 @@ if (!empty($_SESSION['userId'])) {
               </span>
             </div>
             <div class="mb-2 text-start">
-              <a href="passwordForgot.php" class="text-muted small">Passwort vergessen?</a>
+              <a href="/views/passwordForgot.php" class="text-muted small">Passwort vergessen?</a>
             </div>
 
             <button class="btn btn-outline-primary btn-lg w-100" type="submit" name="login">
@@ -64,7 +64,7 @@ if (!empty($_SESSION['userId'])) {
 
           <p class="mb-0">
             Noch keinen Account?
-            <a href="createAccount.php" class="fw-bold text-decoration-none">Jetzt registrieren</a>
+            <a href="/views/createAccount.php" class="fw-bold text-decoration-none">Jetzt registrieren</a>
           </p>
 
         </div>

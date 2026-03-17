@@ -56,7 +56,7 @@ if (isset($_SESSION['userId'])) {
                 <hr class="my-4">
 
                 <p class="mb-0">
-                    <a href="loginsite.php" class="fw-bold text-decoration-none">Zurück zur Anmeldung</a>
+                    <a href="/views/loginsite.php" class="fw-bold text-decoration-none">Zurück zur Anmeldung</a>
                 </p>
 
             </div>
