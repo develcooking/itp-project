@@ -79,7 +79,7 @@ if (!empty($_SESSION['userId'])) {
                                 required>
                                 <label for="email">E-Mail-Adresse</label>
                                 <?php if (!empty($errors['email'])): ?>
-                                        <div class="invalidUserName">
+                                        <div class="invalidEmail">
                                             <?= htmlspecialchars($errors['email']) ?>
                                         </div>
                                     <?php endif; ?>
@@ -97,16 +97,21 @@ if (!empty($_SESSION['userId'])) {
                                     <img id="eyeOpen" src="/resources/imgs/eye.svg" alt="Show password" width="16" height="16" style="cursor:pointer;">
                                     <img id="eyeSlash" src="/resources/imgs/eye-slash.svg" alt="Hide password" width="16" height="16" style="cursor:pointer; display:none;">
                                 </span>
+                                <?php if (!empty($errors['password'])): ?>
+                                    <div class="invalidPassword">
+                                        <?= htmlspecialchars($errors['password']) ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                             <div class="form-floating mb-3 position-relative password-container">
                                 <input
                                 type="password"
-                                name="password"
+                                name="confirmPassword"
                                 class="form-control pe-5"
                                 id="confirmPassword"
-                                placeholder="Passwort"
+                                placeholder="Passwort bestätigen"
                                 required>
-                                <label for="confirmpassword">Passwort bestätigen</label>
+                                <label for="confirmPassword">Passwort bestätigen</label>
                                 <span class="password-eye">
                                     <img id="eyeOpenConfirm" src="/resources/imgs/eye.svg" alt="Show password" width="16" height="16" style="cursor:pointer;">
                                     <img id="eyeSlashConfirm" src="/resources/imgs/eye-slash.svg" alt="Hide password" width="16" height="16" style="cursor:pointer; display:none;">
@@ -133,6 +138,7 @@ if (!empty($_SESSION['userId'])) {
                                 <input
                                 type="text"
                                 name="securityAnswer"
+                                id="securityAnswer"
                                 class="form-control"
                                 placeholder="Antwort"
                                 value="<?= htmlspecialchars($_POST['securityAnswer'] ?? '') ?>"
@@ -192,7 +198,7 @@ if (!empty($_SESSION['userId'])) {
                     <div class="card bg-light shadow p-4 text-center">
                         <h2 class="fw-bold mb-3">Bereits angemeldet</h2>
                         <p class="text-muted mb-4">Sie sind bereits als <?= htmlspecialchars($_SESSION['userName']); ?> angemeldet.</p>
-                        <a href="/views/dashboard.php" class="btn btn-primary btn-lg w-100 mb-2">Zum Dashboard</a>
+                        <a href="/controllers/startpage.php" class="btn btn-primary btn-lg w-100 mb-2">Zum Dashboard</a>
                         <form method="post" action="../controllers/login.php">
                             <?php echo getCsrfTokenInput(); ?>
                             <button class="btn btn-outline-danger btn-lg w-100" type="submit" name="logout">
@@ -240,6 +246,5 @@ if (!empty($_SESSION['userId'])) {
             </div>
         </div>
     </div>
-                </main>
 <script src="/resources/js/formValidation.js"></script>
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>

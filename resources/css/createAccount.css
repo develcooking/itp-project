@@ -1,5 +1,6 @@
 .invalidUserName,
-.invalidEmail{
+.invalidEmail,
+.invalidPassword{
     color: #dc3545;
     font-size: .875em;
 }
