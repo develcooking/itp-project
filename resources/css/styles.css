@@ -202,6 +202,15 @@ select {
   padding: 0.8rem 1rem;
 }
 
+#createJobForm .create-job-control {
+  height: 44px;
+}
+
+#createJobForm button.create-job-control {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .profile-image-preview {
   width: 120px;
   height: 120px;
