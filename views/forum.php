@@ -71,7 +71,7 @@ if ($selectedTopicId) {
         <!-- Sidebar: Berufsbereiche -->
         <div class="col-md-3">
             <div class="card shadow-sm">
-                <div class="card-header text-white" style="background-color: var(--accentColor);">
+                <div class="card-header liste">
                     <h5 class="mb-0">Berufsbereiche</h5>
                 </div>
                 <div class="list-group list-group-flush">
@@ -81,7 +81,7 @@ if ($selectedTopicId) {
                         <?php foreach ($bereiche as $bereich): ?>
                             <a href="?jobId=<?= $bereich['jobId'] ?>" 
                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center <?= $selectedJobId == $bereich['jobId'] ? 'active' : '' ?>"
-                               <?= $selectedJobId == $bereich['jobId'] ? 'style="background-color: var(--accentColor); border-color: var(--accentColor);"' : '' ?>>
+                               <?= $selectedJobId == $bereich['jobId'] ? 'style="background-color: var(--orangeLight); border-color: var(--orangeLight);"' : '' ?>>
                                 <?= htmlspecialchars($bereich['name']) ?>
                                 <i class="bi bi-chevron-right small <?= $selectedJobId == $bereich['jobId'] ? '' : 'text-muted' ?>"></i>
                             </a>
@@ -123,9 +123,9 @@ if ($selectedTopicId) {
                 ?>
 
                 <div class="card mb-3 border-0 shadow-sm">
-                    <div class="card-body">
+                    <div class="card-body m-2">
                         <div class="d-flex justify-content-between mb-2">
-                            <span class="fw-bold text-primary">
+                            <span class="fw-bold usernameForum rounded-1 p-2">
                                 <i class="bi bi-person-circle me-1"></i>
                                 <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
                             </span>
@@ -133,7 +133,7 @@ if ($selectedTopicId) {
                                 <?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?>
                             </small>
                         </div>
-                        <div class="post-content p-2">
+                        <div class="post-content">
                             <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
                         </div>
 
@@ -204,7 +204,7 @@ if ($selectedTopicId) {
                                 <?php foreach ($topics as $topic): ?>
                                     <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>" class="list-group-item list-group-item-action p-3">
                                         <div class="d-flex w-100 justify-content-between align-items-center">
-                                            <h6 class="mb-1 fw-bold"><i class="bi bi-chat-left-text me-2 text-primary"></i><?= htmlspecialchars($topic['name']) ?></h6>
+                                            <h6 class="mb-1 fw-bold"><i class="bi bi-chat-left-text-fill me-2"></i><?= htmlspecialchars($topic['name']) ?></h6>
                                             <div class="d-flex align-items-center">
                                                 <small class="text-muted me-3">Erstellt von: <?= htmlspecialchars($topic['userName'] ?? 'Unbekannt') ?></small>
                                                 <i class="bi bi-arrow-right text-muted"></i>
