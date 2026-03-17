@@ -178,7 +178,7 @@ if (!isset($user)) {
                             Speichern
                         </button>
 
-                        <a href="/views/startpage.php" class="btn btn-outline-secondary btn-lg w-100 mt-2">
+                        <a href="/controllers/startpage.php" class="btn btn-outline-secondary btn-lg w-100 mt-2">
                             Abbrechen
                         </a>
 

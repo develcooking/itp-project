@@ -9,7 +9,15 @@ if (empty($_SESSION['userId'])) {
 }
 
 $user = new User($conn);
-$payload = $user->getProfileImagePayloadById((int)$_SESSION['userId']);
+$requestedUserId = filter_input(INPUT_GET, 'userId', FILTER_VALIDATE_INT);
+$targetUserId = $requestedUserId !== false && $requestedUserId !== null ? (int)$requestedUserId : (int)$_SESSION['userId'];
+
+if ($targetUserId <= 0) {
+    http_response_code(400);
+    exit();
+}
+
+$payload = $user->getProfileImagePayloadById($targetUserId);
 
 if ($payload === null) {
     http_response_code(404);

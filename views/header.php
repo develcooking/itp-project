@@ -71,7 +71,7 @@ if (empty($current_page) || $current_page === '') {
     <a href="../index.php" class="logo border-end">
         <img src="/resources/imgs/logo.jpeg" alt="Ausbildungsportal.net Logo" class="nav-logo">
     </a>
-    <a href="/views/startpage.php" class="nav-btn-primary border-end <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
+    <a href="/controllers/startpage.php" class="nav-btn-primary border-end <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
     <a href="/views/appointmentManagement.php" class="nav-btn-primary border-end <?= $current_page === 'appointmentManagement' ? 'current' : ''; ?>">Termine</a>
     <a href="/views/forum.php" class="nav-btn-primary border-end <?= $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
     <?php if ($_SESSION['role'] === 'Admin'): ?>
@@ -79,7 +79,7 @@ if (empty($current_page) || $current_page === '') {
         <a href="/views/adminJobs.php" class="nav-btn-primary border-end <?= $current_page === 'adminJobs' ? 'current' : ''; ?>">Berufsbereiche</a>
         <?php endif; ?>
     <div class="btn-group nav-logout-form" role="group">
-        <a href="/views/profile.php" class="btn btn-outline-primary rounded-0 nav-account-btn">
+        <a href="/views/profile.php" class="btn rounded-0 nav-account-btn btn-outline-primary">
             <i class="bi bi-person-circle me-1"></i> Account
         </a>
         <button type="button" class="btn btn-outline-primary rounded-0 dropdown-toggle dropdown-toggle-split nav-account-toggle" data-bs-toggle="dropdown" aria-expanded="false">
