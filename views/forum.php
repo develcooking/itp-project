@@ -21,6 +21,7 @@ if ($isAdmin) {
 } else {
     $bereiche = $forumModel->getBereiche();
 }
+
 $topics = [];
 $posts = [];
 $currentJobName = "Berufsbereich";
