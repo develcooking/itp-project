@@ -12,10 +12,6 @@ if (!isset($_SESSION['userId']) || $_SESSION['role'] !== 'Admin') {
 $job = new Job($conn);
 $allBerufsbereiche = $job->getAll();
 ?>
-<!-- DataTables CSS -->
-<link rel="stylesheet" href="../resources/css/datatables.min.css">
-<!-- DataTables JS -->
-<script src="../resources/js/datatables.min.js"></script>
 
 <div class="container-fluid px-3">
 
@@ -78,4 +74,9 @@ $allBerufsbereiche = $job->getAll();
 </div>
 
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>
+<script src="../resources/js/datatables.min.js"></script>
 <script src="/resources/js/adminJobs.js"></script>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="../resources/css/datatables.min.css">
+<!-- DataTables JS -->

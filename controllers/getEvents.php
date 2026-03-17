@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 require_once $homepath . "/models/UserJobs.php";
 require_once $homepath . "/models/Job.php";
@@ -24,7 +25,6 @@ if (isset($_GET['filterEnd']) && $_GET['filterEnd'] !== '') {
 
 $filterJobId = isset($_GET['jobId']) && $_GET['jobId'] !== '' ? (int)$_GET['jobId'] : null;
 
-session_start();
 if (!isset($_SESSION['userId'])) {
     http_response_code(401);
     echo json_encode([]);
@@ -58,19 +58,108 @@ foreach ($appointments as $row) {
         continue;
     }
 
-    $events[] = [
-        'id'            => (int)$row['appointmentId'],
-        'appointmentId' => (int)$row['appointmentId'],
-        'title'         => $row['title'],
-        'start'         => $row['start'],
-        'end'           => $row['end'],
-        'extendedProps' => [
-            'description' => $row['description'],
-            'jobId'       => (int)$row['jobId'],
-            'createdBy'   => (int)$row['createdBy'],
-            'creatorName' => $row['creatorName'],
-        ],
-    ];
+    $recurrenceType = $row['recurrence_type'] ?? 'none';
+    
+    if ($recurrenceType === 'none') {
+        $events[] = [
+            'id'            => (int)$row['appointmentId'],
+            'appointmentId' => (int)$row['appointmentId'],
+            'title'         => $row['title'],
+            'start'         => $row['start'],
+            'end'           => $row['end'],
+            'extendedProps' => [
+                'description' => $row['description'],
+                'jobId'       => (int)$row['jobId'],
+                'createdBy'   => (int)$row['createdBy'],
+                'creatorName' => $row['creatorName'],
+                'isRecurring' => false,
+                'recurrenceType' => $row['recurrence_type'],
+                'recurrenceInterval' => $row['recurrence_interval'],
+                'recurrenceUntil' => $row['recurrence_until']
+            ],
+        ];
+    } else {
+        $interval = (int)($row['recurrence_interval'] ?? 1);
+        $recurrenceUntil = $row['recurrence_until'] ? new DateTime($row['recurrence_until'] . ' 23:59:59') : null;
+        
+        $baseStart = new DateTime($row['start']);
+        $baseEnd = new DateTime($row['end']);
+        $duration = $baseStart->diff($baseEnd);
+        
+        $rangeStart = $startParam ? new DateTime($startParam) : new DateTime('1970-01-01');
+        $rangeEnd = $endParam ? new DateTime($endParam) : new DateTime('2099-12-31');
+
+        $currentStart = clone $baseStart;
+        
+        // Optimization: Jump to the start of the range if the event started long ago
+        if ($currentStart < $rangeStart) {
+            if ($recurrenceType === 'weekly') {
+                $weeksDiff = floor($currentStart->diff($rangeStart)->days / 7);
+                $jumpIntervals = floor($weeksDiff / $interval);
+                if ($jumpIntervals > 0) {
+                    $currentStart->modify("+" . ($jumpIntervals * $interval) . " weeks");
+                }
+            } elseif ($recurrenceType === 'monthly') {
+                $monthsDiff = ($rangeStart->format('Y') - $currentStart->format('Y')) * 12 + ($rangeStart->format('m') - $currentStart->format('m'));
+                $jumpIntervals = floor($monthsDiff / $interval);
+                if ($jumpIntervals > 0) {
+                    $currentStart->modify("+" . ($jumpIntervals * $interval) . " months");
+                }
+            }
+            
+            // Backtrack one interval to ensure we don't skip an event that overlaps the start of the range
+            if ($recurrenceType === 'weekly') {
+                $currentStart->modify("-$interval weeks");
+            } elseif ($recurrenceType === 'monthly') {
+                $currentStart->modify("-$interval months");
+            }
+            
+            // Ensure we don't backtrack before the original start date
+            if ($currentStart < $baseStart) {
+                $currentStart = clone $baseStart;
+            }
+        }
+
+        // Loop to generate instances
+        $safetyCounter = 0;
+        while ($currentStart <= $rangeEnd && (!$recurrenceUntil || $currentStart <= $recurrenceUntil) && $safetyCounter < 1000) {
+            $safetyCounter++;
+            
+            $currentEnd = clone $currentStart;
+            $currentEnd->add($duration);
+
+            // Check if this instance falls within the visible range
+            if ($currentEnd >= $rangeStart && $currentStart <= $rangeEnd) {
+                $events[] = [
+                    'id'            => $row['appointmentId'] . '_' . $currentStart->format('YmdHi'),
+                    'appointmentId' => (int)$row['appointmentId'],
+                    'title'         => $row['title'],
+                    'start'         => $currentStart->format('Y-m-d H:i:s'),
+                    'end'           => $currentEnd->format('Y-m-d H:i:s'),
+                    'extendedProps' => [
+                        'description' => $row['description'],
+                        'jobId'       => (int)$row['jobId'],
+                        'createdBy'   => (int)$row['createdBy'],
+                        'creatorName' => $row['creatorName'],
+                        'isRecurring' => true,
+                        'appointmentId' => (int)$row['appointmentId'],
+                        'recurrenceType' => $row['recurrence_type'],
+                        'recurrenceInterval' => $row['recurrence_interval'],
+                        'recurrenceUntil' => $row['recurrence_until']
+                    ],
+                ];
+            }
+
+            // Move to next occurrence
+            if ($recurrenceType === 'weekly') {
+                $currentStart->modify("+$interval weeks");
+            } elseif ($recurrenceType === 'monthly') {
+                $currentStart->modify("+$interval months");
+            } else {
+                break;
+            }
+        }
+    }
 }
 /* Debugging output
 print("---event:\n");

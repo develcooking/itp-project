@@ -44,5 +44,42 @@ document.addEventListener("DOMContentLoaded", function() {
             return false;
         }
     };
-});
 
+ document.querySelectorAll('.vote-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault(); // prevent page reload
+
+        const button = this.querySelector('.vote-btn');
+        const icon = button.querySelector('.thumb-icon');
+        const countSpan = button.querySelector('.vote-count');
+
+        const formData = new FormData(this);
+        const postId = formData.get('postId');
+        const action = formData.get('action'); // voteUp or voteDown
+
+        // Immediate visual feedback
+        icon.style.color = (action === 'voteUp') ? 'green' : 'red';
+
+        // Send AJAX request
+        fetch(this.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success){
+                // Update counts
+                if(action === 'voteUp') countSpan.textContent = data.newCountUp;
+                if(action === 'voteDown') countSpan.textContent = data.newCountDown;
+            } else {
+                alert('Fehler beim Abstimmen!');
+                // Reset color if failed
+                icon.style.color = '';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            icon.style.color = '';
+        });
+    });
+});

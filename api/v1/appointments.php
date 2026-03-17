@@ -1,18 +1,18 @@
 <?php
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
     exit;
 }
 
-include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
-include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Appointment.php";
-include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Forum.php"; // For hasAccess method
-include_once __DIR__ . "/api_helper.php";
-
-if (!isset($_SESSION)) session_start();
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Appointment.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Forum.php"; // For hasAccess method
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/HtmlSanitizer.php";
+require_once __DIR__ . "/api_helper.php";
 
 $method = $_SERVER['REQUEST_METHOD'];
 $appointment = new Appointment($conn);
@@ -36,15 +36,20 @@ switch ($method) {
                     'end' => $appointment->getEnd(),
                     'description' => $appointment->getDescription(),
                     'createdBy' => $appointment->getCreatedBy(),
-                    'modifiedBy' => $appointment->getModifiedBy()
+                    'modifiedBy' => $appointment->getModifiedBy(),
+                    'recurrenceType' => $appointment->getRecurrenceType(),
+                    'recurrenceInterval' => $appointment->getRecurrenceInterval(),
+                    'recurrenceUntil' => $appointment->getRecurrenceUntil()
                 ];
                 sendResponse(true, $data);
             } else {
                 sendResponse(false, null, 'Appointment not found', 404);
             }
         } else {
+            $start = $_GET['start'] ?? null;
+            $end = $_GET['end'] ?? null;
             if ($_SESSION['role'] === 'Admin') {
-                sendResponse(true, $appointment->getAll());
+                sendResponse(true, $appointment->getAll(null, $start, $end));
             } else {
                 sendResponse(true, $appointment->getForUserJobs($userId));
             }
@@ -57,14 +62,18 @@ switch ($method) {
         if (!$data || !isset($data['title']) || !isset($data['jobId'])) {
             sendResponse(false, null, 'Invalid input or missing title/jobId', 400);
         }
+        hasAccessToJob($data['jobId']);
 
         $appointment->setTitle($data['title'])
                     ->setJobId(intval($data['jobId']))
                     ->setStart($data['start'] ?? date('Y-m-d H:i:s'))
                     ->setEnd($data['end'] ?? date('Y-m-d H:i:s'))
-                    ->setDescription($data['description'] ?? '')
+                    ->setDescription(HtmlSanitizer::sanitize($data['description'] ?? ''))
                     ->setCreatedBy($_SESSION['userId'])
-                    ->setModifiedBy($_SESSION['userId']);
+                    ->setModifiedBy($_SESSION['userId'])
+                    ->setRecurrenceType($data['recurrenceType'] ?? 'none')
+                    ->setRecurrenceInterval(intval($data['recurrenceInterval'] ?? 1))
+                    ->setRecurrenceUntil($data['recurrenceUntil'] ?? null);
 
         if ($appointment->post()) {
             sendResponse(true, ['appointmentId' => $conn->insert_id], 'Appointment created successfully', 201);
@@ -85,6 +94,10 @@ switch ($method) {
             sendResponse(false, null, 'Appointment not found', 404);
         }
 
+        // JobId might not be in PUT data if only title changed
+        $jobId = $data['jobId'] ?? $appointment->getJobId();
+        hasAccessToJob($jobId);
+
         if (empty($_SESSION['userId'])) {
             sendResponse(false, null, 'Unauthorized: Login required', 401);
         }
@@ -96,7 +109,11 @@ switch ($method) {
         if (isset($data['title'])) $appointment->setTitle($data['title']);
         if (isset($data['start'])) $appointment->setStart($data['start']);
         if (isset($data['end'])) $appointment->setEnd($data['end']);
-        if (isset($data['description'])) $appointment->setDescription($data['description']);
+        if (isset($data['description'])) $appointment->setDescription(HtmlSanitizer::sanitize($data['description']));
+        if (isset($data['jobId'])) $appointment->setJobId(intval($data['jobId']));
+        if (isset($data['recurrenceType'])) $appointment->setRecurrenceType($data['recurrenceType']);
+        if (isset($data['recurrenceInterval'])) $appointment->setRecurrenceInterval(intval($data['recurrenceInterval']));
+        if (isset($data['recurrenceUntil'])) $appointment->setRecurrenceUntil($data['recurrenceUntil']);
 
         if ($appointment->update($id)) {
             sendResponse(true, null, 'Appointment updated successfully', 204);

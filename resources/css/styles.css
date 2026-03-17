@@ -13,6 +13,7 @@ body {
   min-height: 100vh;          
   display: flex;
   flex-direction: column;
+  background-image: url("../imgs/bg-netz.jpg");
 }
 
 main {
@@ -40,6 +41,7 @@ main {
     display: flex;
     align-items: stretch;      
     height: 70px;
+    background-color: #fff;
     border-bottom: 2px solid #ffffff33;
 }
 
@@ -100,7 +102,10 @@ main {
 .nav-account-btn {
     text-decoration: none;
 }
-
+nav-account-btn:hover,
+nav-account-toggle:hover {
+    background-color: #737373;
+}
 .nav-account-toggle {
     padding: 0 10px;
     border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -195,6 +200,12 @@ select {
   padding: 0.8rem 1rem;
 }
 
+.profile-image-preview {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+}
+
 /* ===================== FOOTER ===================== */
 .footer {
   background-color: var(--accentColor);
@@ -256,6 +267,94 @@ select {
   padding: 20px;
   box-sizing: border-box;
 }
+.forum-post-avatar {
+  width: 34px;
+  height: 34px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.forum-post-avatar-icon {
+  font-size: 34px;
+  line-height: 1;
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.forum-accent-header {
+  background-color: var(--accentColor);
+}
+
+.forum-bereich-active {
+  background-color: var(--accentColor) !important;
+  border-color: var(--accentColor) !important;
+}
+
+.forum-vote-icon {
+  font-size: 18px;
+}
+
+.forum-vote-up {
+  color: green;
+}
+
+.forum-vote-down {
+  color: red;
+}
+
+.forum-vote-neutral {
+  color: #6c757d;
+}
+
+.forum-search-match-border {
+  border-color: var(--accentColor) !important;
+}
+
+.forum-empty-icon {
+  font-size: 4rem;
+  color: #dee2e6;
+}
+
+.forum-quill-editor {
+  height: 200px;
+  background: #fff;
+}
+
+.forum-accent-btn {
+  background-color: var(--accentColor);
+  border-color: var(--accentColor);
+}
+
+.forum-accent-btn:hover,
+.forum-accent-btn:focus,
+.forum-accent-btn:active {
+  background-color: #737373;
+  border-color: #737373;
+}
+
+.post-content blockquote {
+  border-left: 4px solid #ccc;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  padding-left: 16px;
+  font-style: italic;
+}
+
+.post-content h1 {
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.post-content h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.post-content h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+}
+
 .forum-container {
   min-height: 75vh;
   margin: 10px;

@@ -13,6 +13,9 @@ class Appointment
     private ?int $createdBy;
     private ?int $modifiedBy;
     private ?string $creatorName;
+    private ?string $recurrenceType = 'none';
+    private ?int $recurrenceInterval = 1;
+    private ?string $recurrenceUntil = null;
 
     public function __construct($db)
     {
@@ -40,17 +43,17 @@ class Appointment
 
     public function getStart(): ?string
     {
-        return $this->start; // Was returning $this->title
+        return $this->start; 
     }
 
     public function getEnd(): ?string
     {
-        return $this->end; // Was returning $this->title
+        return $this->end; 
     }
 
     public function getDescription(): ?string
     {
-        return $this->description; // Was returning $this->title
+        return $this->description; 
     }
 
     public function getCreatedBy(): ?int
@@ -61,6 +64,21 @@ class Appointment
     public function getModifiedBy(): ?int
     {
         return $this->modifiedBy;
+    }
+
+    public function getRecurrenceType(): ?string
+    {
+        return $this->recurrenceType;
+    }
+
+    public function getRecurrenceInterval(): ?int
+    {
+        return $this->recurrenceInterval;
+    }
+
+    public function getRecurrenceUntil(): ?string
+    {
+        return $this->recurrenceUntil;
     }
 
     public function setTitle(string $title): self
@@ -104,7 +122,21 @@ class Appointment
         $this->modifiedBy = $modifiedBy;
         return $this;
     }
-
+    public function setRecurrenceType(string $type): self
+    {
+        $this->recurrenceType = $type;
+        return $this;
+    }
+    public function setRecurrenceInterval(int $interval): self
+    {
+        $this->recurrenceInterval = $interval;
+        return $this;
+    }
+    public function setRecurrenceUntil(?string $until): self
+    {
+        $this->recurrenceUntil = $until;
+        return $this;
+    }
 
     public function getAll($filterJobId = null, $start = null, $end = null)
     {
@@ -119,13 +151,22 @@ class Appointment
             $types .= "i";
         }
 
-        if ($start) {
-            $query .= " AND a.end >= ?";
+        if ($start && $end) {
+             // For recurring events, we need to fetch them even if the base record is before the start
+             // as long as the series hasn't ended.
+             $query .= " AND ( (a.recurrence_type = 'none' AND a.end >= ? AND a.start <= ?) 
+                           OR (a.recurrence_type != 'none' AND a.start <= ? AND (a.recurrence_until IS NULL OR a.recurrence_until >= ?)) )";
+             $params[] = $start;
+             $params[] = $end;
+             $params[] = $end;
+             $params[] = $start;
+             $types .= "ssss";
+        } elseif ($start) {
+            $query .= " AND (a.end >= ? OR (a.recurrence_type != 'none' AND (a.recurrence_until IS NULL OR a.recurrence_until >= ?)))";
             $params[] = $start;
-            $types .= "s";
-        }
-
-        if ($end) {
+            $params[] = $start;
+            $types .= "ss";
+        } elseif ($end) {
             $query .= " AND a.start <= ?";
             $params[] = $end;
             $types .= "s";
@@ -147,6 +188,9 @@ class Appointment
                     'start' => $row['start'],
                     'end' => $row['end'],
                     'description' => $row['description'],
+                    'recurrence_type' => $row['recurrence_type'],
+                    'recurrence_interval' => $row['recurrence_interval'],
+                    'recurrence_until' => $row['recurrence_until'],
                     'createdAt' => $row['createdAt'],
                     'modifiedAt' => $row['modifiedAt'],
                     'createdBy' => $row['createdBy'],
@@ -171,18 +215,7 @@ class Appointment
         $result = $stmt->get_result();
         $appointments = [];
         while ($row = $result->fetch_assoc()) {
-            $appointments[] = [
-                'appointmentId' => $row['appointmentId'],
-                'title' => $row['title'],
-                'jobId' => $row['jobId'],
-                'start' => $row['start'],
-                'end' => $row['end'],
-                'description' => $row['description'],
-                'createdAt' => $row['createdAt'],
-                'modifiedAt' => $row['modifiedAt'],
-                'createdBy' => $row['createdBy'],
-                'modifiedBy' => $row['modifiedBy']
-            ];
+            $appointments[] = $row;
         }
         $stmt->close();
         return $appointments;
@@ -191,22 +224,25 @@ class Appointment
     public function post(): bool
     {
         $query = " INSERT INTO " . $this->table . "
-        (title, jobId, start, end, description, createdBy, modifiedBy) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)";
+        (title, jobId, start, end, description, createdBy, modifiedBy, recurrence_type, recurrence_interval, recurrence_until) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
 
         // types: s=string, i=integer
-        // Title(s), JobId(i), Start(s), End(s), Desc(s), Created(i), Modified(i)
+        // Title(s), JobId(i), Start(s), End(s), Desc(s), Created(i), Modified(i) type(s) interval(i) until (s)
         $stmt->bind_param(
-            "sisssii",
+            "sisssiisis",
             $this->title,
             $this->jobId,
             $this->start,
             $this->end,
             $this->description,
             $this->createdBy,
-            $this->modifiedBy
+            $this->modifiedBy,
+            $this->recurrenceType,
+            $this->recurrenceInterval,
+            $this->recurrenceUntil
         );
 
         if ($stmt->execute()) {
@@ -246,6 +282,9 @@ class Appointment
         $this->start = $row['start'];
         $this->end = $row['end'];
         $this->description = $row['description'];
+        $this->recurrenceType = $row['recurrence_type'] ?? 'none';
+        $this->recurrenceInterval = $row['recurrence_interval'] ?? 1;
+        $this->recurrenceUntil = $row['recurrence_until'] ?? null;
         $this->createdBy = $row['createdBy'];
         $this->modifiedBy = $row['modifiedBy'];
         $this->creatorName = $row['creatorName'] ?? null;
@@ -255,16 +294,19 @@ class Appointment
     public function update($appointmentId)
     {
         $query = " UPDATE " . $this->table . " 
-        SET title = ?, start = ?, end = ?, description = ?, jobId = ? WHERE appointmentId = ?";
+        SET title = ?, start = ?, end = ?, description = ?, jobId = ?, recurrence_type = ?, recurrence_interval = ?, recurrence_until = ? WHERE appointmentId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "ssssii",
+            "ssssisisi",
             $this->title,
             $this->start,
             $this->end,
             $this->description,
             $this->jobId,
+            $this->recurrenceType,
+            $this->recurrenceInterval,
+            $this->recurrenceUntil,
             $appointmentId
         );
 

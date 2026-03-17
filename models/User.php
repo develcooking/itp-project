@@ -14,6 +14,12 @@ class User
     private ?string $securityAnswer = '';
     private ?int $activated = null;
     private ?string $schoolCompany = null;
+    private bool $sendNotification = true;
+    private ?string $profileImage = null;
+    private ?string $profileImageMime = null;
+    private bool $hasProfileImage = false;
+    private bool $profileImageDirty = false;
+    private ?bool $profileImageColumnsAvailable = null;
     private ?int $createdBy = null;
     private ?int $modifiedBy = null;
 
@@ -70,6 +76,31 @@ class User
     public function getSchoolCompany(): ?string
     {
         return $this->schoolCompany;
+    }
+
+    public function getSendNotification(): bool
+    {
+        return $this->sendNotification;
+    }
+
+    public function getProfileImage(): ?string
+    {
+        return $this->profileImage;
+    }
+
+    public function getProfileImageMime(): ?string
+    {
+        return $this->profileImageMime;
+    }
+
+    public function hasProfileImage(): bool
+    {
+        return $this->hasProfileImage;
+    }
+
+    public function canStoreProfileImage(): bool
+    {
+        return $this->hasProfileImageColumns();
     }
 
     public function getCreatedBy(): ?int
@@ -136,6 +167,21 @@ class User
         return $this;
     }
 
+    public function setSendNotification(bool $sendNotification): self
+    {
+        $this->sendNotification = $sendNotification;
+        return $this;
+    }
+
+    public function setProfileImage(?string $profileImage, ?string $profileImageMime): self
+    {
+        $this->profileImage = $profileImage;
+        $this->profileImageMime = $profileImageMime;
+        $this->hasProfileImage = !empty($profileImage);
+        $this->profileImageDirty = true;
+        return $this;
+    }
+
     public function setCreatedBy(?int $createdBy): self
     {
         $this->createdBy = $createdBy;
@@ -169,6 +215,7 @@ class User
                     'securityAnswer' => $row['securityAnswer'],
                     'activated' => $row['activated'],
                     'school_company' => $row['school_company'],
+                    'sendNotification' => (int)($row['sendNotification'] ?? 1),
                     'createdAt' => $row['createdAt'],
                     'modifiedAt' => $row['modifiedAt'],
                     'createdBy' => $row['createdBy'],
@@ -228,7 +275,9 @@ class User
 
     public function getById($userId)
     {
-        $query = "SELECT * FROM " . $this->table . " WHERE userid = ?";
+        $query = $this->hasProfileImageColumns()
+            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy FROM " . $this->table . " WHERE userid = ?"
+            : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy FROM " . $this->table . " WHERE userid = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $userId);
         $stmt->execute();
@@ -279,7 +328,7 @@ class User
         $stmt = $this->conn->prepare($query);
 
         $securityAnswer = password_hash($this->securityAnswer, PASSWORD_DEFAULT);
-        $stmt->bind_param("s", $securityAnswer);
+        $stmt->bind_param("si", $securityAnswer, $this->userId);
         $ok = $stmt->execute();
         $stmt->close();
         return $ok;
@@ -336,6 +385,12 @@ class User
         $this->securityAnswer = $row['securityAnswer'];
         $this->activated = $row['activated'];
         $this->schoolCompany = $row['school_company'] ?? null;
+        $this->sendNotification = ((int)($row['sendNotification'] ?? 1)) === 1;
+        $this->profileImageMime = $row['profileImageMime'] ?? null;
+        $this->hasProfileImage = isset($row['hasProfileImage'])
+            ? ((int)$row['hasProfileImage']) === 1
+            : !empty($row['profileImage']);
+        $this->profileImage = $row['profileImage'] ?? null;
     }
 
     public function toArray(): array
@@ -348,13 +403,16 @@ class User
             'email' => $this->getEmail(),
             'role' => $this->getRole(),
             'activated' => $this->getActivated(),
-            'school_company' => $this->getSchoolCompany()
+            'school_company' => $this->getSchoolCompany(),
+            'sendNotification' => $this->getSendNotification() ? 1 : 0
         ];
     }
 
     public function getByEmail($email)
     {
-        $query = "SELECT * FROM " . $this->table . " WHERE email = ?";
+        $query = $this->hasProfileImageColumns()
+            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy FROM " . $this->table . " WHERE email = ?"
+            : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy FROM " . $this->table . " WHERE email = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -398,12 +456,53 @@ class User
 
     public function updateProfile(int $userId): bool
     {
-        $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ?, school_company = ? WHERE userId = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("sssssi", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $userId);
+        $sendNotification = $this->sendNotification ? 1 : 0;
+
+        if ($this->profileImageDirty && $this->hasProfileImageColumns()) {
+            $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ?, school_company = ?, sendNotification = ?, profileImage = ?, profileImageMime = ? WHERE userId = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("sssssibsi", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $sendNotification, $this->profileImage, $this->profileImageMime, $userId);
+            $stmt->send_long_data(6, $this->profileImage ?? '');
+        } else {
+            $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ?, school_company = ?, sendNotification = ? WHERE userId = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("sssssii", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $sendNotification, $userId);
+        }
+
         $ok = $stmt->execute();
         $stmt->close();
+        $this->profileImageDirty = false;
         return $ok;
+    }
+
+    public function getProfileImagePayloadById(int $userId): ?array
+    {
+        if (!$this->hasProfileImageColumns()) {
+            return null;
+        }
+
+        $query = "SELECT profileImage, profileImageMime FROM " . $this->table . " WHERE userId = ? AND profileImage IS NOT NULL LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $stmt->close();
+            return null;
+        }
+
+        $row = $result->fetch_assoc();
+        $stmt->close();
+
+        if (empty($row['profileImage']) || empty($row['profileImageMime'])) {
+            return null;
+        }
+
+        return [
+            'data' => $row['profileImage'],
+            'mime' => $row['profileImageMime']
+        ];
     }
 
     public function updateRole(int $userId, string $role): bool
@@ -431,5 +530,26 @@ class User
 
         $this->createdBy = $this->userId;
         $this->modifiedBy = $this->userId;
+    }
+
+    private function hasProfileImageColumns(): bool
+    {
+        if ($this->profileImageColumnsAvailable !== null) {
+            return $this->profileImageColumnsAvailable;
+        }
+
+        $query = "SHOW COLUMNS FROM " . $this->table . " LIKE 'profileImage'";
+        $result = $this->conn->query($query);
+
+        if (!$result || $result->num_rows === 0) {
+            $this->profileImageColumnsAvailable = false;
+            return false;
+        }
+
+        $mimeQuery = "SHOW COLUMNS FROM " . $this->table . " LIKE 'profileImageMime'";
+        $mimeResult = $this->conn->query($mimeQuery);
+        $this->profileImageColumnsAvailable = $mimeResult && $mimeResult->num_rows > 0;
+
+        return $this->profileImageColumnsAvailable;
     }
 }

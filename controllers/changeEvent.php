@@ -1,5 +1,6 @@
 <?php
 
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Appointment.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/UserJobs.php";
@@ -27,11 +28,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $description = '';
     }
     $jobId = htmlspecialchars($_POST['changejobselection']);
+    $recurrenceType = $_POST['changerecurrence_type'] ?? 'none';
+    $recurrenceInterval = $_POST['changerecurrence_interval'] ?? 1;
+    $recurrenceUntil = $_POST['changerecurrence_until'] ?? null;
+
     if (!is_numeric($jobId)) {
         die("Invalid job id");
     }
     if (!is_numeric($appointmentId)) {
         die("Invalid appointment id");
+    }
+
+    if (!in_array($recurrenceType, ['none', 'weekly', 'monthly'])) {
+        http_response_code(400);
+        die("Invalid recurrence type.");
+    }
+
+    if ($recurrenceType !== 'none') {
+        if (!is_numeric($recurrenceInterval) || (int)$recurrenceInterval < 1) {
+            http_response_code(400);
+            die("Invalid recurrence Interval.");
+        }
+        if (empty($recurrenceUntil)) {
+            http_response_code(400);
+            die("Recurrence end date is required for recurring events.");
+        }
+        $splitedRecurrenceEndDay = explode('-', $recurrenceUntil);
+        if (count($splitedRecurrenceEndDay) !== 3 || !checkdate((int)$splitedRecurrenceEndDay[1], (int)$splitedRecurrenceEndDay[2], (int)$splitedRecurrenceEndDay[0])) {
+            http_response_code(400);
+            die("Invalid End Day for recurrence.");
+        }
+    } else {
+        $recurrenceInterval = 1;
+        $recurrenceUntil = null;
     }
 
     $appointmentmodel = new Appointment($conn);
@@ -71,6 +100,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $appointmentmodel->setEnd($endDateTime);
             $appointmentmodel->setDescription($description);
             $appointmentmodel->setModifiedBy($userId);
+            $appointmentmodel->setRecurrenceType($recurrenceType);
+            $appointmentmodel->setRecurrenceInterval((int)$recurrenceInterval);
+            $appointmentmodel->setRecurrenceUntil($recurrenceUntil);
 
             if ($appointmentmodel->update($appointmentId)) {
                 #echo "Termin erfolgreich erstellt!";

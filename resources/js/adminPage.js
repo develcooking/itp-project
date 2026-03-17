@@ -2,14 +2,14 @@ $(document).ready(function() {
     $('#pendingUsersTable').DataTable({
         order: [[5, 'desc']],
         language: {
-            url: 'https://cdn.datatables.net/plug-ins/2.0.0/i18n/de-DE.json'
+            url: '/resources/js/datatables-de-DE.json'
         }
     });
 
     $('#usersTable').DataTable({
         order: [[5, 'desc']],
         language: {
-            url: 'https://cdn.datatables.net/plug-ins/2.0.0/i18n/de-DE.json'
+            url: '/resources/js/datatables-de-DE.json'
         }
     });
 

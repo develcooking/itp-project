@@ -155,6 +155,11 @@ document.addEventListener('DOMContentLoaded', function () {
             let changedescription = document.getElementById('changedescription');
             let changejobselection = document.getElementById('changejobselection');
             let changeappointmentId = document.getElementById('changeappointmentId');
+            
+            // Recurrence fields
+            let changerecurrence_type = document.getElementById('changerecurrence_type');
+            let changerecurrence_interval = document.getElementById('changerecurrence_interval');
+            let changerecurrence_until = document.getElementById('changerecurrence_until');
 
             // Split start and end date and time
             let starttimearray = splitdateForChangeModle(info.event.start);
@@ -177,7 +182,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Set the job selection dropdown to the selected jobId
             changejobselection.value = info.event.extendedProps.jobId;
-            changeappointmentId.value = info.event.id;
+            changeappointmentId.value = info.event.extendedProps.appointmentId;
+            
+            // Set recurrence fields
+            if (changerecurrence_type) changerecurrence_type.value = info.event.extendedProps.recurrenceType || 'none';
+            if (changerecurrence_interval) changerecurrence_interval.value = info.event.extendedProps.recurrenceInterval || 1;
+            if (changerecurrence_until) changerecurrence_until.value = info.event.extendedProps.recurrenceUntil || '';
+
             let createdBy = info.event.extendedProps.createdBy;
             let creatorName = info.event.extendedProps.creatorName;
 
