@@ -46,8 +46,8 @@ if ($selectedJobId) {
 if ($selectedTopicId) {
     if ($topicModel->getById($selectedTopicId)) {
         $currentTopicName = $topicModel->getName();
-        $posts = $postModel->getByTopicId($selectedTopicId);
-    }
+        $posts = $postModel->getByTopicId($selectedTopicId, $_SESSION['userId']);  
+        }
 }
 ?>
     <link href="../resources/css/quill.snow.css" rel="stylesheet" />
@@ -92,44 +92,76 @@ if ($selectedTopicId) {
 
         <!-- Main Content -->
         <div class="col-md-9">
-            <div class="card shadow-sm min-vh-75">
-                <?php if ($selectedTopicId): ?>
-                    <!-- Thread View (Posts) -->
-                    <div class="card-header d-flex justify-content-between align-items-center bg-light">
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb mb-0">
-                                <li class="breadcrumb-item"><a href="?jobId=<?= $selectedJobId ?>" class="text-decoration-none"><?= htmlspecialchars($currentJobName) ?></a></li>
-                                <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentTopicName) ?></li>
-                            </ol>
-                        </nav>
-                        <button class="btn btn-sm btn-form-sub" data-bs-toggle="modal" data-bs-target="#createPostModal">
-                            <i class="bi bi-reply me-1"></i> Antworten
-                        </button>
+    <div class="card shadow-sm min-vh-75 d-flex flex-column">
+        <?php if ($selectedTopicId): ?>
+            <!-- Thread View (Posts) -->
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="?jobId=<?= $selectedJobId ?>" class="text-decoration-none"><?= htmlspecialchars($currentJobName) ?></a></li>
+                        <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentTopicName) ?></li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="card-body bg-light flex-grow-1">
+                <?php if (empty($posts)): ?>
+                    <div class="p-5 text-center text-muted">
+                        Noch keine Beiträge in diesem Thread.
                     </div>
-                    <div class="card-body bg-light">
-                        <?php if (empty($posts)): ?>
-                            <div class="p-5 text-center text-muted">Noch keine Beiträge in diesem Thread.</div>
-                        <?php else: ?>
-                            <?php foreach ($posts as $post): ?>
-                                <div class="card mb-3 border-0 shadow-sm">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between mb-2">
-                                            <span class="fw-bold text-primary"><i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?></span>
-                                            <small class="text-muted"><?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?></small>
-                                        </div>
-                                        <div class="post-content p-2">
-                                            <?php
-                                            // Allow basic formatting tags but strip everything else (basic XSS protection)
-                                            // Ideally, a library like HTML Purifier should be used here.
-                                            echo strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
-                                            ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
+                <?php else: ?>
+                    <?php foreach ($posts as $post): ?>
 
+                <?php
+                $userVote = $post['voteType'] ?? 'noreaction';
+
+                $upIcon = ($userVote === 'up') ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up';
+                $downIcon = ($userVote === 'down') ? 'bi-hand-thumbs-down-fill' : 'bi-hand-thumbs-down';
+
+                $upColor = ($userVote === 'up') ? 'green' : '#6c757d';
+                $downColor = ($userVote === 'down') ? 'red' : '#6c757d';
+                ?>
+
+                <div class="card mb-3 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold text-primary">
+                                <i class="bi bi-person-circle me-1"></i>
+                                <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
+                            </span>
+                            <small class="text-muted">
+                                <?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?>
+                            </small>
+                        </div>
+                        <div class="post-content p-2">
+                            <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-3">
+
+                        <form method="POST" action="/controllers/forum_actions.php">
+                        <input type="hidden" name="action" value="voteUp">
+                        <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+
+                        <button class="btn btn-sm btn-light">
+                        <i class="bi <?= $upIcon ?>" style="color: <?= $upColor ?>; font-size:18px;"></i>
+                        <span><?= $post['reaction_positive'] ?></span>
+                        </button>
+
+                        </form>
+
+
+                        <form method="POST" action="/controllers/forum_actions.php">
+                        <input type="hidden" name="action" value="voteDown">
+                        <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+
+                        <button class="btn btn-sm btn-light">
+                        <i class="bi <?= $downIcon ?>" style="color: <?= $downColor ?>; font-size:18px;"></i>
+                        <span><?= $post['reaction_negative'] ?></span>
+                        </button>
+
+                        </form>
+
+                        </div>
                 <?php elseif ($selectedJobId): ?>
                     <!-- Threads View (Topics) -->
                     <div class="card-header d-flex justify-content-between align-items-center bg-light">
@@ -179,19 +211,61 @@ if ($selectedTopicId) {
                                     </a>
                                 <?php endforeach; ?>
                             </div>
-                        <?php endif; ?>
-                    </div>
+                        </div>
 
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+            <div class="card-footer bg-light d-flex justify-content-end align-items-center gap-2">
+                <button class="btn btn-form-sub" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                    <i class="bi bi-reply me-1"></i> Antworten
+                </button>
+            </div>
+
+
+        <?php elseif ($selectedJobId): ?>
+            <!-- Threads View (Topics) -->
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentJobName) ?></li>
+                    </ol>
+                </nav>
+                <button class="btn btn-sm btn-form-sub" data-bs-toggle="modal" data-bs-target="#createTopicModal">
+                    <i class="bi bi-plus-circle me-1"></i> Neues Thema
+                </button>
+            </div>
+            <div class="card-body p-0 flex-grow-1">
+                <?php if (empty($topics)): ?>
+                    <div class="p-5 text-center text-muted">Noch keine Themen in diesem Bereich. Seien Sie der Erste!</div>
                 <?php else: ?>
-                    <!-- Default View -->
-                    <div class="card-body text-center d-flex flex-column justify-content-center">
-                        <i class="bi bi-chat-dots" style="font-size: 4rem; color: #dee2e6;"></i>
-                        <h4 class="mt-3">Willkommen im Forum</h4>
-                        <p class="text-muted">Bitte wählen Sie einen Berufsbereich aus der Liste links aus, um die Threads zu sehen.</p>
+                    <div class="list-group list-group-flush">
+                        <?php foreach ($topics as $topic): ?>
+                            <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>" class="list-group-item list-group-item-action py-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-1 fw-bold"><i class="bi bi-chat-left-text me-2 text-primary"></i><?= htmlspecialchars($topic['name']) ?></h6>
+                                    <div class="d-flex align-items-center">
+                                        <small class="text-muted me-3">Erstellt von: <?= htmlspecialchars($topic['userName'] ?? 'Unbekannt') ?></small>
+                                        <i class="bi bi-arrow-right text-muted"></i>
+                                    </div>
+                                </div>
+                            </a>
+                        <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
             </div>
-        </div>
+
+        <?php else: ?>
+            <!-- Default View -->
+            <div class="card-body text-center d-flex flex-column justify-content-center flex-grow-1">
+                <i class="bi bi-chat-dots" style="font-size: 4rem; color: #dee2e6;"></i>
+                <h4 class="mt-3">Willkommen im Forum</h4>
+                <p class="text-muted">Bitte wählen Sie einen Berufsbereich aus der Liste links aus, um die Threads zu sehen.</p>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
     </div>
 </div>
 
@@ -227,6 +301,7 @@ if ($selectedTopicId) {
         </div>
     </div>
 </div>
+<script src="/resources/js/postCreateEditor.js"></script>    
 
      <script src="/resources/js/postCreateEditor.js"></script>
 
