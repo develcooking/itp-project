@@ -226,31 +226,5 @@ if ($selectedTopicId) {
             </div>
         </div>
     </div>
-</div>
-
-<script>
-// Автоскролл к посту при переходе с startpage
-document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.hash) {
-        const element = document.querySelector(window.location.hash);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            element.classList.add('highlight-post');
-            setTimeout(() => element.classList.remove('highlight-post'), 2000);
-        }
-    }
-});
-</script>
-
-<style>
-.highlight-post {
-    animation: highlight 2s ease-in-out;
-}
-
-@keyframes highlight {
-    0%, 100% { background-color: transparent; }
-    50% { background-color: rgba(13, 110, 253, 0.1); }
-}
-</style>
-    
+</div>    
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>
