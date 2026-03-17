@@ -26,6 +26,17 @@ DB_HOST=127.0.0.1
 DB_USER=xxx
 DB_PASS=xxx
 DB_NAME=xxx
+
+MAIL_HOST=smtp.purelymail.com
+MAIL_PORT=465
+MAIL_ENCRYPTION=ssl
+MAIL_USERNAME=Ausbildungsportal@worldofmail.com
+MAIL_PASSWORD=xxxx
+MAIL_FROM_ADDRESS=Ausbildungsportal@worldofmail.com
+MAIL_FROM_NAME=Ausbildungsportal
+
+# Optional, wird fuer Links in E-Mails genutzt
+APP_URL=http://localhost
 APP_ENV=production
 ```
 Wenn APP_ENV nicht `development` ist, werden sql errors nicht angezeigt.

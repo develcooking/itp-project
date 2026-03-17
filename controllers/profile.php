@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveProfile'])) {
     $lastName = htmlspecialchars(trim($_POST['lastName'] ?? ''));
     $email = htmlspecialchars(trim($_POST['email'] ?? ''));
     $schoolCompany = htmlspecialchars(trim($_POST['school_company'] ?? ''));
+    $sendNotification = isset($_POST['sendNotification']) && $_POST['sendNotification'] === '1';
 
     if (empty($userName)) {
         $errors['userName'] = 'Benutzername darf nicht leer sein!';
@@ -53,12 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveProfile'])) {
         $user->setLastName($lastName);
         $user->setEmail($email);
         $user->setSchoolCompany($schoolCompany ?: null);
+        $user->setSendNotification($sendNotification);
 
         if ($user->updateProfile($_SESSION['userId'])) {
             $_SESSION['userName'] = $userName;
             $_SESSION['firstName'] = $firstName;
             $_SESSION['lastName'] = $lastName;
             $_SESSION['email'] = $email;
+            $_SESSION['sendNotification'] = $sendNotification ? 1 : 0;
             $success = 'Profil erfolgreich aktualisiert!';
             $user->getById($_SESSION['userId']);
         } else {
