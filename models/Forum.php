@@ -71,23 +71,75 @@ class Forum {
         return ($row['count'] ?? 0) > 0;
     }
 
-    public function getTopicsByBereich(int $bereich_id): array {
+    public function getTopicsByBereich(int $bereich_id, ?string $search = null): array {
+        // Modified query to include searching in post content
+        $query = "
+            SELECT DISTINCT t.*, u.userName 
+            FROM Topics t 
+            LEFT JOIN Users u ON t.userId = u.userId 
+            LEFT JOIN Posts p ON t.topicId = p.topicId 
+            WHERE t.jobId = ?
+        ";
 
-    $query = "SELECT t.*, u.userName FROM Topics t JOIN Users u ON t.userId = u.userId WHERE t.jobId = ?";
+        if (!empty($search)) {
+            // Search in topic name OR post content
+            $query .= " AND (t.name LIKE ? OR p.content LIKE ?)";
+        }
 
-    $stmt = $this->conn->prepare($query);
-    $stmt->bind_param("i", $bereich_id);
-    $stmt->execute();
+        $stmt = $this->conn->prepare($query);
 
-    $result = $stmt->get_result();
-    $topics = [];
+        if (!empty($search)) {
+            $searchTerm = "%" . $search . "%";
+            // Bind parameters for jobId, topic name search, and post content search
+            $stmt->bind_param("iss", $bereich_id, $searchTerm, $searchTerm);
+        } else {
+            $stmt->bind_param("i", $bereich_id);
+        }
+        
+        $stmt->execute();
 
-    while ($row = $result->fetch_assoc()) {
-        $topics[] = $row;
-    }
+        $result = $stmt->get_result();
+        $topics = [];
 
-    $stmt->close();
-    return $topics;
+        while ($row = $result->fetch_assoc()) {
+            $topicId = $row['topicId'];
+            $topics[$topicId] = $row;
+            $topics[$topicId]['matching_posts'] = [];
+        }
+        $stmt->close();
+
+        // If searching, fetch matching posts for these topics to show snippets
+        if (!empty($search) && !empty($topics)) {
+            $topicIds = array_keys($topics);
+            $idList = implode(',', array_fill(0, count($topicIds), '?'));
+            $postQuery = "SELECT postId, topicId, content FROM Posts WHERE topicId IN ($idList) AND content LIKE ?";
+            
+            $stmt = $this->conn->prepare($postQuery);
+            $types = str_repeat('i', count($topicIds)) . 's';
+            $params = [...$topicIds, $searchTerm];
+            $stmt->bind_param($types, ...$params);
+            
+            $stmt->execute();
+            $postResult = $stmt->get_result();
+            
+            while ($postRow = $postResult->fetch_assoc()) {
+                $content = strip_tags($postRow['content']);
+                $pos = mb_stripos($content, $search);
+                
+                if ($pos !== false) {
+                    $start = max(0, $pos - 40);
+                    $snippet = mb_substr($content, $start, 100);
+                    
+                    $topics[$postRow['topicId']]['matching_posts'][] = [
+                        'postId' => $postRow['postId'],
+                        'content_snippet' => $snippet
+                    ];
+                }
+            }
+            $stmt->close();
+        }
+
+        return array_values($topics);
     }
 
     public function createTopic(int $bereich_id, string $title): bool {
