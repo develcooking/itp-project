@@ -1,13 +1,10 @@
 <?php
-// Контроллер уже включил checkAuth и загрузил данные
 require_once $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 ?>
 
 <div class="container-fluid py-4">
     <div class="row">
-        <!-- Левая колонка: Приветствие и термины -->
         <div class="col-lg-4 mb-4">
-            <!-- Приветствие -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h4 class="card-title mb-1">
@@ -20,13 +17,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
                 </div>
             </div>
 
-            <!-- Ближайшие термины -->
             <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
                         <i class="bi bi-clock-history me-2"></i>Nächste Termine
                     </h5>
-                    <a href="/views/appointmentManagement.php" class="btn btn-sm btn-light">
+                    <a href="/views/appointmentManagement.php" class="btn btn-sm btn-outline-primary">
                         Alle
                     </a>
                 </div>
@@ -80,7 +76,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
             </div>
         </div>
 
-        <!-- Правая колонка: Новые посты из berufsbereiche -->
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -99,21 +94,18 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
                         </div>
                     <?php else: ?>
                         <?php foreach ($recentPosts as $jobPosts): ?>
-                            <!-- Berufsbereich Header -->
                             <div class="mb-4">
-                                <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">
-                                    <i class="bi bi-folder2-open me-2"></i>
+                                <h6 class="text-secondary fw-bold border-bottom pb-2 mb-3">
                                     <?= htmlspecialchars($jobPosts['jobName']) ?>
                                 </h6>
 
-                                <!-- Посты в этом berufsbereich -->
                                 <?php foreach ($jobPosts['posts'] as $post): ?>
                                     <?php
                                     $postDate = new DateTime($post['createdAt']);
                                     $contentPreview = strip_tags($post['content']);
                                     $contentPreview = mb_substr($contentPreview, 0, 150) . '...';
                                     ?>
-                                    <div class="card mb-3 border-start border-primary border-3">
+                                    <div class="card mb-3 border-start  border-3">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start mb-2">
                                                 <h6 class="card-subtitle text-muted mb-0">

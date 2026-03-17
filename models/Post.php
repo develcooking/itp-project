@@ -244,15 +244,8 @@ class Post
         $this->userName = $row['userName'] ?? '';
     }
 
-    /**
- * Получить последний пост из каждого topic в berufsbereiche пользователя
- * @param int $userId
- * @param int $jobLimit Максимум berufsbereiche (4)
- * @return array
- */
 public function getRecentForUserJobs(int $userId, int $jobLimit = 4): array
 {
-    // Получаем последний пост из самого нового topic для каждого Job
     $query = "SELECT 
                 p.postId,
                 p.topicId,
@@ -292,16 +285,14 @@ public function getRecentForUserJobs(int $userId, int $jobLimit = 4): array
     
     while ($row = $result->fetch_assoc()) {
         $jobId = $row['jobId'];
-        
-        // Ограничиваем количество berufsbereiche до $jobLimit
+
         if (!isset($jobCount[$jobId])) {
             if (count($jobCount) >= $jobLimit) {
                 continue;
             }
             $jobCount[$jobId] = 0;
         }
-        
-        // Берём только 1 topic на berufsbereich (самый новый)
+
         if ($jobCount[$jobId] >= 1) {
             continue;
         }
@@ -333,5 +324,4 @@ public function getRecentForUserJobs(int $userId, int $jobLimit = 4): array
     $stmt->close();
     return array_values($postsByJob);
 }
-
 }
