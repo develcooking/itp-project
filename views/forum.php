@@ -243,38 +243,6 @@ if ($selectedTopicId) {
         </div>
     </div>
 </div>
-
-    <script src="/resources/js/postCreateEditor.js"></script>
-
-<!-- Modal for creating Post -->
-<div class="d-flex gap-2 mt-3">
-
-    <!-- Upvote button -->
-    <form method="POST" action="/controllers/forum_actions.php" class="vote-form">
-        <input type="hidden" name="action" value="voteUp">
-        <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
-        <button type="submit" class="btn btn-sm btn-light vote-btn">
-            <svg class="thumb-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M6 0L10 6H6L6 0Z"/> <!-- replace with actual thumbs-up path -->
-            </svg>
-            <span class="vote-count"><?= $post['reaction_positive'] ?></span>
-        </button>
-    </form>
-
-    <!-- Downvote button -->
-    <form method="POST" action="/controllers/forum_actions.php" class="vote-form">
-        <input type="hidden" name="action" value="voteDown">
-        <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
-        <button type="submit" class="btn btn-sm btn-light vote-btn">
-            <svg class="thumb-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M10 0L6 6H10L10 0Z"/> <!-- replace with actual thumbs-down path -->
-            </svg>
-            <span class="vote-count"><?= $post['reaction_negative'] ?></span>
-        </button>
-    </form>
-
-</div>
-
 <script src="/resources/js/postCreateEditor.js"></script>    
 
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>
