@@ -110,8 +110,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 header("Location: /views/forum.php?jobId=$jobId&topicId=$topicId&error=post_failed");
                 break;
-        }
-    }
+              case 'voteUp':
+            $postId = intval($_POST['postId'] ?? 0);
+            if ($postId > 0) {
+                $post = new Post($conn);
+                $post->vote($postId, $_SESSION['userId'], 'up');
+            }
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit();
+
+        case 'voteDown':
+            $postId = intval($_POST['postId'] ?? 0);
+            if ($postId > 0) {
+                $post = new Post($conn);
+                $post->vote($postId, $_SESSION['userId'], 'down');
+            }
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit();
+                            }
+                }
 }
 
 header("Location: /views/forum.php");

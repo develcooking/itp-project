@@ -84,17 +84,36 @@ class Post
         return $this->userName;
     }
 
-    public function getByTopicId($topicId)
-    {
-        $query = "SELECT p.*, u.userName FROM " . $this->table . " p JOIN Users u ON p.userId = u.userId WHERE p.topicId = ? ORDER BY p.createdAt ASC";
+        public function getByTopicId($topicId, $userId)   
+         {
+            $query = "
+            SELECT 
+                p.*,
+                u.userName,
+
+                SUM(CASE WHEN ur.voteType = 'up' THEN 1 ELSE 0 END) AS reaction_positive,
+                SUM(CASE WHEN ur.voteType = 'down' THEN 1 ELSE 0 END) AS reaction_negative,
+
+                MAX(CASE WHEN ur.userId = ? THEN ur.voteType ELSE NULL END) AS voteType
+
+            FROM Posts p
+            JOIN Users u ON p.userId = u.userId
+            LEFT JOIN user_reactions ur ON p.postId = ur.postId
+
+            WHERE p.topicId = ?
+
+            GROUP BY p.postId
+            ORDER BY p.createdAt ASC
+            ";        
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $topicId);
+        $stmt->bind_param("ii", $userId, $topicId);
         $stmt->execute();
         $result = $stmt->get_result();
         $posts = [];
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $posts[] = [
+                    'voteType' => $row['voteType'] ?? 'noreaction',
                     'postId' => $row['postId'],
                     'topicId' => $row['topicId'],
                     'userId' => $row['userId'],
@@ -244,5 +263,50 @@ class Post
         $this->userName = $row['userName'] ?? '';
     }
 
+public function vote($postId, $userId, $type)
+{
+    if (!in_array($type, ['up','down'])) return false;
 
+    // Check current vote
+    $query = "SELECT voteType FROM user_reactions WHERE userId = ? AND postId = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("ii", $userId, $postId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $currentVote = $row['voteType'];
+
+        if ($currentVote === $type) {
+            // Same vote → switch to noreaction
+            $update = "UPDATE user_reactions SET voteType = 'noreaction' WHERE userId = ? AND postId = ?";
+            $stmt = $this->conn->prepare($update);
+            $stmt->bind_param("ii", $userId, $postId);
+            $stmt->execute();
+            $stmt->close();
+            return true;
+        }
+
+        // Different vote → switch vote
+        $update = "UPDATE user_reactions SET voteType = ? WHERE userId = ? AND postId = ?";
+        $stmt = $this->conn->prepare($update);
+        $stmt->bind_param("sii", $type, $userId, $postId);
+        $stmt->execute();
+        $stmt->close();
+
+        return true;
+    }
+
+    $stmt->close();
+
+    // No previous vote → insert new row
+    $insert = "INSERT INTO user_reactions (userId, postId, voteType) VALUES (?, ?, ?)";
+    $stmt = $this->conn->prepare($insert);
+    $stmt->bind_param("iis", $userId, $postId, $type);
+    $stmt->execute();
+    $stmt->close();
+
+    return true;
+}
 }
