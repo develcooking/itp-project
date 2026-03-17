@@ -46,7 +46,7 @@ if (empty($current_page) || $current_page === '') {
     <a href="../index.php" class="logo border-end">
         <img src="/resources/imgs/logo.jpeg" alt="Ausbildungsportal.net Logo" class="nav-logo">
     </a>
-    <a href="/views/startpage.php" class="nav-btn-primary border-end <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
+    <a href="/controllers/startpage.php" class="nav-btn-primary border-end <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
     <a href="/views/appointmentManagement.php" class="nav-btn-primary border-end <?= $current_page === 'appointmentManagement' ? 'current' : ''; ?>">Termine</a>
     <a href="/views/forum.php" class="nav-btn-primary border-end <?= $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
     <?php if ($_SESSION['role'] === 'Admin'): ?>

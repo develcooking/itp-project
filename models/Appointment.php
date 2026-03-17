@@ -332,4 +332,40 @@ class Appointment
         $stmt->close();
         return false;
     }
+
+ 
+public function getUpcomingForUser(int $userId, int $limit = 5): array
+{
+    $query = "SELECT a.*, j.name as jobName 
+              FROM " . $this->table . " a
+              INNER JOIN users_jobs uj ON a.jobId = uj.jobId
+              INNER JOIN Jobs j ON a.jobId = j.jobId
+              WHERE uj.userId = ? 
+              AND a.start >= NOW()
+              AND a.start <= DATE_ADD(NOW(), INTERVAL 7 DAY)
+              ORDER BY a.start ASC
+              LIMIT ?";
+    
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("ii", $userId, $limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $appointments = [];
+    while ($row = $result->fetch_assoc()) {
+        $appointments[] = [
+            'appointmentId' => $row['appointmentId'],
+            'jobId' => $row['jobId'],
+            'jobName' => $row['jobName'],
+            'title' => $row['title'],
+            'start' => $row['start'],
+            'end' => $row['end'],
+            'description' => $row['description'],
+            'createdAt' => $row['createdAt']
+        ];
+    }
+    
+    $stmt->close();
+    return $appointments;
+}
 }

@@ -56,7 +56,7 @@ if ($selectedTopicId) {
 <div class="container-fluid mt-4 forum-container">
     <div class="row">
         <!-- Sidebar: Berufsbereiche -->
-        <div class="col-md-3">
+        <div class="col-md-3" >
             <div class="card shadow-sm">
                 <div class="card-header text-white forum-accent-header">
                     <h5 class="mb-0">Berufsbereiche</h5>
@@ -79,21 +79,42 @@ if ($selectedTopicId) {
 
         <!-- Main Content -->
         <div class="col-md-9">
-    <div class="card shadow-sm min-vh-75 d-flex flex-column">
-        <?php if ($selectedTopicId): ?>
-            <!-- Thread View (Posts) -->
-            <div class="card-header d-flex justify-content-between align-items-center bg-light">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="?jobId=<?= $selectedJobId ?>" class="text-decoration-none"><?= htmlspecialchars($currentJobName) ?></a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentTopicName) ?></li>
-                    </ol>
-                </nav>
-            </div>
-            <div class="card-body bg-light flex-grow-1">
-                <?php if (empty($posts)): ?>
-                    <div class="p-5 text-center text-muted">
-                        Noch keine Beiträge in diesem Thread.
+            <div class="card shadow-sm min-vh-75">
+                <?php if ($selectedTopicId): ?>
+                    <!-- Thread View (Posts) -->
+                    <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="?jobId=<?= $selectedJobId ?>" class="text-decoration-none"><?= htmlspecialchars($currentJobName) ?></a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentTopicName) ?></li>
+                            </ol>
+                        </nav>
+                        <button class="btn btn-sm btn-form-sub" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                            <i class="bi bi-reply me-1"></i> Antworten
+                        </button>
+                    </div>
+                    <div class="card-body bg-light">
+                        <?php if (empty($posts)): ?>
+                            <div class="p-5 text-center text-muted">Noch keine Beiträge in diesem Thread.</div>
+                        <?php else: ?>
+                            <?php foreach ($posts as $post): ?>
+                                <div class="card mb-3 border-0 shadow-sm" id="post-<?= $post['postId'] ?>">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="fw-bold text-primary"><i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?></span>
+                                            <small class="text-muted"><?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?></small>
+                                        </div>
+                                        <div class="post-content p-2">
+                                            <?php
+                                            // Allow basic formatting tags but strip everything else (basic XSS protection)
+                                            // Ideally, a library like HTML Purifier should be used here.
+                                            echo strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+                                            ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 <?php else: ?>
                     <?php foreach ($posts as $post): ?>
