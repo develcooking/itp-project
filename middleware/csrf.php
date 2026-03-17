@@ -40,7 +40,7 @@ function getCsrfTokenInput() {
  * @param string|null $token The token to verify. If null, it checks $_POST['csrf_token'] or X-CSRF-TOKEN header.
  * @return bool True if valid, false otherwise.
  */
-function verifyCsrfToken($token) {
+function verifyCsrfToken($token = null) {
     if ($token === null) {
         if (isset($_POST['csrf_token'])) {
             $token = $_POST['csrf_token'];
@@ -57,6 +57,7 @@ function verifyCsrfToken($token) {
 }
 
 //-> $stateChangingMethods = ['POST', 'PUT', 'DELETE', 'PATCH']; nacharbeiten für POST, aktuell die methode wird weggenommen
+
 function validateCsrfOrDie() {
     $stateChangingMethods = ['PUT', 'DELETE', 'PATCH'];
     if (in_array($_SERVER['REQUEST_METHOD'], $stateChangingMethods)) {
