@@ -468,7 +468,8 @@ a:hover {
 }
 
 .list-group-item.active{
-color: var(--accentColor);
+  background-color: var(--orangeLight);
+  color: var(--accentColor);
 }
 
 .bold-icon {
