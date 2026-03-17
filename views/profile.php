@@ -108,6 +108,17 @@ if (!isset($user)) {
                         <div class="form-floating mb-3">
                             <input
                             type="text"
+                            id="role"
+                            class="form-control"
+                            placeholder="Rolle"
+                            value="<?= htmlspecialchars($user->getRole()) ?>"
+                            disabled>
+                            <label for="role">Rolle</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input
+                            type="text"
                             name="school_company"
                             id="school_company"
                             class="form-control"
