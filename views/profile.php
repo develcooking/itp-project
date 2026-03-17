@@ -34,8 +34,40 @@ if (!isset($user)) {
                         </div>
                     <?php endif; ?>
 
-                    <form method="post" action="/controllers/profile.php">
+                    <form method="post" action="/controllers/profile.php" enctype="multipart/form-data">
                         <?php echo getCsrfTokenInput(); ?>
+
+                        <div class="mb-3">
+                            <?php if ($user->hasProfileImage()): ?>
+                                <img
+                                    src="/controllers/profileImage.php"
+                                    alt="Aktuelles Profilbild"
+                                    class="rounded-circle border profile-image-preview">
+                            <?php else: ?>
+                                <img
+                                    src="/resources/imgs/icon.png"
+                                    alt="Standard Profilbild"
+                                    class="rounded-circle border profile-image-preview">
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="mb-3 text-start">
+                            <input
+                                type="file"
+                                name="profileImage"
+                                id="profileImage"
+                                class="d-none"
+                                accept="image/jpeg,image/png,image/webp">
+                            <label for="profileImage" class="form-control d-flex align-items-center justify-content-start gap-2">
+                                <span class="btn btn-outline-primary btn-sm">Datei auswahlen</span>
+                                <span id="profileImageFileName" class="text-muted">Profilbild hochladen (JPG, PNG, WEBP, max. 2 MB)</span>
+                            </label>
+                            <?php if (!empty($errors['profileImage'])): ?>
+                                <div class="invalidUserName mt-1">
+                                    <?= htmlspecialchars($errors['profileImage']) ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
 
                         <div class="form-floating mb-3">
                             <input
@@ -158,3 +190,24 @@ if (!isset($user)) {
     </div>
 
 <?php include $homepath . "/views/footer.php"; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const profileImageInput = document.getElementById('profileImage');
+    const profileImageFileName = document.getElementById('profileImageFileName');
+
+    if (!profileImageInput || !profileImageFileName) {
+        return;
+    }
+
+    profileImageInput.addEventListener('change', function () {
+        if (profileImageInput.files && profileImageInput.files.length > 0) {
+            profileImageFileName.textContent = profileImageInput.files[0].name;
+            profileImageFileName.classList.remove('text-muted');
+        } else {
+            profileImageFileName.textContent = 'Profilbild hochladen (JPG, PNG, WEBP, max. 2 MB)';
+            profileImageFileName.classList.add('text-muted');
+        }
+    });
+});
+</script>
