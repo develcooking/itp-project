@@ -194,4 +194,67 @@ $(document).ready(function() {
             }
         });
     });
+
+    // Sperren Modal öffnen
+    const blockModalEl = document.getElementById('blockModal');
+    const blockModal = new bootstrap.Modal(blockModalEl);
+    let blockTargetUserId = null;
+
+    $(document).on('click', '.block-btn', function() {
+        const btn = $(this);
+        blockTargetUserId = btn.data('userId');
+        const userName = btn.data('username');
+        $('#blockModalUserName').text('Benutzer: ' + userName);
+        blockModal.show();
+    });
+
+    // Dauer auswählen und Sperren ausführen
+    $(document).on('click', '.block-duration-btn', function() {
+        const duration = $(this).data('duration');
+        if (!blockTargetUserId) return;
+
+        $.ajax({
+            url: '/controllers/admin.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'blockUser', userId: blockTargetUserId, duration: duration },
+            success: function(response) {
+                if (response.success) {
+                    blockModal.hide();
+                    location.reload();
+                } else {
+                    alert('Fehler: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('Fehler beim Sperren des Benutzers.');
+            }
+        });
+    });
+
+    // Benutzer freigeben
+    $(document).on('click', '.unblock-btn', function() {
+        const btn = $(this);
+        const userId = btn.data('userId');
+        const userName = btn.data('username');
+
+        if (!confirm('Benutzer "' + userName + '" wirklich freigeben?')) return;
+
+        $.ajax({
+            url: '/controllers/admin.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'unblockUser', userId: userId },
+            success: function(response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert('Fehler: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('Fehler beim Freigeben des Benutzers.');
+            }
+        });
+    });
 });
