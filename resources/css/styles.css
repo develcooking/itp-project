@@ -200,6 +200,12 @@ select {
   padding: 0.8rem 1rem;
 }
 
+.profile-image-preview {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+}
+
 /* ===================== FOOTER ===================== */
 .footer {
   background-color: var(--accentColor);

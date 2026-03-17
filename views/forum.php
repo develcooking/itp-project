@@ -48,7 +48,7 @@ if ($selectedJobId) {
 if ($selectedTopicId) {
     if ($topicModel->getById($selectedTopicId)) {
         $currentTopicName = $topicModel->getName();
-        $posts = $postModel->getByTopicId($selectedTopicId, $_SESSION['userId']);
+        $posts = $postModel->getByTopicId($selectedTopicId, $_SESSION['userId']);  
         }
 }
 ?>
@@ -164,19 +164,6 @@ if ($selectedTopicId) {
                         </form>
 
                         </div>
-                            </div>
-                        </div>
-
-                    <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-
-            <div class="card-footer bg-light d-flex justify-content-end align-items-center gap-2">
-                <button class="btn btn-form-sub" data-bs-toggle="modal" data-bs-target="#createPostModal">
-                    <i class="bi bi-reply me-1"></i> Antworten
-                </button>
-            </div>
-
                 <?php elseif ($selectedJobId): ?>
                     <!-- Threads View (Topics) -->
                     <div class="card-header d-flex justify-content-between align-items-center bg-light">
@@ -226,8 +213,18 @@ if ($selectedTopicId) {
                                     </a>
                                 <?php endforeach; ?>
                             </div>
-                        <?php endif; ?>
-                    </div>
+                        </div>
+
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+            <div class="card-footer bg-light d-flex justify-content-end align-items-center gap-2">
+                <button class="btn btn-form-sub" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                    <i class="bi bi-reply me-1"></i> Antworten
+                </button>
+            </div>
+
 
         <?php elseif ($selectedJobId): ?>
             <!-- Threads View (Topics) -->
@@ -306,6 +303,7 @@ if ($selectedTopicId) {
         </div>
     </div>
 </div>
+<script src="/resources/js/postCreateEditor.js"></script>    
 
      <script src="/resources/js/postCreateEditor.js"></script>
 

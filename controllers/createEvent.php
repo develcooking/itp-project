@@ -30,6 +30,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $endtime = $_POST['endtime'] ?? '';
     $jobId = $_POST['jobselection'] ?? '';
     $description = $_POST['description'] ?? '';
+    $recurrenceType = $_POST['recurrence_type'] ?? 'none';
+    $recurrenceInterval = $_POST['recurrence_interval'] ?? 1;
+    $recurrenceUntil = $_POST['recurrence_until'] ?? null;
+
+    if (!in_array($recurrenceType, ['none', 'weekly', 'monthly'])) {
+        http_response_code(400);
+        die("Invalid recurrence type.");
+    }
+
+    if ($recurrenceType !== 'none') {
+        if (!is_numeric($recurrenceInterval) || (int)$recurrenceInterval < 1) {
+            http_response_code(400);
+            die("Invalid recurrence Interval.");
+        }
+        if (empty($recurrenceUntil)) {
+            http_response_code(400);
+            die("Recurrence end date is required for recurring events.");
+        }
+        $splitedRecurrenceEndDay = explode('-', $recurrenceUntil);
+        if (count($splitedRecurrenceEndDay) !== 3 || !checkdate((int)$splitedRecurrenceEndDay[1], (int)$splitedRecurrenceEndDay[2], (int)$splitedRecurrenceEndDay[0])) {
+            http_response_code(400);
+            die("Invalid End Day for recurrence.");
+        }
+    } else {
+        $recurrenceInterval = 1;
+        $recurrenceUntil = null;
+    }
 
     // Authorization check: Is the user assigned to this job? (unless Admin)
     if ($userRole !== 'admin') {
@@ -60,6 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $appointmentmodel->setDescription(HtmlSanitizer::sanitize($description));
             $appointmentmodel->setCreatedBy($createdBy);
             $appointmentmodel->setModifiedBy($modifiedBy);
+            $appointmentmodel->setRecurrenceType($recurrenceType);
+            $appointmentmodel->setRecurrenceInterval((int)$recurrenceInterval);
+            $appointmentmodel->setRecurrenceUntil($recurrenceUntil);
 
             if ($appointmentmodel->post()) {
                 header("Location: /views/appointmentManagement.php");

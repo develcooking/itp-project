@@ -11,6 +11,9 @@ if (empty($_SESSION['userId'])) {
 $errors = [];
 $success = '';
 
+$allowedImageMimes = ['image/jpeg', 'image/png', 'image/webp'];
+$maxProfileImageBytes = 2 * 1024 * 1024;
+
 $user = new User($conn);
 $user->getById($_SESSION['userId']);
 
@@ -21,6 +24,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveProfile'])) {
     $email = htmlspecialchars(trim($_POST['email'] ?? ''));
     $schoolCompany = htmlspecialchars(trim($_POST['school_company'] ?? ''));
     $sendNotification = isset($_POST['sendNotification']) && $_POST['sendNotification'] === '1';
+    $profileImageData = null;
+    $profileImageMime = null;
+
+    if (isset($_FILES['profileImage']) && ($_FILES['profileImage']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+        if (!$user->canStoreProfileImage()) {
+            $errors['profileImage'] = 'Profilbilder sind noch nicht verfügbar. Bitte führen Sie zuerst die neue Datenbank-Migration aus.';
+        }
+
+        $uploadError = $_FILES['profileImage']['error'];
+
+        if (empty($errors['profileImage']) && $uploadError !== UPLOAD_ERR_OK) {
+            $errors['profileImage'] = 'Fehler beim Upload des Profilbildes.';
+        } elseif (empty($errors['profileImage']) && ($_FILES['profileImage']['size'] ?? 0) > $maxProfileImageBytes) {
+            $errors['profileImage'] = 'Das Profilbild darf maximal 2 MB groß sein.';
+        } elseif (empty($errors['profileImage'])) {
+            $tmpName = $_FILES['profileImage']['tmp_name'] ?? '';
+
+            if (!is_uploaded_file($tmpName)) {
+                $errors['profileImage'] = 'Ungültiger Datei-Upload erkannt.';
+            } else {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $detectedMime = $finfo ? finfo_file($finfo, $tmpName) : false;
+                if ($finfo) {
+                    finfo_close($finfo);
+                }
+
+                $imageType = @exif_imagetype($tmpName);
+                $allowedExifTypes = [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP];
+
+                if ($detectedMime === false || !in_array($detectedMime, $allowedImageMimes, true) || !in_array($imageType, $allowedExifTypes, true)) {
+                    $errors['profileImage'] = 'Nur JPG, PNG oder WEBP sind erlaubt.';
+                } else {
+                    $fileData = file_get_contents($tmpName);
+                    if ($fileData === false || $fileData === '') {
+                        $errors['profileImage'] = 'Das Profilbild konnte nicht gelesen werden.';
+                    } else {
+                        $profileImageData = $fileData;
+                        $profileImageMime = $detectedMime;
+                    }
+                }
+            }
+        }
+    }
 
     if (empty($userName)) {
         $errors['userName'] = 'Benutzername darf nicht leer sein!';
@@ -55,6 +101,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveProfile'])) {
         $user->setEmail($email);
         $user->setSchoolCompany($schoolCompany ?: null);
         $user->setSendNotification($sendNotification);
+
+        if ($profileImageData !== null && $profileImageMime !== null) {
+            $user->setProfileImage($profileImageData, $profileImageMime);
+        }
 
         if ($user->updateProfile($_SESSION['userId'])) {
             $_SESSION['userName'] = $userName;

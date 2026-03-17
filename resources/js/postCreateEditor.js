@@ -44,8 +44,6 @@ document.addEventListener("DOMContentLoaded", function() {
             return false;
         }
     };
-});
-
 
  document.querySelectorAll('.vote-form').forEach(form => {
     form.addEventListener('submit', function(e) {
