@@ -19,6 +19,18 @@ if (!empty($_SESSION['userId'])) {
         </div>
       <?php endif; ?>
 
+      <?php if (isset($_GET['blocked'])): ?>
+        <?php if ($_GET['blocked'] === 'permanent'): ?>
+          <div class="alert alert-danger text-center mb-4">
+              Ihr Konto ist dauerhaft gesperrt. Bitte wenden Sie sich an einen Administrator.
+          </div>
+        <?php elseif ($_GET['blocked'] === 'temp' && !empty($_GET['until'])): ?>
+          <div class="alert alert-danger text-center mb-4">
+              Ihr Konto ist derzeit gesperrt. Die Sperre läuft am <?= htmlspecialchars($_GET['until']) ?> ab.
+          </div>
+        <?php endif; ?>
+      <?php endif; ?>
+
       <?php if (!isset($_SESSION['userId'])): ?>
         <div class="card bg-light shadow p-4 text-center">
 

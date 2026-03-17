@@ -53,12 +53,25 @@ if ($selectedTopicId) {
 ?>
     <link href="../resources/css/quill.snow.css" rel="stylesheet" />
     <script src="../resources/js/quill.js"></script>
+    <style>
+        /* Styles for rendered Quill content in the forum */
+        .post-content blockquote {
+            border-left: 4px solid #ccc;
+            margin-bottom: 5px;
+            margin-top: 5px;
+            padding-left: 16px;
+            font-style: italic;
+        }
+        .post-content h1 { font-size: 2em; font-weight: bold; }
+        .post-content h2 { font-size: 1.5em; font-weight: bold; }
+        .post-content h3 { font-size: 1.17em; font-weight: bold; }
+    </style>
 <div class="container-fluid mt-4 forum-container">
     <div class="row">
         <!-- Sidebar: Berufsbereiche -->
-        <div class="col-md-3" >
+        <div class="col-md-3">
             <div class="card shadow-sm">
-                <div class="card-header text-white forum-accent-header">
+                <div class="card-header text-white" style="background-color: var(--accentColor);">
                     <h5 class="mb-0">Berufsbereiche</h5>
                 </div>
                 <div class="list-group list-group-flush">
@@ -66,8 +79,9 @@ if ($selectedTopicId) {
                         <div class="p-3 text-center text-muted">Keine Bereiche verfügbar.</div>
                     <?php else: ?>
                         <?php foreach ($bereiche as $bereich): ?>
-                                     <a href="?jobId=<?= $bereich['jobId'] ?>" 
-                                         class="list-group-item list-group-item-action d-flex justify-content-between align-items-center <?= $selectedJobId == $bereich['jobId'] ? 'active forum-bereich-active' : '' ?>">
+                            <a href="?jobId=<?= $bereich['jobId'] ?>" 
+                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center <?= $selectedJobId == $bereich['jobId'] ? 'active' : '' ?>"
+                               <?= $selectedJobId == $bereich['jobId'] ? 'style="background-color: var(--accentColor); border-color: var(--accentColor);"' : '' ?>>
                                 <?= htmlspecialchars($bereich['name']) ?>
                                 <i class="bi bi-chevron-right small <?= $selectedJobId == $bereich['jobId'] ? '' : 'text-muted' ?>"></i>
                             </a>
@@ -79,7 +93,7 @@ if ($selectedTopicId) {
 
         <!-- Main Content -->
         <div class="col-md-9">
-            <div class="card shadow-sm min-vh-75">
+            <div class="card shadow-sm min-vh-75 d-flex flex-column">
                 <?php if ($selectedTopicId): ?>
                     <div class="card-header d-flex justify-content-between align-items-center bg-light">
                         <nav aria-label="breadcrumb">
@@ -88,13 +102,12 @@ if ($selectedTopicId) {
                                 <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentTopicName) ?></li>
                             </ol>
                         </nav>
-                        <button class="btn btn-sm btn-form-sub" data-bs-toggle="modal" data-bs-target="#createPostModal">
-                            <i class="bi bi-reply me-1"></i> Antworten
-                        </button>
                     </div>
-                    <div class="card-body bg-light">
+                    <div class="card-body bg-light flex-grow-1">
                         <?php if (empty($posts)): ?>
-                            <div class="p-5 text-center text-muted">Noch keine Beiträge in diesem Thread.</div>
+                            <div class="p-5 text-center text-muted">
+                                Noch keine Beiträge in diesem Thread.
+                            </div>
                         <?php else: ?>
                             <?php foreach ($posts as $post): ?>
                                 <?php
@@ -215,7 +228,7 @@ if ($selectedTopicId) {
 <div class="modal fade" id="createTopicModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header text-white forum-accent-header">
+            <div class="modal-header text-white" style="background-color: var(--accentColor);">
                 <h5 class="modal-title">Neues Thema und initiales Beitrag erstellen</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -228,15 +241,15 @@ if ($selectedTopicId) {
                         <label for="topicName" class="form-label">Titel des Themas</label>
                         <input type="text" class="form-control" name="topicName" id="topicName" placeholder="Titel eingeben" required>
                     </div>
-                <!-- Modal for creating initial Post -->
+                    <!-- Modal for creating initial Post -->
                     <input type="hidden" name="postContent" id="postContentHiddenInitial">
                     <div class="mb-3">
                         <label class="form-label">Ihre Nachricht</label>
-                        <div id="quillEditorInitial" class="forum-quill-editor"></div>
+                        <div id="quillEditorInitial" style="height: 200px; background: white;"></div>
                     </div>
                     <div class="text-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                        <button type="submit" class="btn text-white forum-accent-btn">Thema erstellen</button>
+                        <button type="submit" class="btn text-white" style="background-color: var(--accentColor);">Thema erstellen</button>
                     </div>
                 </form>
             </div>
@@ -244,13 +257,12 @@ if ($selectedTopicId) {
     </div>
 </div>
 
-     <script src="/resources/js/postCreateEditor.js"></script>
 
 <!-- Modal for creating Post -->
 <div class="modal fade" id="createPostModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header text-white forum-accent-header">
+            <div class="modal-header text-white" style="background-color: var(--accentColor);">
                 <h5 class="modal-title">Antworten</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -263,11 +275,11 @@ if ($selectedTopicId) {
                     <input type="hidden" name="postContent" id="postContentHidden">
                     <div class="mb-3">
                         <label class="form-label">Ihre Nachricht</label>
-                        <div id="quillEditor" class="forum-quill-editor"></div>
+                        <div id="quillEditor" style="height: 200px; background: white;"></div>
                     </div>
                     <div class="text-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                        <button type="submit" class="btn text-white forum-accent-btn">Antwort absenden</button>
+                        <button type="submit" class="btn text-white" style="background-color: var(--accentColor);">Antwort absenden</button>
                     </div>
                 </form>
             </div>
