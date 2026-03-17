@@ -57,7 +57,6 @@ function verifyCsrfToken($token = null) {
 }
 
 //-> $stateChangingMethods = ['POST', 'PUT', 'DELETE', 'PATCH']; nacharbeiten für POST, aktuell die methode wird weggenommen
-
 function validateCsrfOrDie() {
     $stateChangingMethods = ['PUT', 'DELETE', 'PATCH'];
     if (in_array($_SERVER['REQUEST_METHOD'], $stateChangingMethods)) {
