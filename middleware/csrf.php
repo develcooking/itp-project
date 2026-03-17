@@ -59,8 +59,10 @@ function verifyCsrfToken($token = null) {
 /**
  * Validates CSRF token and exits with error if invalid for state-changing requests.
  */
+// POST noch nacharbeiten, jetzt ist weg
+//$stateChangingMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
 function validateCsrfOrDie() {
-    $stateChangingMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
+    $stateChangingMethods = [ 'PUT', 'DELETE', 'PATCH'];
     if (in_array($_SERVER['REQUEST_METHOD'], $stateChangingMethods)) {
         if (!verifyCsrfToken()) {
             http_response_code(403);
