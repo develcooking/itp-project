@@ -1,13 +1,11 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../database/db.php';
-
-session_start();
 
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['passwordForgot'])) {
-
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     $securityAnswer = trim($_POST['securityAnswer'] ?? '');
 
@@ -26,7 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['passwordForgot'])) {
             $storedHash  = $user->getSecurityAnswer();
 
             if (!password_verify($inputAnswer, $storedHash)) {
-                $errors['general'] = "Sicherheitsantwort falsch";
+                // Attaker cant know if the email exists or doesnt
+                $errors['general'] = "E-Mail oder Sicherheitsantwort ist falsch";
             } else {
                 // Create reset session
                 $_SESSION['password_reset'] = [

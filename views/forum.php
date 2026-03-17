@@ -11,21 +11,30 @@ $postModel = new Post($conn);
 
 $selectedJobId = isset($_GET['jobId']) ? intval($_GET['jobId']) : null;
 $selectedTopicId = isset($_GET['topicId']) ? intval($_GET['topicId']) : null;
+$searchTerm = isset($_GET['search']) ? trim($_GET['search']) : null;
 
-$bereiche = $forumModel->getBereiche();
+$isAdmin = isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin';
+
+if ($isAdmin) {
+    // Admins see all Berufsbereiche
+    $bereiche = $forumModel->getallBereiche();
+} else {
+    $bereiche = $forumModel->getBereiche();
+}
 $topics = [];
 $posts = [];
 $currentJobName = "Berufsbereich";
 $currentTopicName = "";
 
 if ($selectedJobId) {
-    if (!$forumModel->hasAccess($_SESSION['userId'] ?? 0, $selectedJobId)) {
-        header("Location: /views/forum.php?error=no_access");
-        exit();
+    if (!$isAdmin) {
+        if (!$forumModel->hasAccess($_SESSION['userId'] ?? 0, $selectedJobId)) {
+            header("Location: /views/forum.php?error=no_access");
+            exit();
+        }
     }
-    $topics = $forumModel->getTopicsByBereich($selectedJobId);
+    $topics = $forumModel->getTopicsByBereich($selectedJobId, $searchTerm);
     // Even if empty, we treat it as an empty topic list
-    
     foreach ($bereiche as $b) {
         if ($b['jobId'] == $selectedJobId) {
             $currentJobName = $b['name'];
@@ -153,6 +162,54 @@ if ($selectedTopicId) {
                         </form>
 
                         </div>
+                <?php elseif ($selectedJobId): ?>
+                    <!-- Threads View (Topics) -->
+                    <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentJobName) ?></li>
+                            </ol>
+                        </nav>
+                        <?php // search field ?>
+                        <div class="d-flex align-items-center">
+                            <form class="d-flex me-3" method="GET" action="">
+                                <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
+                                <input class="form-control form-control-sm me-2" type="search" name="search" placeholder="Suche..." aria-label="Search" value="<?= htmlspecialchars($searchTerm ?? '') ?>">
+                                <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                            </form>
+                            <button class="btn btn-sm btn-form-sub" data-bs-toggle="modal" data-bs-target="#createTopicModal">
+                                <i class="bi bi-plus-circle me-1"></i> Neues Thema
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <?php if (empty($topics)): ?>
+                            <div class="p-5 text-center text-muted">Noch keine Themen in diesem Bereich. Seien Sie der Erste!</div>
+                        <?php else: ?>
+                            <div class="list-group list-group-flush">
+                                <?php foreach ($topics as $topic): ?>
+                                    <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>" class="list-group-item list-group-item-action p-3">
+                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <h6 class="mb-1 fw-bold"><i class="bi bi-chat-left-text me-2 text-primary"></i><?= htmlspecialchars($topic['name']) ?></h6>
+                                            <div class="d-flex align-items-center">
+                                                <small class="text-muted me-3">Erstellt von: <?= htmlspecialchars($topic['userName'] ?? 'Unbekannt') ?></small>
+                                                <i class="bi bi-arrow-right text-muted"></i>
+                                            </div>
+                                        </div>
+
+                                        <?php // search results?>
+                                        <?php if (isset($topic['matching_posts']) && !empty($topic['matching_posts'])): ?>
+                                            <div class="mt-2 ps-3 border-start border-3" style="border-color: var(--accentColor) !important;">
+                                                <small class="text-muted d-block mb-1"><i class="bi bi-search me-1"></i>Gefunden in Beiträgen:</small>
+                                                <?php foreach ($topic['matching_posts'] as $match): ?>
+                                                    <div class="mb-1 small text-dark-emphasis fst-italic">
+                                                        "&hellip;<?= htmlspecialchars($match['content_snippet']) ?>&hellip;"
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </a>
+                                <?php endforeach; ?>
                             </div>
                         </div>
 
@@ -222,6 +279,7 @@ if ($selectedTopicId) {
             </div>
             <div class="modal-body">
                 <form id="createTopicForm" action="/controllers/forum_actions.php" method="POST">
+                    <?php echo getCsrfTokenInput(); ?>
                     <input type="hidden" name="action" value="createTopic">
                     <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
                     <div class="mb-3">
@@ -245,4 +303,35 @@ if ($selectedTopicId) {
 </div>
 <script src="/resources/js/postCreateEditor.js"></script>    
 
+     <script src="/resources/js/postCreateEditor.js"></script>
+
+<!-- Modal for creating Post -->
+<div class="modal fade" id="createPostModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header text-white" style="background-color: var(--accentColor);">
+                <h5 class="modal-title">Antworten</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createPostForm" action="/controllers/forum_actions.php" method="POST">
+                    <?php echo getCsrfTokenInput(); ?>
+                    <input type="hidden" name="action" value="createPost">
+                    <input type="hidden" name="topicId" value="<?= $selectedTopicId ?>">
+                    <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
+                    <input type="hidden" name="postContent" id="postContentHidden">
+                    <div class="mb-3">
+                        <label class="form-label">Ihre Nachricht</label>
+                        <div id="quillEditor" style="height: 200px; background: white;"></div>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                        <button type="submit" class="btn text-white" style="background-color: var(--accentColor);">Antwort absenden</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>

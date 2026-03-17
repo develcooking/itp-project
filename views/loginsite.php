@@ -1,6 +1,12 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
+
+if (!empty($_SESSION['userId'])) {
+    header("Location: /views/startpage.php");
+    exit();
+}
 ?>
 
 <div class="flex-grow-1 d-flex justify-content-center align-items-center m-5">
@@ -26,6 +32,7 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
           <?php endif; ?>
 
           <form method="post" action="../controllers/login.php">
+            <?php echo getCsrfTokenInput(); ?>
 
             <div class="form-floating mb-3">
               <input type="email" name="email" class="form-control" id="emailLogin" placeholder="E-Mail-Adresse" required>
@@ -44,7 +51,7 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
               </span>
             </div>
             <div class="mb-2 text-start">
-              <a href="passwordForgot.php" class="text-muted small">Passwort vergessen?</a>
+              <a href="/views/passwordForgot.php" class="text-muted small">Passwort vergessen?</a>
             </div>
 
             <button class="btn btn-outline-primary btn-lg w-100" type="submit" name="login">
@@ -57,12 +64,13 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 
           <p class="mb-0">
             Noch keinen Account?
-            <a href="createAccount.php" class="fw-bold text-decoration-none">Jetzt registrieren</a>
+            <a href="/views/createAccount.php" class="fw-bold text-decoration-none">Jetzt registrieren</a>
           </p>
 
         </div>
       <?php else: ?>
         <form method="post" action="">
+          <?php echo getCsrfTokenInput(); ?>
           <button class="btn btn-outline-primary btn-lg w-100" type="submit" name="logout">
             Logout (<?= htmlspecialchars($_SESSION['userName']); ?>)
           </button>

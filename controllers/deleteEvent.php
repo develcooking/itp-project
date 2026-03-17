@@ -1,4 +1,5 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Appointment.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/UserJobs.php";
@@ -28,7 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     // delete appointment by id
     if ($appointmentmodel->delete($appointmentId)) {
-        http_response_code(response_code: 201);
         header("Location: " . "../views/appointmentManagement.php");
     } else {
         http_response_code(500);

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 
 // Privent direct access
  if (!isset($_SESSION['registered'])) {

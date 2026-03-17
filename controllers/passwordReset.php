@@ -1,8 +1,7 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../database/db.php';
-
-session_start();
 
 /**
  * Hilfsfunktion für Redirects mit Fehlermeldung
@@ -27,7 +26,6 @@ if (time() - $_SESSION['password_reset']['time'] > 900) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $email = $_SESSION['password_reset']['email'] ?? '';
     $newPassword = $_POST['newPassword'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';

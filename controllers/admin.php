@@ -1,10 +1,7 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/User.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Job.php";

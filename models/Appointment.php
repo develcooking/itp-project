@@ -106,13 +106,38 @@ class Appointment
     }
 
 
-    public function getAll()
+    public function getAll($filterJobId = null, $start = null, $end = null)
     {
         $query = "SELECT a.*, u.userName as creatorName FROM " . $this->table . " a 
-                  LEFT JOIN Users u ON a.createdBy = u.userId";
+                  LEFT JOIN Users u ON a.createdBy = u.userId WHERE 1=1";
+        $params = [];
+        $types = "";
+
+        if ($filterJobId) {
+            $query .= " AND a.jobId = ?";
+            $params[] = $filterJobId;
+            $types .= "i";
+        }
+
+        if ($start) {
+            $query .= " AND a.end >= ?";
+            $params[] = $start;
+            $types .= "s";
+        }
+
+        if ($end) {
+            $query .= " AND a.start <= ?";
+            $params[] = $end;
+            $types .= "s";
+        }
+
         $stmt = $this->conn->prepare($query);
+        if ($types) {
+            $stmt->bind_param($types, ...$params);
+        }
         $stmt->execute();
         $result = $stmt->get_result();
+        $appointments = [];
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $appointments[] = [
@@ -132,7 +157,7 @@ class Appointment
         }
 
         $stmt->close();
-        return $appointments ?? [];
+        return $appointments;
     }
 
     public function getForUserJobs(int $userId): array

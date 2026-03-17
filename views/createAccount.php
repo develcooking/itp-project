@@ -1,6 +1,12 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 include $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
+
+if (!empty($_SESSION['userId'])) {
+    header("Location: /views/startpage.php");
+    exit();
+}
 
 ?>
 
@@ -20,7 +26,7 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
                                       </div>
                                   <?php endif; ?>
                         <form method="post" action="../controllers/register.php">
-
+                            <?php echo getCsrfTokenInput(); ?>
                             <div class="form-floating mb-3">
                                 <input
                                 type="text"
@@ -146,6 +152,17 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
                                 </select>
                             </div>
 
+                            <div class="form-floating mb-3">
+                                <input
+                                type="text"
+                                name="school_company"
+                                id="school_company"
+                                class="form-control"
+                                placeholder="Schule / Betrieb"
+                                value="<?= htmlspecialchars($_POST['school_company'] ?? '') ?>">
+                                <label for="school_company">Schule / Betrieb</label>
+                            </div>
+
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="checkbox" id="datenschutzCheck" name="datenschutz" required>
                                 <label class="form-check-label" for="datenschutzCheck">
@@ -177,6 +194,7 @@ include $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
                         <p class="text-muted mb-4">Sie sind bereits als <?= htmlspecialchars($_SESSION['userName']); ?> angemeldet.</p>
                         <a href="/views/dashboard.php" class="btn btn-primary btn-lg w-100 mb-2">Zum Dashboard</a>
                         <form method="post" action="../controllers/login.php">
+                            <?php echo getCsrfTokenInput(); ?>
                             <button class="btn btn-outline-danger btn-lg w-100" type="submit" name="logout">
                                 Abmelden
                             </button>

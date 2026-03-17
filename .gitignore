@@ -7,5 +7,7 @@ composer.lock
 .ai/*
 .vscode/*
 .idea/
+.idea/workspace.xml
 .ai/
 .vscode/
+.vscode/settings.json
