@@ -291,12 +291,7 @@ class Appointment
         return false;
     }
 
-    /**
- * Получить ближайшие appointments для пользователя (на следующую неделю)
- * @param int $userId
- * @param int $limit
- * @return array
- */
+ 
 public function getUpcomingForUser(int $userId, int $limit = 5): array
 {
     $query = "SELECT a.*, j.name as jobName 
