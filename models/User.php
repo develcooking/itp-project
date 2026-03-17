@@ -14,6 +14,7 @@ class User
     private ?string $securityAnswer = '';
     private ?int $activated = null;
     private ?string $schoolCompany = null;
+    private bool $sendNotification = true;
     private ?int $createdBy = null;
     private ?int $modifiedBy = null;
 
@@ -70,6 +71,11 @@ class User
     public function getSchoolCompany(): ?string
     {
         return $this->schoolCompany;
+    }
+
+    public function getSendNotification(): bool
+    {
+        return $this->sendNotification;
     }
 
     public function getCreatedBy(): ?int
@@ -136,6 +142,12 @@ class User
         return $this;
     }
 
+    public function setSendNotification(bool $sendNotification): self
+    {
+        $this->sendNotification = $sendNotification;
+        return $this;
+    }
+
     public function setCreatedBy(?int $createdBy): self
     {
         $this->createdBy = $createdBy;
@@ -169,6 +181,7 @@ class User
                     'securityAnswer' => $row['securityAnswer'],
                     'activated' => $row['activated'],
                     'school_company' => $row['school_company'],
+                    'sendNotification' => (int)($row['sendNotification'] ?? 1),
                     'createdAt' => $row['createdAt'],
                     'modifiedAt' => $row['modifiedAt'],
                     'createdBy' => $row['createdBy'],
@@ -336,6 +349,7 @@ class User
         $this->securityAnswer = $row['securityAnswer'];
         $this->activated = $row['activated'];
         $this->schoolCompany = $row['school_company'] ?? null;
+        $this->sendNotification = ((int)($row['sendNotification'] ?? 1)) === 1;
     }
 
     public function toArray(): array
@@ -348,7 +362,8 @@ class User
             'email' => $this->getEmail(),
             'role' => $this->getRole(),
             'activated' => $this->getActivated(),
-            'school_company' => $this->getSchoolCompany()
+            'school_company' => $this->getSchoolCompany(),
+            'sendNotification' => $this->getSendNotification() ? 1 : 0
         ];
     }
 
@@ -398,9 +413,10 @@ class User
 
     public function updateProfile(int $userId): bool
     {
-        $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ?, school_company = ? WHERE userId = ?";
+        $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ?, school_company = ?, sendNotification = ? WHERE userId = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("sssssi", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $userId);
+        $sendNotification = $this->sendNotification ? 1 : 0;
+        $stmt->bind_param("sssssii", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $sendNotification, $userId);
         $ok = $stmt->execute();
         $stmt->close();
         return $ok;

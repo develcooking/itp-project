@@ -4,6 +4,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Forum.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Topic.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Post.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/app/services/TopicPostNotificationService.php";
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -98,6 +99,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $post->setModifiedBy($userId);
                     
                     if ($post->post()) {
+                        $notificationService = new TopicPostNotificationService($conn);
+                        $notificationService->notifyTopicOwnerAboutNewPost($topicId, $post->getPostId(), $userId);
+
                         header("Location: /views/forum.php?jobId=$jobId&topicId=$topicId");
                         exit();
                     }

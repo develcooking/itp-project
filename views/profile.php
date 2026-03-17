@@ -115,6 +115,21 @@ if (!isset($user)) {
                             <label for="school_company">Schule / Betrieb</label>
                         </div>
 
+                        <div class="form-check form-switch text-start mb-3">
+                            <input type="hidden" name="sendNotification" value="0">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                role="switch"
+                                id="sendNotification"
+                                name="sendNotification"
+                                value="1"
+                                <?= $user->getSendNotification() ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="sendNotification">
+                                Benachrichtigungen für neue Beiträge in meinen Themen erhalten
+                            </label>
+                        </div>
+
                         <button class="btn btn-outline-primary btn-lg w-100 mt-3" type="submit" name="saveProfile">
                             Speichern
                         </button>
