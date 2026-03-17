@@ -65,7 +65,7 @@ include './header.php';
                 <th>Email</th>
                 <th>Rolle</th>
                 <th>Schule/Betrieb</th>
-                <th>Wann</th>
+                <th>Gesperrt</th>
                 <th class="w-auto">Aktionen</th>
             </tr>
             </thead>
@@ -84,11 +84,35 @@ include './header.php';
                         </select>
                     </td>
                     <td><?= htmlspecialchars($user['school_company'] ?? '') ?></td>
-                    <td><?= $user['createdAt'] ? date('d.m.Y H:i', strtotime($user['createdAt'])) : '' ?></td>
+                    <?php
+                        $isBlocked   = !empty($user['isBlocked']);
+                        $blockedUntil = $user['blockedUntil'] ?? null;
+                        // Abgelaufene temp. Sperren als inaktiv anzeigen
+                        $tempExpired = $blockedUntil && strtotime($blockedUntil) <= time();
+                        $effectivelyBlocked = ($isBlocked || ($blockedUntil && !$tempExpired));
+                    ?>
+                    <td>
+                        <?php if ($isBlocked): ?>
+                            <span class="badge bg-danger">Permanent</span>
+                        <?php elseif ($blockedUntil && !$tempExpired): ?>
+                            <span class="badge bg-warning text-dark">bis <?= date('d.m.Y', strtotime($blockedUntil)) ?></span>
+                        <?php else: ?>
+                            <span class="badge bg-success">Aktiv</span>
+                        <?php endif; ?>
+                    </td>
                     <td class="text-nowrap" style="width:1%">
                         <button class="btn btn-primary btn-sm me-1 jobs-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">
                             Berufsbereiche
                         </button>
+                        <?php if ($effectivelyBlocked): ?>
+                        <button class="btn btn-success btn-sm me-1 unblock-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">
+                            Freigeben
+                        </button>
+                        <?php else: ?>
+                        <button class="btn btn-warning btn-sm me-1 block-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">
+                            Sperren
+                        </button>
+                        <?php endif; ?>
                         <button class="btn btn-danger btn-sm delete-user-btn" data-user-id="<?= $user['userId'] ?>" data-username="<?= htmlspecialchars($user['userName'] ?? '') ?>">
                             Löschen
                         </button>
@@ -111,6 +135,30 @@ include './header.php';
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sperren Modal -->
+<div class="modal fade" id="blockModal" tabindex="-1" aria-labelledby="blockModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="blockModalTitle">Benutzer sperren</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="blockModalUserName" class="fw-semibold mb-3"></p>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-warning block-duration-btn" data-duration="1week">1 Woche</button>
+                    <button class="btn btn-outline-warning block-duration-btn" data-duration="1month">1 Monat</button>
+                    <button class="btn btn-outline-warning block-duration-btn" data-duration="1year">1 Jahr</button>
+                    <button class="btn btn-danger block-duration-btn" data-duration="permanent">Permanent</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
             </div>
         </div>
     </div>

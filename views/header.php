@@ -2,6 +2,31 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 
+// Blocked-Check für eingeloggte Nutzer (nicht auf der Login-Seite selbst)
+$_headerPage = basename($_SERVER['PHP_SELF'], '.php');
+if (!empty($_SESSION['userId']) && $_headerPage !== 'loginsite') {
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+    $headerUser = new User($conn);
+    if ($headerUser->getById($_SESSION['userId'])) {
+        // Abgelaufene temporäre Sperren automatisch aufheben
+        $headerUser->clearExpiredBlock($_SESSION['userId']);
+        $headerUser->getById($_SESSION['userId']);
+
+        if ($headerUser->getIsBlocked()) {
+            session_unset();
+            session_destroy();
+            header('Location: /views/loginsite.php?blocked=permanent');
+            exit;
+        } elseif ($headerUser->getBlockedUntil() !== null) {
+            $until = urlencode(date('d.m.Y \u\m H:i \U\h\r', strtotime($headerUser->getBlockedUntil())));
+            session_unset();
+            session_destroy();
+            header('Location: /views/loginsite.php?blocked=temp&until=' . $until);
+            exit;
+        }
+    }
+}
+
 // Get the current page name from the URL
 $current_page = basename($_SERVER['REQUEST_URI'], '.php');
 if (empty($current_page) || $current_page === '') {

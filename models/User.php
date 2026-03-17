@@ -22,6 +22,8 @@ class User
     private ?bool $profileImageColumnsAvailable = null;
     private ?int $createdBy = null;
     private ?int $modifiedBy = null;
+    private bool $isBlocked = false;
+    private ?string $blockedUntil = null;
 
     public function __construct($db)
     {
@@ -113,6 +115,16 @@ class User
         return $this->modifiedBy;
     }
 
+    public function getIsBlocked(): bool
+    {
+        return $this->isBlocked;
+    }
+
+    public function getBlockedUntil(): ?string
+    {
+        return $this->blockedUntil;
+    }
+
     public function setUserName(string $userName): self
     {
         $this->userName = $userName;
@@ -194,6 +206,18 @@ class User
         return $this;
     }
 
+    public function setIsBlocked(bool $isBlocked): self
+    {
+        $this->isBlocked = $isBlocked;
+        return $this;
+    }
+
+    public function setBlockedUntil(?string $blockedUntil): self
+    {
+        $this->blockedUntil = $blockedUntil;
+        return $this;
+    }
+
     public function getAll(): array
     {
         $query = "SELECT * FROM " . $this->table;
@@ -219,7 +243,9 @@ class User
                     'createdAt' => $row['createdAt'],
                     'modifiedAt' => $row['modifiedAt'],
                     'createdBy' => $row['createdBy'],
-                    'modifiedBy' => $row['modifiedBy']
+                    'modifiedBy' => $row['modifiedBy'],
+                    'isBlocked' => (bool)($row['isBlocked'] ?? false),
+                    'blockedUntil' => $row['blockedUntil'] ?? null
                 ];
             }
         }
@@ -276,8 +302,8 @@ class User
     public function getById($userId)
     {
         $query = $this->hasProfileImageColumns()
-            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy FROM " . $this->table . " WHERE userid = ?"
-            : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy FROM " . $this->table . " WHERE userid = ?";
+            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE userid = ?"
+            : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE userid = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $userId);
         $stmt->execute();
@@ -391,6 +417,8 @@ class User
             ? ((int)$row['hasProfileImage']) === 1
             : !empty($row['profileImage']);
         $this->profileImage = $row['profileImage'] ?? null;
+        $this->isBlocked = (bool)($row['isBlocked'] ?? false);
+        $this->blockedUntil = $row['blockedUntil'] ?? null;
     }
 
     public function toArray(): array
@@ -411,8 +439,8 @@ class User
     public function getByEmail($email)
     {
         $query = $this->hasProfileImageColumns()
-            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy FROM " . $this->table . " WHERE email = ?"
-            : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy FROM " . $this->table . " WHERE email = ?";
+            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE email = ?"
+            : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE email = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -503,6 +531,42 @@ class User
             'data' => $row['profileImage'],
             'mime' => $row['profileImageMime']
         ];
+    }
+
+    public function blockUser(int $userId, bool $permanent, ?string $blockedUntil): bool
+    {
+        if ($permanent) {
+            $query = "UPDATE " . $this->table . " SET isBlocked = 1, blockedUntil = NULL WHERE userId = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $userId);
+        } else {
+            $query = "UPDATE " . $this->table . " SET isBlocked = 0, blockedUntil = ? WHERE userId = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("si", $blockedUntil, $userId);
+        }
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
+
+    public function unblockUser(int $userId): bool
+    {
+        $query = "UPDATE " . $this->table . " SET isBlocked = 0, blockedUntil = NULL WHERE userId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $userId);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
+
+    public function clearExpiredBlock(int $userId): bool
+    {
+        $query = "UPDATE " . $this->table . " SET blockedUntil = NULL WHERE userId = ? AND blockedUntil IS NOT NULL AND blockedUntil <= NOW()";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $userId);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
     }
 
     public function updateRole(int $userId, string $role): bool
