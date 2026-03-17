@@ -11,17 +11,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createAccount'])) {
     $lastName = htmlspecialchars(trim($_POST['lastName'] ?? ''));
     $email = htmlspecialchars(trim($_POST['email'] ?? ''));
     $password = trim($_POST['password'] ?? '');
+    $confirmPassword = trim($_POST['confirmPassword'] ?? '');
     $role = htmlspecialchars(trim($_POST['role'] ?? ''));
     $securityAnswer = trim($_POST['securityAnswer'] ?? '');
     $schoolCompany = htmlspecialchars(trim($_POST['school_company'] ?? ''));
 
-    if (empty($userName) || empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($role) || empty($securityAnswer)) {
+    if (empty($userName) || empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($role) || empty($securityAnswer) || empty($confirmPassword)) {
         $errors['general'] = 'Bitte füllen Sie alle Felder aus!';
+    } elseif ($password !== $confirmPassword) {
+        $errors['password'] = 'Passwörter stimmen nicht überein!';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors['email'] = 'Ungültiges E-Mail-Format!';
     } elseif (strlen($password) < 8) {
         $errors['password'] = 'Passwort muss mindestens 8 Zeichen lang sein!';
-    } elseif ($password !== $securityAnswer) {
+    } elseif ($password == $securityAnswer) {
         $errors['password'] = 'Passwort kann nicht Sicherheitsantwort sein!';
     } elseif (!preg_match('/[A-Z]/', $password)) {
         $errors['password'] = 'Passwort muss min ein Großzeichen haben!';
@@ -51,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createAccount'])) {
 
             if ($user->post()) {
                 $_SESSION['registered'] = true;
-                header("Location: /views/successRegister.php", true, 303);
+                header("Location: /views/successRegister.php");
                 exit();
             } else {
                 $errors['general'] = 'Fehler beim Registrieren. Bitte versuchen Sie es später erneut.';

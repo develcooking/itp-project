@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
             this.classList.remove('is-invalid');
 
             const parentDiv = this.parentElement;
-            const errorDivs = parentDiv.querySelectorAll('.invalidUserName,.generalError, .invalid-feedback');
+            const errorDivs = parentDiv.querySelectorAll('.invalidUserName, .invalidEmail, .invalidPassword, .generalError, .invalid-feedback');
             errorDivs.forEach(div => div.remove());
 
             if (this.value.trim() !== '') {
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     /** @type {HTMLFormElement|null} */
-    const form = document.querySelector("form[action='../controllers/createNewUser.php']");
+    const form = document.querySelector("form[action='../controllers/register.php'], form[action='/controllers/passwordReset.php']");
 
     /**
      * Helper function to get input elements by ID
@@ -253,9 +253,12 @@ if (confirmPasswordReset)
                 if (!validateField(rule)) valid = false;
             });
 
-            if (!validateEmail()) valid = false;
-            if (!validatePassword()) valid = false;
-            if (!validatePasswordMatch()) valid = false;
+            if (email && !validateEmail(email)) valid = false;
+            if (password && !validatePassword(password)) valid = false;
+            if (password && !validatePasswordMatch(password, confirmpassword)) valid = false;
+            
+            if (passwordReset && !validatePassword(passwordReset)) valid = false;
+            if (passwordReset && !validatePasswordMatch(passwordReset, confirmPasswordReset)) valid = false;
 
             // Prevent submit if invalid
             if (!valid) e.preventDefault();
