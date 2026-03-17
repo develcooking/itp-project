@@ -349,6 +349,9 @@ public function getRecentForUserJobs(int $userId, int $jobLimit = 4): array
     
     $stmt->close();
     return array_values($postsByJob);
+
+}
+
     private function hasProfileImageColumns(): bool
     {
         if ($this->profileImageColumnsAvailable !== null) {
