@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $content = trim($_POST['postContent'] ?? '');
                 //$topicId = intval($_POST['topicId'] ?? 0);
                 $jobId = intval($_POST['jobId'] ?? 0);
-                
+
                 if (!empty($name) && $jobId > 0) {
                     if (!$isAdmin) {
                         // Check access
@@ -41,13 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $topic->setUserId($userId);
                     $topic->setCreatedBy($userId);
                     $topic->setModifiedBy($userId);
-                    
+
                     if ($topic->post()) {
-                        
+
                         // Basic XSS protection on input (optional, but good practice)
                         $content = strip_tags($content, '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
                         $topicId = $topic->getTopicId();
-                        
+
                         $post = new Post($conn);
                         $post->setTopicID($topicId);
                         $post->setUserId($userId);
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $post->setReactionPositive(0);
                         $post->setCreatedBy($userId);
                         $post->setModifiedBy($userId);
-                        
+
                         if ($post->post()) {
                             header("Location: /views/forum.php?jobId=$jobId&topicId=$topicId");
                             exit();
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $content = trim($_POST['postContent'] ?? '');
                 $topicId = intval($_POST['topicId'] ?? 0);
                 $jobId = intval($_POST['jobId'] ?? 0);
-                
+
                 if (!empty($content) && $topicId > 0) {
                     if (!$isAdmin) {
                         // Check access to jobId
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $post->setReactionPositive(0);
                     $post->setCreatedBy($userId);
                     $post->setModifiedBy($userId);
-                    
+
                     if ($post->post()) {
                         $notificationService = new TopicPostNotificationService($conn);
                         $notificationService->notifyTopicOwnerAboutNewPost($topicId, $post->getPostId(), $userId);
@@ -110,25 +110,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 header("Location: /views/forum.php?jobId=$jobId&topicId=$topicId&error=post_failed");
                 break;
-              case 'voteUp':
-            $postId = intval($_POST['postId'] ?? 0);
-            if ($postId > 0) {
-                $post = new Post($conn);
-                $post->vote($postId, $_SESSION['userId'], 'up');
-            }
-            header("Location: " . $_SERVER['HTTP_REFERER']);
-            exit();
-
-        case 'voteDown':
-            $postId = intval($_POST['postId'] ?? 0);
-            if ($postId > 0) {
-                $post = new Post($conn);
-                $post->vote($postId, $_SESSION['userId'], 'down');
-            }
-            header("Location: " . $_SERVER['HTTP_REFERER']);
-            exit();
-                            }
+            case 'voteUp':
+                $postId = intval($_POST['postId'] ?? 0);
+                if ($postId > 0) {
+                    $post = new Post($conn);
+                    $post->vote($postId, $_SESSION['userId'], 'up');
                 }
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit();
+
+            case 'voteDown':
+                $postId = intval($_POST['postId'] ?? 0);
+                if ($postId > 0) {
+                    $post = new Post($conn);
+                    $post->vote($postId, $_SESSION['userId'], 'down');
+                }
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit();
+
+            case 'togglePin':
+
+                if (!$isAdmin) {
+                    header("Location: /views/forum.php?error=no_permission");
+                    exit();
+                }
+
+                $topicId = intval($_POST['topicId']);
+
+                $topic = new Topic($conn);
+                if ($topic->togglePin($topicId)) {
+                    header("Location: " . $_SERVER['HTTP_REFERER']);
+                    exit();
+                }
+
+                break;
+        }
+    }
 }
 
 header("Location: /views/forum.php");
