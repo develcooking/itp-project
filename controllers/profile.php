@@ -16,6 +16,7 @@ $maxProfileImageBytes = 2 * 1024 * 1024;
 
 $user = new User($conn);
 $user->getById($_SESSION['userId']);
+$profileStats = $user->getProfileStatsByUserId((int)$_SESSION['userId']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveProfile'])) {
     $userName = htmlspecialchars(trim($_POST['userName'] ?? ''));
@@ -114,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveProfile'])) {
             $_SESSION['sendNotification'] = $sendNotification ? 1 : 0;
             $success = 'Profil erfolgreich aktualisiert!';
             $user->getById($_SESSION['userId']);
+            $profileStats = $user->getProfileStatsByUserId((int)$_SESSION['userId']);
         } else {
             $errors['general'] = 'Fehler beim Speichern. Bitte versuchen Sie es später erneut.';
         }

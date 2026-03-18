@@ -533,6 +533,41 @@ class User
         ];
     }
 
+    public function getProfileStatsByUserId(int $userId): array
+    {
+        $query = "SELECT
+                    (SELECT COUNT(*) FROM Topics t WHERE t.userId = ?) AS topicCount,
+                    (SELECT COUNT(*) FROM Posts p WHERE p.userId = ?) AS postCount,
+                    (
+                        SELECT COUNT(*)
+                        FROM user_reactions ur
+                        INNER JOIN Posts p ON p.postId = ur.postId
+                        WHERE p.userId = ?
+                          AND ur.voteType = 'up'
+                    ) AS reactionPositiveCount,
+                    (
+                        SELECT COUNT(*)
+                        FROM user_reactions ur
+                        INNER JOIN Posts p ON p.postId = ur.postId
+                        WHERE p.userId = ?
+                          AND ur.voteType = 'down'
+                    ) AS reactionNegativeCount";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("iiii", $userId, $userId, $userId, $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc() ?: [];
+        $stmt->close();
+
+        return [
+            'topicCount' => (int)($row['topicCount'] ?? 0),
+            'postCount' => (int)($row['postCount'] ?? 0),
+            'reactionPositiveCount' => (int)($row['reactionPositiveCount'] ?? 0),
+            'reactionNegativeCount' => (int)($row['reactionNegativeCount'] ?? 0)
+        ];
+    }
+
     public function blockUser(int $userId, bool $permanent, ?string $blockedUntil): bool
     {
         if ($permanent) {
