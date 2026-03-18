@@ -79,6 +79,7 @@ class Forum {
             LEFT JOIN Users u ON t.userId = u.userId 
             LEFT JOIN Posts p ON t.topicId = p.topicId 
             WHERE t.jobId = ?
+            ORDER BY pinned DESC, t.createdAt DESC
         ";
 
         if (!empty($search)) {
