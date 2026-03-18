@@ -79,12 +79,13 @@ class Forum {
             LEFT JOIN Users u ON t.userId = u.userId 
             LEFT JOIN Posts p ON t.topicId = p.topicId 
             WHERE t.jobId = ?
-            ORDER BY pinned DESC, t.createdAt DESC
         ";
 
         if (!empty($search)) {
             // Search in topic name OR post content
             $query .= " AND (t.name LIKE ? OR p.content LIKE ?)";
+        } else {
+            $query .= "ORDER BY pinned DESC, t.createdAt DESC ";
         }
 
         $stmt = $this->conn->prepare($query);
