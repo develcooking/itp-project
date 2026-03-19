@@ -5,7 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Appointment.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Post.php";
 
 $userId = $_SESSION['userId'];
-
+$_SESSION['current_view'] = 'startpage';
 $appointmentModel = new Appointment($conn);
 $upcomingAppointments = $appointmentModel->getUpcomingForUser($userId, 5);
 $postModel = new Post($conn);

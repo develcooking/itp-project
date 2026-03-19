@@ -98,6 +98,11 @@ if (empty($current_page) || $current_page === '') {
             </li>
         </ul>
     </div>
+</nav>
+<?php endif; ?>
+
+<main class="main-container <?= (isset($_SESSION['current_view']) && $_SESSION['current_view'] === 'startpage') || $current_page === 'startpage' ? 'main-startpage' : '' ?>">
+
 
     <!-- Mobile hamburger button -->
     <button class="btn btn-default offcanvas-toggle d-lg-none ms-auto me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas" aria-controls="mobileOffcanvas">
