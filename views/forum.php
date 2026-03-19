@@ -210,7 +210,7 @@ if ($selectedTopicId) {
                     </div>
                     <div class="card-body p-0">
                         <?php if (empty($topics)): ?>
-                            <div class="p-5 text-center text-muted">Noch keine Themen in diesem Bereich. Seien Sie der Erste!</div>
+                            <div class="p-5 text-center text-muted">Noch keine Themen in diesem Bereich. Seien Sie der/die Erste!</div>
                         <?php else: ?>
                             <div class="list-group list-group-flush">
                                 <?php foreach ($topics as $topic): ?>
@@ -228,7 +228,7 @@ if ($selectedTopicId) {
                                             </div>
                                                                     
                                             <!-- COLUMN 2: Pin Button -->
-                                            <div class="col-md-2 text-center">
+                                            <div class="col-md-1 text-center">
                                                 <?php if ($isAdmin): ?>
                                                     <form method="POST" action="/controllers/forum_actions.php">
                                                         <?php echo getCsrfTokenInput(); ?>
@@ -243,7 +243,7 @@ if ($selectedTopicId) {
                                             </div>
                                                 
                                             <!-- COLUMN 3: Meta Infos -->
-                                            <div class="col-md-1 d-flex justify-content-end align-items-center gap-2">
+                                            <div class="col-md-2 d-flex justify-content-end align-items-center gap-2">
                                                 
                                                 <?php if (!empty($topic['pinned'])): ?>
                                                     <span>📌</span>
