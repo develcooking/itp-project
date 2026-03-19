@@ -6,6 +6,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Forum.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Topic.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Post.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/app/services/TopicPostNotificationService.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/HtmlSanitizer.php";
 
 if (!isset($_SESSION['userId'])) {
     header("Location: /views/loginsite.php");
@@ -45,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($topic->post()) {
 
                         // Basic XSS protection on input (optional, but good practice)
-                        $content = strip_tags($content, '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+                        $content = HtmlSanitizer::sanitize($content);
                         $topicId = $topic->getTopicId();
 
                         $post = new Post($conn);
@@ -88,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     // XSS protection on input
-                    $content = strip_tags($content, '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+                    $content = HtmlSanitizer::sanitize($content);
 
                     $post = new Post($conn);
                     $post->setTopicID($topicId);
@@ -143,6 +144,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     exit();
                 }
 
+                break;
+
+            case 'editPost':
+                $postId = intval($_POST['postId'] ?? 0);
+                $content = trim($_POST['postContent'] ?? '');
+                if ($postId > 0 && !empty($content)) {
+                    $post = new Post($conn);
+                    if ($post->getById($postId)) {
+                        if ($post->getUserId() == $userId || $isAdmin) {
+                            $content = HtmlSanitizer::sanitize($content);
+                            $post->setContent($content);
+                            $post->setModifiedBy($userId);
+                            if ($post->update($postId)) {
+                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                exit();
+                            }
+                        }
+                    }
+                }
+                header("Location: /views/forum.php?error=edit_failed");
+                break;
+
+            case 'deletePost':
+                $postId = intval($_POST['postId'] ?? 0);
+                if ($postId > 0) {
+                    $post = new Post($conn);
+                    if ($post->getById($postId)) {
+                        if ($post->getUserId() == $userId || $isAdmin) {
+                            if ($post->delete($postId)) {
+                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                exit();
+                            }
+                        }
+                    }
+                }
+                header("Location: /views/forum.php?error=delete_failed");
                 break;
         }
     }
