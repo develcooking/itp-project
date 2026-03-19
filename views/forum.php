@@ -155,7 +155,7 @@ if ($selectedTopicId) {
                             </div>
 
                             <a href="/views/post_details.php?postId=<?= $post['postId'] ?>&topicId=<?= $selectedTopicId ?>&jobId=<?= $selectedJobId ?>" class="btn btn-sm btn-form-sub">
-                                <i class="bi bi-chat-dots me-1"></i> Kommentare
+                                <i class="bi bi-chat-dots me-1"></i> Kommentare (<?= $post['comment_count'] ?>)
                             </a>
                         </div>
                     </div>

@@ -196,6 +196,34 @@ $topicName = $topicModel->getName();
                         </div>
                     </div>
 
+                                        <!-- Add Comment Form -->
+                    <div class="card shadow-sm border-0 mt-4 mx-2">
+                        <div class="card-header bg-white border-bottom fw-bold">
+                            <i class="bi bi-reply me-2"></i>Kommentar hinzufügen
+                        </div>
+                        <div class="card-body">
+                            <form id="createCommentForm" action="/controllers/forum_actions.php" method="POST">
+                                <?php echo getCsrfTokenInput(); ?>
+                                <input type="hidden" name="action" value="createComment">
+                                <input type="hidden" name="postId" value="<?= $postId ?>">
+                                <input type="hidden" name="topicId" value="<?= $topicId ?>">
+                                <input type="hidden" name="jobId" value="<?= $jobId ?>">
+                                <input type="hidden" name="commentContent" id="commentContentHidden">
+                                
+                                <div class="mb-3">
+                                    <div id="quillEditorComment" style="height: 150px; background: white;"></div>
+                                </div>
+                                
+                                <div class="text-end">
+                                    <a href="/views/forum.php?jobId=<?= $jobId ?>&topicId=<?= $topicId ?>" class="btn btn-secondary shadow-sm">Zurück</a>
+                                    <button type="submit" class="btn btn-form-sub shadow-sm">
+                                        <i class="bi bi-send me-1"></i> Kommentar absenden
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <!-- Comments Section -->
                     <h5 class="mb-3 px-2">Kommentare (<?= count($comments) ?>)</h5>
 
@@ -231,34 +259,6 @@ $topicName = $topicModel->getName();
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
-
-                    <!-- Add Comment Form -->
-                    <div class="card shadow-sm border-0 mt-4 mx-2">
-                        <div class="card-header bg-white border-bottom fw-bold">
-                            <i class="bi bi-reply me-2"></i>Kommentar hinzufügen
-                        </div>
-                        <div class="card-body">
-                            <form id="createCommentForm" action="/controllers/forum_actions.php" method="POST">
-                                <?php echo getCsrfTokenInput(); ?>
-                                <input type="hidden" name="action" value="createComment">
-                                <input type="hidden" name="postId" value="<?= $postId ?>">
-                                <input type="hidden" name="topicId" value="<?= $topicId ?>">
-                                <input type="hidden" name="jobId" value="<?= $jobId ?>">
-                                <input type="hidden" name="commentContent" id="commentContentHidden">
-                                
-                                <div class="mb-3">
-                                    <div id="quillEditorComment" style="height: 150px; background: white;"></div>
-                                </div>
-                                
-                                <div class="text-end">
-                                    <a href="/views/forum.php?jobId=<?= $jobId ?>&topicId=<?= $topicId ?>" class="btn btn-secondary shadow-sm">Zurück</a>
-                                    <button type="submit" class="btn btn-form-sub shadow-sm">
-                                        <i class="bi bi-send me-1"></i> Kommentar absenden
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

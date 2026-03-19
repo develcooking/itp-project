@@ -100,11 +100,14 @@ class Post
                 SUM(CASE WHEN ur.voteType = 'up' THEN 1 ELSE 0 END) AS reaction_positive,
                 SUM(CASE WHEN ur.voteType = 'down' THEN 1 ELSE 0 END) AS reaction_negative,
 
-                MAX(CASE WHEN ur.userId = ? THEN ur.voteType ELSE NULL END) AS voteType
+                MAX(CASE WHEN ur.userId = ? THEN ur.voteType ELSE NULL END) AS voteType,
+
+                COUNT(c.commentId) AS comment_count
 
             FROM Posts p
             JOIN Users u ON p.userId = u.userId
             LEFT JOIN user_reactions ur ON p.postId = ur.postId
+            LEFT JOIN Comments c ON p.postId = c.postId
 
             WHERE p.topicId = ?
 
@@ -129,6 +132,7 @@ class Post
                     'description' => $row['description'],
                     'reaction_negative' => $row['reaction_negative'],
                     'reaction_positive' => $row['reaction_positive'],
+                    'comment_count' => (int)($row['comment_count'] ?? 0),
                     'createdAt' => $row['createdAt'],
                     'modifiedAt' => $row['modifiedAt'],
                     'createdBy' => $row['createdBy'],
