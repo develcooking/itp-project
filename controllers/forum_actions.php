@@ -5,6 +5,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Forum.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Topic.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Post.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Comment.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/app/services/TopicPostNotificationService.php";
 
 if (!isset($_SESSION['userId'])) {
@@ -110,6 +111,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 header("Location: /views/forum.php?jobId=$jobId&topicId=$topicId&error=post_failed");
                 break;
+
+            case 'createComment':
+                $content = trim($_POST['commentContent'] ?? '');
+                $postId = intval($_POST['postId'] ?? 0);
+                $topicId = intval($_POST['topicId'] ?? 0);
+                $jobId = intval($_POST['jobId'] ?? 0);
+
+                if (!empty($content) && $postId > 0) {
+                    if (!$isAdmin) {
+                        // Check access to jobId
+                        if (!$forumModel->hasAccess($userId, $jobId)) {
+                            header("Location: /views/post_details.php?postId=$postId&topicId=$topicId&jobId=$jobId&error=no_access");
+                            exit();
+                        }
+                    }
+
+                    // Ensure post is in this topic
+                    $postModel = new Post($conn);
+                    if (!$postModel->getById($postId) || $postModel->getTopicId() != $topicId) {
+                        header("Location: /views/post_details.php?postId=$postId&topicId=$topicId&jobId=$jobId&error=invalid_post");
+                        exit();
+                    }
+
+                    // XSS protection on input
+                    $content = strip_tags($content, '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+
+                    $comment = new Comment($conn);
+                    $comment->setPostId($postId);
+                    $comment->setUserId($userId);
+                    $comment->setContent($content);
+
+                    if ($comment->create()) {
+                        header("Location: /views/post_details.php?postId=$postId&topicId=$topicId&jobId=$jobId");
+                        exit();
+                    }
+                }
+                header("Location: /views/post_details.php?postId=$postId&topicId=$topicId&jobId=$jobId&error=comment_failed");
+                break;
+
             case 'voteUp':
                 $postId = intval($_POST['postId'] ?? 0);
                 if ($postId > 0) {
