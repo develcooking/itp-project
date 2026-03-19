@@ -497,3 +497,76 @@ a:hover {
     margin-bottom: 0;
   }
 }
+
+@media (max-width: 991px) {
+    /* Offcanvas body links */
+    #mobileOffcanvas .nav-btn-primary {
+        display: block;
+        height: auto;
+        padding: 10px 15px;
+        font-size: 1rem;
+        text-align: left;
+        margin-bottom: 5px;
+    }
+
+    #mobileOffcanvas .nav-btn-primary.current {
+        background-color: var(--backgroundWhite);
+        color: var(--bg-color)
+    }
+
+    #mobileOffcanvas .nav-btn-primary:hover {
+         background-color: var(--backgroundWhite);
+        color: var(--bg-color)
+    }
+
+    /* Account / Logout buttons at bottom */
+    #mobileOffcanvas .nav-account-btn,
+    #mobileOffcanvas .nav-logout-btn {
+        padding: 10px 15px;
+        font-size: 1rem;
+    }
+
+    /* Offcanvas header tweaks */
+    #mobileOffcanvas .offcanvas-header {
+        padding: 10px 15px;
+        background-color: var(--accentColor);
+    }
+
+    /* Ensure the offcanvas menu background matches your navbar */
+    #mobileOffcanvas {
+        background-color: var(--backgroundWhite);
+    }
+
+    #mobileOffcanvas a,
+    #mobileOffcanvas button {
+        color: var(--accentColor);
+        background-color: var(--backgroundWhite)
+    }
+
+    #mobileOffcanvas a:hover,
+    #mobileOffcanvas button:hover {
+        color: var(--accentColor);
+        background-color: var(--orangeLight);
+    }
+
+    .mobile_logout .nav-logout-btn
+    {
+    background-color: var(--accentColor)!important;
+    color:var(--backgroundWhite)!important;
+    }
+
+    .mobile_logout .nav-logout-btn:hover
+    {
+    background-color: var(--btn-Color)!important;
+    color:var(--accentColor)!important;
+    }
+
+    #mobileOffcanvasLabel {
+  margin: 0;
+  line-height: 40px;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--backgroundWhite);
+}
+}

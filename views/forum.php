@@ -191,10 +191,36 @@ if ($selectedTopicId) {
                                 <?php foreach ($topics as $topic): ?>
                                     <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>" class="list-group-item list-group-item-action p-3">
                                         <div class="d-flex w-100 justify-content-between align-items-center">
-                                            <h6 class="mb-1 fw-bold"><i class="bi bi-chat-left-text-fill me-2"></i><?= htmlspecialchars($topic['name']) ?></h6>
-                                            <div class="d-flex align-items-center">
-                                                <small class="text-muted me-3">Erstellt von: <?= htmlspecialchars($topic['userName'] ?? 'Unbekannt') ?></small>
+
+                                            <h6 class="mb-1 fw-bold d-flex align-items-center gap-2">
+                                                <i class="bi bi-chat-left-text-fill me-2"></i>
+                                                <?= htmlspecialchars($topic['name']) ?>
+
+                                                <?php if (!empty($topic['pinned'])): ?>
+                                                    <span title="Angepinnt">📌</span>
+                                                <?php endif; ?>
+                                            </h6>
+
+                                            <div class="d-flex align-items-center gap-2">
+
+                                                <small class="text-muted">
+                                                    Erstellt von: <?= htmlspecialchars($topic['userName'] ?? 'Unbekannt') ?>
+                                                </small>
+
+                                                <?php if ($isAdmin): ?>
+                                                    <form method="POST" action="/controllers/forum_actions.php" class="ms-2">
+                                                        <?php echo getCsrfTokenInput(); ?>
+                                                        <input type="hidden" name="action" value="togglePin">
+                                                        <input type="hidden" name="topicId" value="<?= $topic['topicId'] ?>">
+
+                                                        <button class="btn btn-sm btn-outline-warning" onclick="event.stopPropagation();">
+                                                            <?= !empty($topic['pinned']) ? 'Unpin' : '📌 Pin' ?>
+                                                        </button>
+                                                    </form>
+                                                <?php endif; ?>
+
                                                 <i class="bi bi-arrow-right text-muted"></i>
+
                                             </div>
                                         </div>
                                         <?php if (isset($topic['matching_posts']) && !empty($topic['matching_posts'])): ?>

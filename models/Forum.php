@@ -84,6 +84,8 @@ class Forum {
         if (!empty($search)) {
             // Search in topic name OR post content
             $query .= " AND (t.name LIKE ? OR p.content LIKE ?)";
+        } else {
+            $query .= "ORDER BY pinned DESC, t.createdAt DESC ";
         }
 
         $stmt = $this->conn->prepare($query);
