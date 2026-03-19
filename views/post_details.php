@@ -230,7 +230,7 @@ $topicName = $topicModel->getName();
                     </div>
 
                     <!-- Comments Section -->
-                    <h5 class="mb-3 px-2">Kommentare (<?= count($comments) ?>)</h5>
+                    <h5 class="m-3 px-2">Kommentare (<?= count($comments) ?>)</h5>
 
                     <?php if (empty($comments)): ?>
                         <div class="alert alert-light border shadow-sm mx-2" role="alert">

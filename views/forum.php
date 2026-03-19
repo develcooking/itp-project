@@ -146,23 +146,29 @@ if ($selectedTopicId) {
                                         <div class="post-content" id="post-content-<?= $post['postId'] ?>">
                                             <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
                                         </div>
-                                        <div class="d-flex gap-2 mt-3">
-                                            <form method="POST" action="/controllers/forum_actions.php">
-                                                <input type="hidden" name="action" value="voteUp">
-                                                <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
-                                                <button class="btn btn-sm btn-light" type="submit">
-                                                    <i class="bi <?= $upIcon ?> forum-vote-icon <?= $upVoteClass ?>"></i>
-                                                    <span><?= $post['reaction_positive'] ?></span>
-                                                </button>
-                                            </form>
-                                            <form method="POST" action="/controllers/forum_actions.php">
-                                                <input type="hidden" name="action" value="voteDown">
-                                                <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
-                                                <button class="btn btn-sm btn-light" type="submit">
-                                                    <i class="bi <?= $downIcon ?> forum-vote-icon <?= $downVoteClass ?>"></i>
-                                                    <span><?= $post['reaction_negative'] ?></span>
-                                                </button>
-                                            </form>
+                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                            <div class="d-flex gap-2">
+                                                <form method="POST" action="/controllers/forum_actions.php">
+                                                    <input type="hidden" name="action" value="voteUp">
+                                                    <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+                                                    <button class="btn btn-sm btn-light" type="submit">
+                                                        <i class="bi <?= $upIcon ?> forum-vote-icon <?= $upVoteClass ?>"></i>
+                                                        <span><?= $post['reaction_positive'] ?></span>
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="/controllers/forum_actions.php">
+                                                    <input type="hidden" name="action" value="voteDown">
+                                                    <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+                                                    <button class="btn btn-sm btn-light" type="submit">
+                                                        <i class="bi <?= $downIcon ?> forum-vote-icon <?= $downVoteClass ?>"></i>
+                                                        <span><?= $post['reaction_negative'] ?></span>
+                                                    </button>
+                                                </form>
+                                            </div>
+
+                                            <a href="/views/post_details.php?postId=<?= $post['postId'] ?>&topicId=<?= $selectedTopicId ?>&jobId=<?= $selectedJobId ?>" class="btn btn-sm btn-form-sub">
+                                                <i class="bi bi-chat-dots me-1"></i> Kommentare (<?= $post['comment_count'] ?>)
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
