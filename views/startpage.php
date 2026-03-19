@@ -124,7 +124,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <small class="text-muted">
                                                     <i class="bi bi-person-circle me-1"></i>
-                                                    <?= htmlspecialchars($post['firstName'] . ' ' . $post['lastName']) ?>
+                                                    <?= htmlspecialchars($post['userName']) ?>
                                                 </small>
                                                 <a href="/views/forum.php?jobId=<?= $jobPosts['jobId'] ?>&topicId=<?= $post['topicId'] ?>#post-<?= $post['postId'] ?>" 
                                                    class="btn btn-sm btn-outline-primary">

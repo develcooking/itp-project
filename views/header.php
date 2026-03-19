@@ -101,15 +101,10 @@ if (empty($current_page) || $current_page === '') {
 </nav>
 <?php endif; ?>
 
-<main class="main-container <?= (isset($_SESSION['current_view']) && $_SESSION['current_view'] === 'startpage') || $current_page === 'startpage' ? 'main-startpage' : '' ?>">
-
-
     <!-- Mobile hamburger button -->
     <button class="btn btn-default offcanvas-toggle d-lg-none ms-auto me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas" aria-controls="mobileOffcanvas">
         <span class="navbar-toggler-icon"></span>
     </button>
-
-</nav>
 
 <!-- Mobile Offcanvas Menu -->
 <!-- Mobile Offcanvas Menu (right side) -->
@@ -125,9 +120,9 @@ if (empty($current_page) || $current_page === '') {
     <?php if ($_SESSION['role'] === 'Admin'): ?>
       <a href="/views/adminPage.php" class="nav-btn-primary mb-2 <?= $current_page==='adminPage'?'current':'' ?>">Benutzerverwaltung</a>
       <a href="/views/adminJobs.php" class="nav-btn-primary mb-2 <?= $current_page==='adminJobs'?'current':'' ?>">Berufsbereiche</a>
-    <a href="/controllers/profile.php" class="nav-btn-primary mb-2 <?= $current_page==='profile'?'current':'' ?>">Account</a>
-
     <?php endif; ?>
+    
+    <a href="/controllers/profile.php" class="nav-btn-primary mb-2 <?= $current_page==='profile'?'current':'' ?>">Account</a>
     
     <!-- Spacer so account/logout are at bottom -->
     <div class="mt-auto mobile_logout">
@@ -138,7 +133,3 @@ if (empty($current_page) || $current_page === '') {
     </div>
   </div>
 </div>
-
-<?php endif; ?>
-
-<main class="main-container align-items-center">
