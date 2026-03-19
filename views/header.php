@@ -83,7 +83,7 @@ if (empty($current_page) || $current_page === '') {
     </div>
     <!-- Desktop account dropdown -->
     <div class="btn-group nav-logout-form d-none d-lg-flex" role="group">
-        <a href="/views/profile.php" class="btn rounded-0 nav-account-btn btn-outline-primary">
+        <a href="/controllers/profile.php" class="btn rounded-0 nav-account-btn btn-outline-primary">
             <i class="bi bi-person-circle me-1"></i> Account
         </a>
         <button type="button" class="btn btn-outline-primary rounded-0 dropdown-toggle dropdown-toggle-split nav-account-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -120,7 +120,7 @@ if (empty($current_page) || $current_page === '') {
     <?php if ($_SESSION['role'] === 'Admin'): ?>
       <a href="/views/adminPage.php" class="nav-btn-primary mb-2 <?= $current_page==='adminPage'?'current':'' ?>">Benutzerverwaltung</a>
       <a href="/views/adminJobs.php" class="nav-btn-primary mb-2 <?= $current_page==='adminJobs'?'current':'' ?>">Berufsbereiche</a>
-      <a href="/views/profile.php" class="nav-btn-primary mb-2 <?= $current_page==='profile'?'current':'' ?>">Account</a>
+    <a href="/controllers/profile.php" class="nav-btn-primary mb-2 <?= $current_page==='profile'?'current':'' ?>">Account</a>
 
     <?php endif; ?>
     
