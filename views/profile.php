@@ -14,7 +14,7 @@ if (!isset($user)) {
 }
 
 if (!isset($profileStats) || !is_array($profileStats)) {
-    $profileStats = $user->getProfileStatsByUserId((int)$_SESSION['userId']);
+    $profileStats = $user->getProfileStats();
 }
 
 $profileStats = array_merge([
