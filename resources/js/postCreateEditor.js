@@ -13,14 +13,17 @@ document.addEventListener("DOMContentLoaded", function() {
             ]
         }
     });
-    document.getElementById('createTopicForm').onsubmit = function() {
-        const postContentHiddenInitial = document.getElementById('postContentHiddenInitial');
-        postContentHiddenInitial.value = quillInitial.root.innerHTML;
-        if (quillInitial.getText().trim().length === 0) {
-            alert('Bitte geben Sie eine Nachricht ein.');
-            return false;
-        }
-    };
+    const createTopicForm = document.getElementById('createTopicForm');
+    if (createTopicForm) {
+        createTopicForm.onsubmit = function() {
+            const postContentHiddenInitial = document.getElementById('postContentHiddenInitial');
+            postContentHiddenInitial.value = quillInitial.root.innerHTML;
+            if (quillInitial.getText().trim().length === 0) {
+                alert('Bitte geben Sie eine Nachricht ein.');
+                return false;
+            }
+        };
+    }
     const quill = new Quill('#quillEditor', {
         theme: 'snow',
         placeholder: 'Schreiben Sie hier Ihre Nachricht...',
@@ -35,15 +38,75 @@ document.addEventListener("DOMContentLoaded", function() {
             ]
         }
     });
-    document.getElementById('createPostForm').onsubmit = function() {
-        const postContentHidden = document.getElementById('postContentHidden');
-        postContentHidden.value = quill.root.innerHTML;
+    const createPostForm = document.getElementById('createPostForm');
+    if (createPostForm) {
+        createPostForm.onsubmit = function() {
+            const postContentHidden = document.getElementById('postContentHidden');
+            postContentHidden.value = quill.root.innerHTML;
 
-        if (quill.getText().trim().length === 0) {
-            alert('Bitte geben Sie eine Nachricht ein.');
-            return false;
+            if (quill.getText().trim().length === 0) {
+                alert('Bitte geben Sie eine Nachricht ein.');
+                return false;
+            }
+        };
+    }
+
+    // Edit Post Quill
+    const quillEdit = new Quill('#quillEditorEdit', {
+        theme: 'snow',
+        placeholder: 'Schreiben Sie hier Ihre Nachricht...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link'],
+                ['clean']
+            ]
         }
-    };
+    });
+
+    // Handle Edit Button Click
+    document.querySelectorAll('.edit-post-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            const contentDiv = document.getElementById('post-content-' + postId);
+            if (contentDiv) {
+                quillEdit.root.innerHTML = contentDiv.innerHTML;
+                document.getElementById('editPostId').value = postId;
+                const editModalElem = document.getElementById('editPostModal');
+                const editModal = new bootstrap.Modal(editModalElem);
+                editModal.show();
+            }
+        });
+    });
+
+    // Handle Edit Form Submit
+    const editPostForm = document.getElementById('editPostForm');
+    if (editPostForm) {
+        editPostForm.onsubmit = function() {
+            const postContentHidden = document.getElementById('editPostContentHidden');
+            postContentHidden.value = quillEdit.root.innerHTML;
+
+            if (quillEdit.getText().trim().length === 0) {
+                alert('Bitte geben Sie eine Nachricht ein.');
+                return false;
+            }
+        };
+    }
+
+    // Handle Delete Button Click
+    document.querySelectorAll('.delete-post-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (confirm('Sind Sie sicher, dass Sie diesen Beitrag löschen möchten?')) {
+                const postId = this.getAttribute('data-post-id');
+                document.getElementById('deletePostId').value = postId;
+                document.getElementById('deletePostForm').submit();
+            }
+        });
+    });
+
     document.querySelectorAll('.vote-form').forEach(form => {
         form.addEventListener('submit', function(e) {
             e.preventDefault(); // prevent page reload
