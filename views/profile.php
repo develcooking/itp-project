@@ -12,11 +12,22 @@ if (!isset($user)) {
     $user = new User($conn);
     $user->getById($_SESSION['userId']);
 }
+
+if (!isset($profileStats) || !is_array($profileStats)) {
+    $profileStats = $user->getProfileStats();
+}
+
+$profileStats = array_merge([
+    'topicCount' => 0,
+    'postCount' => 0,
+    'reactionPositiveCount' => 0,
+    'reactionNegativeCount' => 0
+], $profileStats);
 ?>
 
     <div class="container min-vh-100 d-flex justify-content-center align-items-center my-4">
-        <div class="row w-100 justify-content-center">
-            <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+        <div class="row w-100 justify-content-center align-items-stretch g-4">
+            <div class="col-12 col-lg-8">
                 <div class="card bg-light shadow p-4 text-center">
 
                     <h2 class="fw-bold mb-2">Mein Profil</h2>
@@ -184,6 +195,35 @@ if (!isset($user)) {
 
                     </form>
 
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="card bg-light shadow h-100 p-4">
+                    <h3 class="fw-bold mb-2">Deine Statistik</h3>
+                    <p class="text-muted mb-4">Übersicht deiner Aktivitat im Forum.</p>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div class="border rounded-3 p-3 bg-white">
+                            <div class="text-muted small">Erstellte Themen</div>
+                            <div class="fs-3 fw-bold"><?= (int)($profileStats['topicCount'] ?? 0) ?></div>
+                        </div>
+
+                        <div class="border rounded-3 p-3 bg-white">
+                            <div class="text-muted small">Erstellte Beitrage</div>
+                            <div class="fs-3 fw-bold"><?= (int)($profileStats['postCount'] ?? 0) ?></div>
+                        </div>
+
+                        <div class="border rounded-3 p-3 bg-white">
+                            <div class="text-muted small">Erhaltene positive Reaktionen</div>
+                            <div class="fs-3 fw-bold\"><?= (int)($profileStats['reactionPositiveCount'] ?? 0) ?></div>
+                        </div>
+
+                        <div class="border rounded-3 p-3 bg-white">
+                            <div class="text-muted small">Erhaltene negative Reaktionen</div>
+                            <div class="fs-3 fw-bold\"><?= (int)($profileStats['reactionNegativeCount'] ?? 0) ?></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

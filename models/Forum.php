@@ -72,7 +72,7 @@ class Forum {
     }
 
     public function getTopicsByBereich(int $bereich_id, ?string $search = null): array {
-        // Modified query to include searching in post and comment content
+        // Modified query to include searching in post content
         $query = "
             SELECT DISTINCT t.*, u.userName 
             FROM Topics t 
@@ -122,22 +122,26 @@ class Forum {
         if (!empty($search) && !empty($topics)) {
             $topicIds = array_keys($topics);
             $idList = implode(',', array_fill(0, count($topicIds), '?'));
-            
+
             // 1. Fetch matching posts
             $postQuery = "SELECT postId, topicId, content FROM Posts WHERE topicId IN ($idList) AND content LIKE ?";
+            
             $stmt = $this->conn->prepare($postQuery);
             $types = str_repeat('i', count($topicIds)) . 's';
             $params = [...$topicIds, $searchTerm];
             $stmt->bind_param($types, ...$params);
+            
             $stmt->execute();
             $postResult = $stmt->get_result();
             
             while ($postRow = $postResult->fetch_assoc()) {
                 $content = strip_tags($postRow['content']);
                 $pos = mb_stripos($content, $search);
+                
                 if ($pos !== false) {
                     $start = max(0, $pos - 40);
                     $snippet = mb_substr($content, $start, 100);
+                    
                     $topics[$postRow['topicId']]['matching_posts'][] = [
                         'postId' => $postRow['postId'],
                         'content_snippet' => $snippet

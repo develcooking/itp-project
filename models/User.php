@@ -482,19 +482,19 @@ class User
     return $row['email_count'] > 0;
     }
 
-    public function updateProfile(int $userId): bool
+    public function updateProfile(): bool
     {
         $sendNotification = $this->sendNotification ? 1 : 0;
 
         if ($this->profileImageDirty && $this->hasProfileImageColumns()) {
             $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ?, school_company = ?, sendNotification = ?, profileImage = ?, profileImageMime = ? WHERE userId = ?";
             $stmt = $this->conn->prepare($query);
-            $stmt->bind_param("sssssibsi", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $sendNotification, $this->profileImage, $this->profileImageMime, $userId);
+            $stmt->bind_param("sssssibsi", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $sendNotification, $this->profileImage, $this->profileImageMime, $this->userId);
             $stmt->send_long_data(6, $this->profileImage ?? '');
         } else {
             $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ?, school_company = ?, sendNotification = ? WHERE userId = ?";
             $stmt = $this->conn->prepare($query);
-            $stmt->bind_param("sssssii", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $sendNotification, $userId);
+            $stmt->bind_param("sssssii", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $sendNotification, $this->userId);
         }
 
         $ok = $stmt->execute();
@@ -530,6 +530,41 @@ class User
         return [
             'data' => $row['profileImage'],
             'mime' => $row['profileImageMime']
+        ];
+    }
+
+    public function getProfileStats(): array
+    {
+        $query = "SELECT
+                    (SELECT COUNT(*) FROM Topics t WHERE t.userId = ?) AS topicCount,
+                    (SELECT COUNT(*) FROM Posts p WHERE p.userId = ?) AS postCount,
+                    (
+                        SELECT COUNT(*)
+                        FROM user_reactions ur
+                        INNER JOIN Posts p ON p.postId = ur.postId
+                        WHERE p.userId = ?
+                          AND ur.voteType = 'up'
+                    ) AS reactionPositiveCount,
+                    (
+                        SELECT COUNT(*)
+                        FROM user_reactions ur
+                        INNER JOIN Posts p ON p.postId = ur.postId
+                        WHERE p.userId = ?
+                          AND ur.voteType = 'down'
+                    ) AS reactionNegativeCount";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("iiii", $this->userId, $this->userId, $this->userId, $this->userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc() ?: [];
+        $stmt->close();
+
+        return [
+            'topicCount' => (int)($row['topicCount'] ?? 0),
+            'postCount' => (int)($row['postCount'] ?? 0),
+            'reactionPositiveCount' => (int)($row['reactionPositiveCount'] ?? 0),
+            'reactionNegativeCount' => (int)($row['reactionNegativeCount'] ?? 0)
         ];
     }
 
