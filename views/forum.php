@@ -137,6 +137,33 @@ if ($selectedTopicId) {
                                         <div class="post-content">
                                             <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
                                         </div>
+                                        <?php
+// Load attachments for this post
+$stmt = $conn->prepare("SELECT attachmentId, fileName, fileType FROM postAttachments WHERE postId = ?");
+$stmt->bind_param("i", $post['postId']);
+$stmt->execute();
+$resultFiles = $stmt->get_result();
+
+while ($file = $resultFiles->fetch_assoc()) {
+
+    $isImage = strpos($file['fileType'], 'image/') === 0;
+
+    echo '<div class="mt-2">';
+
+    // 🖼️ IMAGE PREVIEW
+    if ($isImage) {
+        echo '<img src="/controllers/download.php?id='.$file['attachmentId'].'" 
+                    style="max-width:200px; border-radius:8px; display:block; margin-bottom:5px;">';
+    }
+
+    // 📎 FILE LINK
+    echo '<a href="/controllers/download.php?id='.$file['attachmentId'].'" target="_blank">';
+    echo '📎 ' . htmlspecialchars($file['fileName']);
+    echo '</a>';
+
+    echo '</div>';
+}
+?>
                                         <div class="d-flex gap-2 mt-3">
                                             <form method="POST" action="/controllers/forum_actions.php">
                                                 <input type="hidden" name="action" value="voteUp">
@@ -233,8 +260,8 @@ if ($selectedTopicId) {
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="createTopicForm" action="/controllers/forum_actions.php" method="POST">
-                    <?php echo getCsrfTokenInput(); ?>
+                    <form id="createTopicForm" action="/controllers/forum_actions.php" method="POST" enctype="multipart/form-data">                    
+                        <?php echo getCsrfTokenInput(); ?>
                     <input type="hidden" name="action" value="createTopic">
                     <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
                     <div class="mb-3">
@@ -242,10 +269,14 @@ if ($selectedTopicId) {
                         <input type="text" class="form-control" name="topicName" id="topicName" placeholder="Titel eingeben" required>
                     </div>
                     <!-- Modal for creating initial Post -->
-                    <input type="hidden" name="postContent" id="postContentHiddenInitial">
-                    <div class="mb-3">
+                        <input type="hidden" name="postContent" id="postContentHiddenInitial">                    
+                        <div class="mb-3">
                         <label class="form-label">Ihre Nachricht</label>
                         <div id="quillEditorInitial" style="height: 200px; background: white;"></div>
+                        <div class="mb-3">
+                            <label class="form-label">Dateien anhängen </label>
+                            <input type="file" name="attachments[]" multiple class="form-control">
+                        </div>
                     </div>
                     <div class="text-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
@@ -256,10 +287,8 @@ if ($selectedTopicId) {
         </div>
     </div>
 </div>
-
-
 <!-- Modal for creating Post -->
-<div class="modal fade" id="createPostModal" tabindex="-1">
+<div class="modal fade " id="createPostModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header text-white" style="background-color: var(--accentColor);">
@@ -267,7 +296,7 @@ if ($selectedTopicId) {
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="createPostForm" action="/controllers/forum_actions.php" method="POST">
+                    <form id="createPostForm" action="/controllers/forum_actions.php" method="POST" enctype="multipart/form-data">                    
                     <?php echo getCsrfTokenInput(); ?>
                     <input type="hidden" name="action" value="createPost">
                     <input type="hidden" name="topicId" value="<?= $selectedTopicId ?>">
