@@ -130,7 +130,12 @@ if ($selectedTopicId) {
                                                 <?php else: ?>
                                                     <i class="bi bi-person-circle forum-post-avatar-icon" aria-label="Standard Profilbild"></i>
                                                 <?php endif; ?>
-                                                <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
+                                                <span>
+                                                    <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
+                                                    <?php if (!empty($post['school_company'])): ?>
+                                                        <span class="text-muted fw-normal ms-1" style="opacity: 0.6;">- <?= htmlspecialchars($post['school_company']) ?></span>
+                                                    <?php endif; ?>
+                                                </span>
                                             </span>
                                             <div>
                                                 <?php if ($post['userId'] == $_SESSION['userId']): ?>

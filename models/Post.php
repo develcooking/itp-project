@@ -94,7 +94,8 @@ class Post
             $query = "
             SELECT 
                 p.*,
-                u.userName
+                u.userName,
+                u.school_company
                 {$selectProfileImageState},
 
                 SUM(CASE WHEN ur.voteType = 'up' THEN 1 ELSE 0 END) AS reaction_positive,
@@ -124,6 +125,7 @@ class Post
                     'topicId' => $row['topicId'],
                     'userId' => $row['userId'],
                     'userName' => $row['userName'],
+                    'school_company' => $row['school_company'],
                     'hasProfileImage' => ((int)($row['hasProfileImage'] ?? 0)) === 1,
                     'content' => $row['content'],
                     'description' => $row['description'],
