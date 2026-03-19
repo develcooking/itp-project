@@ -1,107 +1,82 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const quillInitial = new Quill('#quillEditorInitial', {
-        theme: 'snow',
-        placeholder: 'Schreiben Sie hier Ihre Nachricht...',
-        modules: {
-            toolbar: [
-                [{ 'header': [1, 2, 3, false] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                ['blockquote', 'code-block'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['link'],
-                ['clean']
-            ]
+    
+    // --- 1. Initialer Editor (nur wenn vorhanden) ---
+    const elInitial = document.getElementById('quillEditorInitial');
+    if (elInitial) {
+        const quillInitial = new Quill('#quillEditorInitial', {
+            theme: 'snow',
+            placeholder: 'Schreiben Sie hier Ihre Nachricht...',
+            modules: { toolbar: [[{ 'header': [1, 2, 3, false] }], ['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['link'], ['clean']] }
+        });
+        const createTopicForm = document.getElementById('createTopicForm');
+        if (createTopicForm) {
+            createTopicForm.onsubmit = function() {
+                document.getElementById('postContentHiddenInitial').value = quillInitial.root.innerHTML;
+                if (quillInitial.getText().trim().length === 0) { alert('Bitte Nachricht eingeben.'); return false; }
+            };
         }
-    });
-    const createTopicForm = document.getElementById('createTopicForm');
-    if (createTopicForm) {
-        createTopicForm.onsubmit = function() {
-            const postContentHiddenInitial = document.getElementById('postContentHiddenInitial');
-            postContentHiddenInitial.value = quillInitial.root.innerHTML;
-            if (quillInitial.getText().trim().length === 0) {
-                alert('Bitte geben Sie eine Nachricht ein.');
-                return false;
-            }
-        };
-    }
-    const quill = new Quill('#quillEditor', {
-        theme: 'snow',
-        placeholder: 'Schreiben Sie hier Ihre Nachricht...',
-        modules: {
-            toolbar: [
-                [{ 'header': [1, 2, 3, false] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                ['blockquote', 'code-block'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['link'],
-                ['clean']
-            ]
-        }
-    });
-    const createPostForm = document.getElementById('createPostForm');
-    if (createPostForm) {
-        createPostForm.onsubmit = function() {
-            const postContentHidden = document.getElementById('postContentHidden');
-            postContentHidden.value = quill.root.innerHTML;
-
-            if (quill.getText().trim().length === 0) {
-                alert('Bitte geben Sie eine Nachricht ein.');
-                return false;
-            }
-        };
     }
 
-    // Edit Post Quill
-    const quillEdit = new Quill('#quillEditorEdit', {
-        theme: 'snow',
-        placeholder: 'Schreiben Sie hier Ihre Nachricht...',
-        modules: {
-            toolbar: [
-                [{ 'header': [1, 2, 3, false] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                ['blockquote', 'code-block'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['link'],
-                ['clean']
-            ]
+    // --- 2. Standard Post Editor (nur wenn vorhanden) ---
+    const elPost = document.getElementById('quillEditor');
+    if (elPost) {
+        const quill = new Quill('#quillEditor', {
+            theme: 'snow',
+            modules: { toolbar: [[{ 'header': [1, 2, 3, false] }], ['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['link']] }
+        });
+        const createPostForm = document.getElementById('createPostForm');
+        if (createPostForm) {
+            createPostForm.onsubmit = function() {
+                document.getElementById('postContentHidden').value = quill.root.innerHTML;
+                if (quill.getText().trim().length === 0) { alert('Bitte Nachricht eingeben.'); return false; }
+            };
         }
-    });
+    }
 
-    // Handle Edit Button Click
+    // --- 3. EDIT POST EDITOR (Das Sorgenkind) ---
+    const elEdit = document.getElementById('quillEditorEdit');
+    let quillEdit; // Globaler im Scope definieren
+    if (elEdit) {
+        quillEdit = new Quill('#quillEditorEdit', {
+            theme: 'snow',
+            modules: { toolbar: [[{ 'header': [1, 2, 3, false] }], ['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['link']] }
+        });
+    }
+
+    // Bearbeiten-Button Click Handler
     document.querySelectorAll('.edit-post-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const postId = this.getAttribute('data-post-id');
             const contentDiv = document.getElementById('post-content-' + postId);
-            if (contentDiv) {
+            const editModalElem = document.getElementById('editPostModal');
+            
+            if (contentDiv && quillEdit && editModalElem) {
+                // Inhalt in den Editor laden
                 quillEdit.root.innerHTML = contentDiv.innerHTML;
+                // ID ins versteckte Feld
                 document.getElementById('editPostId').value = postId;
-                const editModalElem = document.getElementById('editPostModal');
-                const editModal = new bootstrap.Modal(editModalElem);
-                editModal.show();
+                
+                // Modal öffnen (Bootstrap 5)
+                const modal = new bootstrap.Modal(editModalElem);
+                modal.show();
             }
         });
     });
 
-    // Handle Edit Form Submit
+    // Formular-Submit für Edit
     const editPostForm = document.getElementById('editPostForm');
-    if (editPostForm) {
+    if (editPostForm && quillEdit) {
         editPostForm.onsubmit = function() {
-            const postContentHidden = document.getElementById('editPostContentHidden');
-            postContentHidden.value = quillEdit.root.innerHTML;
-
-            if (quillEdit.getText().trim().length === 0) {
-                alert('Bitte geben Sie eine Nachricht ein.');
-                return false;
-            }
+            document.getElementById('editPostContentHidden').value = quillEdit.root.innerHTML;
+            if (quillEdit.getText().trim().length === 0) { alert('Inhalt darf nicht leer sein.'); return false; }
         };
     }
 
-    // Handle Delete Button Click
+    // --- 4. Löschen & Votes ---
     document.querySelectorAll('.delete-post-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (confirm('Sind Sie sicher, dass Sie diesen Beitrag löschen möchten?')) {
-                const postId = this.getAttribute('data-post-id');
-                document.getElementById('deletePostId').value = postId;
+            if (confirm('Sind Sie sicher?')) {
+                document.getElementById('deletePostId').value = this.getAttribute('data-post-id');
                 document.getElementById('deletePostForm').submit();
             }
         });

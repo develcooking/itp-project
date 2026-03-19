@@ -175,11 +175,19 @@ $topicName = $topicModel->getName();
                                     <?php endif; ?>
                                     <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
                                 </span>
-                                <small class="text-muted">
-                                    <?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?>
-                                </small>
+                                <div>
+                                    <?php if ($post['userId'] == $_SESSION['userId']): ?>
+                                        <i class="bi bi-pencil text-muted edit-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Bearbeiten"></i>
+                                        <i class="bi bi-trash3 text-muted delete-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Löschen"></i>
+                                    <?php elseif ($isAdmin): ?>
+                                        <i class="bi bi-trash3 text-muted delete-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Löschen"></i>
+                                    <?php endif; ?>
+                                    <small class="text-muted">
+                                        <?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?>
+                                    </small>
+                                </div>
                             </div>
-                            <div class="post-content p-2">
+                            <div class="post-content p-2" id="post-content-<?= $post['postId'] ?>">
                                 <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
                             </div>
 
@@ -207,7 +215,7 @@ $topicName = $topicModel->getName();
                         </div>
                     </div>
 
-                                        <!-- Add Comment Form -->
+                    <!-- Add Comment Form -->
                     <div class="card shadow-sm border-0 mt-4 mx-2">
                         <div class="card-header bg-white border-bottom fw-bold">
                             <i class="bi bi-reply me-2"></i>Kommentar hinzufügen
@@ -289,7 +297,44 @@ $topicName = $topicModel->getName();
     </div>
 </div>
 
+    <!-- Modal for editing Post -->
+    <div class="modal fade" id="editPostModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header text-white" style="background-color: var(--accentColor);">
+                <h5 class="modal-title">Beitrag bearbeiten</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPostForm" action="/controllers/forum_actions.php" method="POST">
+                    <?php echo getCsrfTokenInput(); ?>
+                    <input type="hidden" name="action" value="editPost">
+                    <input type="hidden" name="postId" id="editPostId">
+                    <input type="hidden" name="postContent" id="editPostContentHidden">
+                    <div class="mb-3">
+                        <label class="form-label">Ihre Nachricht</label>
+                        <div id="quillEditorEdit" style="height: 200px; background: white;"></div>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                        <button type="submit" class="btn text-white" style="background-color: var(--accentColor);">Änderungen speichern</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Hidden form for deleting Post -->
+    <form id="deletePostForm" action="/controllers/forum_actions.php" method="POST" style="display: none;">
+    <?php echo getCsrfTokenInput(); ?>
+    <input type="hidden" name="action" value="deletePost">
+    <input type="hidden" name="postId" id="deletePostId">
+    </form>
+
+    <script src="/resources/js/postCreateEditor.js"></script>
 <script>
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Quill editor for comments
     var quillEditorComment = new Quill('#quillEditorComment', {
