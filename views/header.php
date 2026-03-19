@@ -97,7 +97,7 @@ if (empty($current_page) || $current_page === '') {
 </nav>
 <?php endif; ?>
 
-<main class="main-container align-items-center">
+<main class="main-container <?= (isset($_SESSION['current_view']) && $_SESSION['current_view'] === 'startpage') || $current_page === 'startpage' ? 'main-startpage' : '' ?>">
 
 
 

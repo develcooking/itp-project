@@ -25,6 +25,16 @@ main {
   align-items: center;
 }
 
+main.main-startpage {
+  display: block;
+  align-items: flex-start;
+  padding-top: 0;
+}
+ 
+main.main-startpage .container-fluid {
+  padding-top: 1rem;
+}
+
 .hat {
   flex: 1;
   text-align: left;
