@@ -200,8 +200,8 @@ $profileStats = array_merge([
 
             <div class="col-12 col-lg-4">
                 <div class="card bg-light shadow h-100 p-4">
-                    <h3 class="fw-bold mb-2">Deine Statistik</h3>
-                    <p class="text-muted mb-4">Übersicht deiner Aktivitat im Forum.</p>
+                    <h3 class="fw-bold mb-2">Statistik</h3>
+                    <p class="text-muted mb-4">Übersicht Ihrer Aktivitat im Forum.</p>
 
                     <div class="d-flex flex-column gap-3">
                         <div class="border rounded-3 p-3 bg-white">

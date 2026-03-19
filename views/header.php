@@ -103,13 +103,12 @@ if (empty($current_page) || $current_page === '') {
 
 <main class="main-container <?= (isset($_SESSION['current_view']) && $_SESSION['current_view'] === 'startpage') || $current_page === 'startpage' ? 'main-startpage' : '' ?>">
 
-
+    <?php if (!empty($_SESSION['userId'])): ?>
     <!-- Mobile hamburger button -->
     <button class="btn btn-default offcanvas-toggle d-lg-none ms-auto me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas" aria-controls="mobileOffcanvas">
         <span class="navbar-toggler-icon"></span>
     </button>
-
-</nav>
+    <?php endif; ?>
 
 <!-- Mobile Offcanvas Menu -->
 <!-- Mobile Offcanvas Menu (right side) -->
@@ -139,6 +138,3 @@ if (empty($current_page) || $current_page === '') {
   </div>
 </div>
 
-<?php endif; ?>
-
-<main class="main-container align-items-center">
