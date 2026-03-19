@@ -149,66 +149,49 @@ $topicName = $topicModel->getName();
                     $downColor = ($userVote === 'down') ? 'forum-vote-down' : 'forum-vote-neutral';
                     ?>
 
-                    <div class="card mb-4 border-0 shadow-sm forum-post-card">
-                        <div class="row g-0">
-                            <!-- Sidebar: User Info -->
-                            <div class="col-md-2 border-end bg-light d-flex flex-column align-items-center p-3 text-center d-none d-md-flex">
-                                <div class="mb-2">
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-body m-2">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold text-primary d-flex align-items-center gap-2">
                                     <?php if (!empty($post['hasProfileImage'])): ?>
                                         <img
                                             src="/controllers/profileImage.php?userId=<?= (int)$post['userId'] ?>"
                                             alt="Profilbild von <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>"
-                                            class="rounded-circle border shadow-sm"
-                                            style="width: 64px; height: 64px; object-fit: cover;"
+                                            class="forum-post-avatar rounded-circle border"
                                             onerror="this.onerror=null;this.src='/resources/imgs/icon.png';">
                                     <?php else: ?>
-                                        <i class="bi bi-person-circle text-muted" style="font-size: 64px;"></i>
+                                        <i class="bi bi-person-circle forum-post-avatar-icon" aria-label="Standard Profilbild"></i>
                                     <?php endif; ?>
-                                </div>
-                                <span class="fw-bold text-primary small text-break">
                                     <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
                                 </span>
+                                <small class="text-muted">
+                                    <?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?>
+                                </small>
+                            </div>
+                            <div class="post-content p-2">
+                                <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
                             </div>
 
-                            <!-- Main Content -->
-                            <div class="col-md-10">
-                                <div class="card-body h-100 d-flex flex-column">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div class="d-md-none fw-bold text-primary mb-1">
-                                             <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
-                                        </div>
-                                        <small class="text-muted">
-                                            <i class="bi bi-clock me-1"></i><?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?>
-                                        </small>
-                                    </div>
-                                    <div class="post-content flex-grow-1">
-                                        <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
-                                    </div>
+                            <div class="d-flex gap-2 mt-3 pt-2 border-top">
+                                <form method="POST" action="/controllers/forum_actions.php">
+                                    <input type="hidden" name="action" value="voteUp">
+                                    <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+                                    <input type="hidden" name="redirectTo" value="/views/post_details.php?postId=<?= $postId ?>&topicId=<?= $topicId ?>&jobId=<?= $jobId ?>">
+                                    <button class="btn btn-sm btn-light">
+                                        <i class="bi <?= $upIcon ?> forum-vote-icon <?= $upColor ?>"></i>
+                                        <span><?= $post['reaction_positive'] ?></span>
+                                    </button>
+                                </form>
 
-                                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
-                                        <div class="d-flex gap-2">
-                                            <form method="POST" action="/controllers/forum_actions.php">
-                                                <input type="hidden" name="action" value="voteUp">
-                                                <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
-                                                <input type="hidden" name="redirectTo" value="/views/post_details.php?postId=<?= $postId ?>&topicId=<?= $topicId ?>&jobId=<?= $jobId ?>">
-                                                <button class="btn btn-sm btn-light border">
-                                                    <i class="bi <?= $upIcon ?> forum-vote-icon <?= $upColor ?>"></i>
-                                                    <span class="ms-1"><?= $post['reaction_positive'] ?></span>
-                                                </button>
-                                            </form>
-
-                                            <form method="POST" action="/controllers/forum_actions.php">
-                                                <input type="hidden" name="action" value="voteDown">
-                                                <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
-                                                <input type="hidden" name="redirectTo" value="/views/post_details.php?postId=<?= $postId ?>&topicId=<?= $topicId ?>&jobId=<?= $jobId ?>">
-                                                <button class="btn btn-sm btn-light border">
-                                                    <i class="bi <?= $downIcon ?> forum-vote-icon <?= $downColor ?>"></i>
-                                                    <span class="ms-1"><?= $post['reaction_negative'] ?></span>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                                <form method="POST" action="/controllers/forum_actions.php">
+                                    <input type="hidden" name="action" value="voteDown">
+                                    <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+                                    <input type="hidden" name="redirectTo" value="/views/post_details.php?postId=<?= $postId ?>&topicId=<?= $topicId ?>&jobId=<?= $jobId ?>">
+                                    <button class="btn btn-sm btn-light">
+                                        <i class="bi <?= $downIcon ?> forum-vote-icon <?= $downColor ?>"></i>
+                                        <span><?= $post['reaction_negative'] ?></span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -223,33 +206,26 @@ $topicName = $topicModel->getName();
                     <?php else: ?>
                         <?php foreach ($comments as $comment): ?>
                             <div class="card mb-3 border-0 shadow-sm mx-2">
-                                <div class="row g-0">
-                                    <div class="col-md-1 border-end bg-light d-flex flex-column align-items-center p-2 text-center d-none d-md-flex">
-                                        <?php if (!empty($comment['hasProfileImage'])): ?>
-                                            <img
-                                                src="/controllers/profileImage.php?userId=<?= (int)$comment['userId'] ?>"
-                                                alt="Profilbild"
-                                                class="rounded-circle border"
-                                                style="width: 40px; height: 40px; object-fit: cover;"
-                                                onerror="this.onerror=null;this.src='/resources/imgs/icon.png';">
-                                        <?php else: ?>
-                                            <i class="bi bi-person-circle text-muted" style="font-size: 40px;"></i>
-                                        <?php endif; ?>
+                                <div class="card-body m-2">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="fw-bold text-primary d-flex align-items-center gap-2">
+                                            <?php if (!empty($comment['hasProfileImage'])): ?>
+                                                <img
+                                                    src="/controllers/profileImage.php?userId=<?= (int)$comment['userId'] ?>"
+                                                    alt="Profilbild"
+                                                    class="forum-post-avatar rounded-circle border"
+                                                    onerror="this.onerror=null;this.src='/resources/imgs/icon.png';">
+                                            <?php else: ?>
+                                                <i class="bi bi-person-circle forum-post-avatar-icon" aria-label="Standard Profilbild"></i>
+                                            <?php endif; ?>
+                                            <?= htmlspecialchars($comment['userName'] ?? 'Unbekannt') ?>
+                                        </span>
+                                        <small class="text-muted">
+                                            <?= date('d.m.Y H:i', strtotime($comment['createdAt'])) ?>
+                                        </small>
                                     </div>
-                                    <div class="col-md-11">
-                                        <div class="card-body py-2">
-                                            <div class="d-flex justify-content-between mb-1">
-                                                <span class="fw-bold text-primary small">
-                                                    <?= htmlspecialchars($comment['userName'] ?? 'Unbekannt') ?>
-                                                </span>
-                                                <small class="text-muted" style="font-size: 0.75rem;">
-                                                    <?= date('d.m.Y H:i', strtotime($comment['createdAt'])) ?>
-                                                </small>
-                                            </div>
-                                            <div class="comment-content small">
-                                                <?= strip_tags($comment['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
-                                            </div>
-                                        </div>
+                                    <div class="post-content p-2">
+                                        <?= strip_tags($comment['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
                                     </div>
                                 </div>
                             </div>
