@@ -221,6 +221,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 header("Location: /views/forum.php?error=delete_failed");
                 break;
+
+            case 'editComment':
+                $commentId = intval($_POST['commentId'] ?? 0);
+                $content = trim($_POST['commentContent'] ?? '');
+                if ($commentId > 0 && !empty($content)) {
+                    $comment = new Comment($conn);
+                    if ($comment->getById($commentId)) {
+                            $content = HtmlSanitizer::sanitize($content);
+                            $comment->setUserId($userId); // Für modifiedBy im Model
+                            if ($comment->update($commentId, $content)) {
+                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                exit();
+                            }
+                    }
+                }
+                header("Location: " . $_SERVER['HTTP_REFERER'] . "&error=edit_comment_failed");
+                break;
+            
+            case 'deleteComment':
+                $commentId = intval($_POST['commentId'] ?? 0);
+                if ($commentId > 0) {
+                    $comment = new Comment($conn);
+                    if ($comment->getById($commentId)) {
+                            if ($comment->delete($commentId)) {
+                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                exit();
+                            }
+                    }
+                }
+                header("Location: " . $_SERVER['HTTP_REFERER'] . "&error=delete_comment_failed");
+                break;
         }
     }
 }

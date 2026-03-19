@@ -280,11 +280,20 @@ $topicName = $topicModel->getName();
                                             <?php endif; ?>
                                             <?= htmlspecialchars($comment['userName'] ?? 'Unbekannt') ?>
                                         </span>
+                                        <div class="comment-actions">
+                                            <!-- Edit/Delete comment -->
+                                        <?php if ($comment['userId'] == $_SESSION['userId']): ?>
+                                        <i class="bi bi-pencil text-muted edit-comment-btn me-2" style="cursor: pointer;" data-comment-id="<?= $comment['commentId'] ?>" title="Bearbeiten"></i>
+                                        <i class="bi bi-trash3 text-muted delete-comment-btn me-2" style="cursor: pointer;" data-comment-id="<?= $comment['commentId'] ?>" title="Löschen"></i>
+                                        <?php elseif ($isAdmin): ?>
+                                        <i class="bi bi-trash3 text-muted delete-comment-btn me-2" style="cursor: pointer;" data-comment-id="<?= $comment['commentId'] ?>" title="Löschen"></i>
+                                        <?php endif; ?>
                                         <small class="text-muted">
                                             <?= date('d.m.Y H:i', strtotime($comment['createdAt'])) ?>
                                         </small>
+                                        </div>
                                     </div>
-                                    <div class="post-content p-2">
+                                    <div class="post-content p-2" id="comment-content-<?= $comment['commentId'] ?>">
                                         <?= strip_tags($comment['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
                                     </div>
                                 </div>
@@ -333,6 +342,32 @@ $topicName = $topicModel->getName();
     </form>
 
     <script src="/resources/js/postCreateEditor.js"></script>
+    
+    <!-- Modal for editing comments -->
+<div class="modal fade" id="editCommentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="editCommentForm" action="/controllers/forum_actions.php" method="POST">
+                <div class="modal-header"><h5>Kommentar bearbeiten</h5></div>
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="editComment">
+                    <input type="hidden" name="commentId" id="editCommentId">
+                    <input type="hidden" name="commentContent" id="editCommentContentHidden">
+                    <div id="quillEditorCommentEdit" style="height: 200px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<form id="deleteCommentForm" action="/controllers/forum_actions.php" method="POST" style="display:none;">
+    <?php echo getCsrfTokenInput(); ?>
+    <input type="hidden" name="action" value="deleteComment">
+    <input type="hidden" name="commentId" id="deleteCommentId">
+</form>
 <script>
 
 document.addEventListener('DOMContentLoaded', function() {

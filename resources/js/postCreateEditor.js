@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // --- 3. EDIT POST EDITOR (Das Sorgenkind) ---
+    // --- 3. Edit post editor ---
     const elEdit = document.getElementById('quillEditorEdit');
     let quillEdit; // Globaler im Scope definieren
     if (elEdit) {
@@ -118,6 +118,47 @@ document.addEventListener("DOMContentLoaded", function() {
                     console.error(err);
                     icon.style.color = '';
                 });
+        });
+    });
+    // 1. Editor für Kommentar-Bearbeitung initialisieren
+    const elCommentEdit = document.getElementById('quillEditorCommentEdit');
+    let quillCommentEdit;
+    if (elCommentEdit) {
+        quillCommentEdit = new Quill('#quillEditorCommentEdit', {
+            theme: 'snow',
+            modules: { toolbar: [['bold', 'italic', 'underline'], ['link', 'clean']] }
+        });
+    }
+
+    // 2. Edit Button Handler
+    document.querySelectorAll('.edit-comment-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const commentId = this.getAttribute('data-comment-id');
+            const contentDiv = document.getElementById('comment-content-' + commentId);
+
+            if (contentDiv && quillCommentEdit) {
+                quillCommentEdit.root.innerHTML = contentDiv.innerHTML;
+                document.getElementById('editCommentId').value = commentId;
+                new bootstrap.Modal(document.getElementById('editCommentModal')).show();
+            }
+        });
+    });
+
+    // 3. Submit Handler
+    const editCommentForm = document.getElementById('editCommentForm');
+    if (editCommentForm && quillCommentEdit) {
+        editCommentForm.onsubmit = function() {
+            document.getElementById('editCommentContentHidden').value = quillCommentEdit.root.innerHTML;
+        };
+    }
+
+    // 4. Delete Button Handler
+    document.querySelectorAll('.delete-comment-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (confirm('Kommentar wirklich löschen?')) {
+                document.getElementById('deleteCommentId').value = this.getAttribute('data-comment-id');
+                document.getElementById('deleteCommentForm').submit();
+            }
         });
     });
 });
