@@ -302,7 +302,7 @@ class User
     public function getById($userId)
     {
         $query = $this->hasProfileImageColumns()
-            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE userid = ?"
+            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL AND OCTET_LENGTH(profileImage) > 0 AND profileImageMime IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE userid = ?"
             : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE userid = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $userId);
@@ -439,7 +439,7 @@ class User
     public function getByEmail($email)
     {
         $query = $this->hasProfileImageColumns()
-            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE email = ?"
+            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL AND OCTET_LENGTH(profileImage) > 0 AND profileImageMime IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE email = ?"
             : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE email = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("s", $email);
@@ -487,10 +487,16 @@ class User
         $sendNotification = $this->sendNotification ? 1 : 0;
 
         if ($this->profileImageDirty && $this->hasProfileImageColumns()) {
-            $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ?, school_company = ?, sendNotification = ?, profileImage = ?, profileImageMime = ? WHERE userId = ?";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bind_param("sssssibsi", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $sendNotification, $this->profileImage, $this->profileImageMime, $this->userId);
-            $stmt->send_long_data(6, $this->profileImage ?? '');
+            if ($this->profileImage === null || $this->profileImageMime === null) {
+                $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ?, school_company = ?, sendNotification = ?, profileImage = NULL, profileImageMime = NULL WHERE userId = ?";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bind_param("sssssii", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $sendNotification, $this->userId);
+            } else {
+                $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ?, school_company = ?, sendNotification = ?, profileImage = ?, profileImageMime = ? WHERE userId = ?";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bind_param("sssssibsi", $this->userName, $this->firstName, $this->lastName, $this->email, $this->schoolCompany, $sendNotification, $this->profileImage, $this->profileImageMime, $this->userId);
+                $stmt->send_long_data(6, $this->profileImage);
+            }
         } else {
             $query = "UPDATE " . $this->table . " SET userName = ?, firstName = ?, lastName = ?, email = ?, school_company = ?, sendNotification = ? WHERE userId = ?";
             $stmt = $this->conn->prepare($query);
@@ -509,7 +515,7 @@ class User
             return null;
         }
 
-        $query = "SELECT profileImage, profileImageMime FROM " . $this->table . " WHERE userId = ? AND profileImage IS NOT NULL LIMIT 1";
+        $query = "SELECT profileImage, profileImageMime FROM " . $this->table . " WHERE userId = ? AND profileImage IS NOT NULL AND OCTET_LENGTH(profileImage) > 0 AND profileImageMime IS NOT NULL LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $userId);
         $stmt->execute();
