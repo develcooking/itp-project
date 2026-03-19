@@ -136,12 +136,14 @@ if ($selectedTopicId) {
                                                 <?php if ($post['userId'] == $_SESSION['userId']): ?>
                                                     <i class="bi bi-pencil gray-600 edit-post-btn me-1" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>"></i>
                                                     <i class="bi bi-trash3 gray-600 delete-post-btn me-1" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>"></i>
+                                                <?php elseif ($post['userId'] != $_SESSION['userId'] && $isAdmin): ?>
+                                                    <i class="bi bi-trash3 gray-600 delete-post-btn me-1" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>"></i>
                                                 <?php endif; ?>
                                                 <small class="text-muted"><?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?></small>
                                             </div>
                                         </div>
                                         <div class="post-content" id="post-content-<?= $post['postId'] ?>">
-                                            <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
+                                            <?= $post['content'] ?>
                                         </div>
                                         <div class="d-flex gap-2 mt-3">
                                             <form method="POST" action="/controllers/forum_actions.php">
