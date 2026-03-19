@@ -66,6 +66,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if (!empty($errors)) {
+    unset($_SESSION['userId']);
+    unset($_SESSION['logged_in']);
+    unset($_SESSION['userName']);
+    unset($_SESSION['firstName']);
+    unset($_SESSION['lastName']);
+    unset($_SESSION['email']);
+    unset($_SESSION['role']);
+    
     require $_SERVER['DOCUMENT_ROOT'] . "/views/loginsite.php";
     exit();
 }
