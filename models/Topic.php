@@ -213,4 +213,13 @@ class Topic
         $this->modifiedBy = $row['modifiedBy'];
         $this->userName = $row['userName'] ?? '';
     }
+    public function togglePin($topicId)
+    {
+    $query = "UPDATE " . $this->table . " SET pinned = NOT pinned WHERE topicId = ?";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $topicId);
+
+    return $stmt->execute();
+    }
 }

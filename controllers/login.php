@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $_SESSION['lastName'] = $user->getLastName();
                             $_SESSION['email'] = $user->getEmail();
                             $_SESSION['role'] = $user->getRole();
+                            $_SESSION['company'] = $user->getSchoolCompany();
 
                             header("Location: /controllers/startpage.php");
                             exit();

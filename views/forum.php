@@ -109,7 +109,7 @@ if ($selectedTopicId) {
                                 Noch keine Beiträge in diesem Thread.
                             </div>
                         <?php else: ?>
-                            <?php foreach ($posts as $post): ?>
+                            <?php foreach ($posts as $index => $post): ?>
                                 <?php
                                 $userVote = $post['voteType'] ?? 'noreaction';
                                 $upIcon = ($userVote === 'up') ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up';
@@ -132,10 +132,18 @@ if ($selectedTopicId) {
                                                 <?php endif; ?>
                                                 <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
                                             </span>
-                                            <small class="text-muted"><?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?></small>
+                                            <div>
+                                                <?php if ($post['userId'] == $_SESSION['userId']): ?>
+                                                    <i class="bi bi-pencil gray-600 edit-post-btn me-1" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>"></i>
+                                                    <i class="bi bi-trash3 gray-600 delete-post-btn me-1" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>"></i>
+                                                <?php elseif ($post['userId'] != $_SESSION['userId'] && $isAdmin): ?>
+                                                    <i class="bi bi-trash3 gray-600 delete-post-btn me-1" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>"></i>
+                                                <?php endif; ?>
+                                                <small class="text-muted"><?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?></small>
+                                            </div>
                                         </div>
-                                        <div class="post-content">
-                                            <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
+                                        <div class="post-content" id="post-content-<?= $post['postId'] ?>">
+                                            <?= $post['content'] ?>
                                         </div>
                                         <?php
 // Load attachments for this post
@@ -218,10 +226,36 @@ while ($file = $resultFiles->fetch_assoc()) {
                                 <?php foreach ($topics as $topic): ?>
                                     <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>" class="list-group-item list-group-item-action p-3">
                                         <div class="d-flex w-100 justify-content-between align-items-center">
-                                            <h6 class="mb-1 fw-bold"><i class="bi bi-chat-left-text-fill me-2"></i><?= htmlspecialchars($topic['name']) ?></h6>
-                                            <div class="d-flex align-items-center">
-                                                <small class="text-muted me-3">Erstellt von: <?= htmlspecialchars($topic['userName'] ?? 'Unbekannt') ?></small>
+
+                                            <h6 class="mb-1 fw-bold d-flex align-items-center gap-2">
+                                                <i class="bi bi-chat-left-text-fill me-2"></i>
+                                                <?= htmlspecialchars($topic['name']) ?>
+
+                                                <?php if (!empty($topic['pinned'])): ?>
+                                                    <span title="Angepinnt">📌</span>
+                                                <?php endif; ?>
+                                            </h6>
+
+                                            <div class="d-flex align-items-center gap-2">
+
+                                                <small class="text-muted">
+                                                    Erstellt von: <?= htmlspecialchars($topic['userName'] ?? 'Unbekannt') ?>
+                                                </small>
+
+                                                <?php if ($isAdmin): ?>
+                                                    <form method="POST" action="/controllers/forum_actions.php" class="ms-2">
+                                                        <?php echo getCsrfTokenInput(); ?>
+                                                        <input type="hidden" name="action" value="togglePin">
+                                                        <input type="hidden" name="topicId" value="<?= $topic['topicId'] ?>">
+
+                                                        <button class="btn btn-sm btn-outline-warning" onclick="event.stopPropagation();">
+                                                            <?= !empty($topic['pinned']) ? 'Unpin' : '📌 Pin' ?>
+                                                        </button>
+                                                    </form>
+                                                <?php endif; ?>
+
                                                 <i class="bi bi-arrow-right text-muted"></i>
+
                                             </div>
                                         </div>
                                         <?php if (isset($topic['matching_posts']) && !empty($topic['matching_posts'])): ?>
@@ -314,8 +348,42 @@ while ($file = $resultFiles->fetch_assoc()) {
             </div>
         </div>
     </div>
-</div>
-    
-<script src="/resources/js/postCreateEditor.js"></script>
+    </div>
 
+    <!-- Modal for editing Post -->
+    <div class="modal fade" id="editPostModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header text-white" style="background-color: var(--accentColor);">
+                <h5 class="modal-title">Beitrag bearbeiten</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPostForm" action="/controllers/forum_actions.php" method="POST">
+                    <?php echo getCsrfTokenInput(); ?>
+                    <input type="hidden" name="action" value="editPost">
+                    <input type="hidden" name="postId" id="editPostId">
+                    <input type="hidden" name="postContent" id="editPostContentHidden">
+                    <div class="mb-3">
+                        <label class="form-label">Ihre Nachricht</label>
+                        <div id="quillEditorEdit" style="height: 200px; background: white;"></div>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                        <button type="submit" class="btn text-white" style="background-color: var(--accentColor);">Änderungen speichern</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Hidden form for deleting Post -->
+    <form id="deletePostForm" action="/controllers/forum_actions.php" method="POST" style="display: none;">
+    <?php echo getCsrfTokenInput(); ?>
+    <input type="hidden" name="action" value="deletePost">
+    <input type="hidden" name="postId" id="deletePostId">
+    </form>
+
+    <script src="/resources/js/postCreateEditor.js"></script>
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>

@@ -8,7 +8,7 @@ if (!empty($_SESSION['userId']) && $_headerPage !== 'loginsite') {
     require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
     $headerUser = new User($conn);
     if ($headerUser->getById($_SESSION['userId'])) {
-        // Abgelaufene temporäre Sperren automatisch aufheben
+         // Abgelaufene temporäre Sperren automatisch aufheben
         $headerUser->clearExpiredBlock($_SESSION['userId']);
         $headerUser->getById($_SESSION['userId']);
 
@@ -37,14 +37,14 @@ if (empty($current_page) || $current_page === '') {
 <!DOCTYPE html>
 <html lang="de-DE">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="/resources/imgs/icon.png">
-    <title>Ausbildungsportal.net</title>
-    <meta name="csrf-token" content="<?php echo getCsrfToken(); ?>">
-    <script src="/resources/js/csrf.js"></script>
-    <link rel="stylesheet" href="../resources/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../resources/css/bootstrap-icons.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="/resources/imgs/icon.png">
+<title>Ausbildungsportal.net</title>
+<meta name="csrf-token" content="<?php echo getCsrfToken(); ?>">
+<script src="/resources/js/csrf.js"></script>
+<link rel="stylesheet" href="../resources/css/bootstrap.min.css">
+<link rel="stylesheet" href="../resources/css/bootstrap-icons.css">
     <link rel="stylesheet" type="text/css" href="/resources/css/styles.css">
 </head>
 <body>
@@ -71,15 +71,19 @@ if (empty($current_page) || $current_page === '') {
     <a href="../index.php" class="logo border-end">
         <img src="/resources/imgs/logo.jpeg" alt="Ausbildungsportal.net Logo" class="nav-logo">
     </a>
-    <a href="/controllers/startpage.php" class="nav-btn-primary border-end <?= $current_page === 'startpage' ? 'current' : ''; ?>">Startseite</a>
-    <a href="/views/appointmentManagement.php" class="nav-btn-primary border-end <?= $current_page === 'appointmentManagement' ? 'current' : ''; ?>">Termine</a>
-    <a href="/views/forum.php" class="nav-btn-primary border-end <?= $current_page === 'forum' ? 'current' : ''; ?>">Forum</a>
-    <?php if ($_SESSION['role'] === 'Admin'): ?>
-        <a href="/views/adminPage.php" class="nav-btn-primary border-end <?= $current_page === 'adminPage' ? 'current' : ''; ?>">Benutzerverwaltung</a>
-        <a href="/views/adminJobs.php" class="nav-btn-primary border-end <?= $current_page === 'adminJobs' ? 'current' : ''; ?>">Berufsbereiche</a>
+    <!-- Desktop links -->
+    <div class="d-none d-lg-flex flex-grow-1">
+        <a href="/controllers/startpage.php" class="nav-btn-primary border-end <?= $current_page==='startpage'?'current':'' ?>">Startseite</a>
+        <a href="/views/appointmentManagement.php" class="nav-btn-primary border-end <?= $current_page==='appointmentManagement'?'current':'' ?>">Termine</a>
+        <a href="/views/forum.php" class="nav-btn-primary border-end <?= $current_page==='forum'?'current':'' ?>">Forum</a>
+        <?php if ($_SESSION['role'] === 'Admin'): ?>
+        <a href="/views/adminPage.php" class="nav-btn-primary border-end <?= $current_page==='adminPage'?'current':'' ?>">Benutzerverwaltung</a>
+        <a href="/views/adminJobs.php" class="nav-btn-primary border-end <?= $current_page==='adminJobs'?'current':'' ?>">Berufsbereiche</a>
         <?php endif; ?>
-    <div class="btn-group nav-logout-form" role="group">
-        <a href="/views/profile.php" class="btn rounded-0 nav-account-btn btn-outline-primary">
+    </div>
+    <!-- Desktop account dropdown -->
+    <div class="btn-group nav-logout-form d-none d-lg-flex" role="group">
+        <a href="/controllers/profile.php" class="btn rounded-0 nav-account-btn btn-outline-primary">
             <i class="bi bi-person-circle me-1"></i> Account
         </a>
         <button type="button" class="btn btn-outline-primary rounded-0 dropdown-toggle dropdown-toggle-split nav-account-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -94,14 +98,42 @@ if (empty($current_page) || $current_page === '') {
             </li>
         </ul>
     </div>
+
+    <!-- Mobile hamburger button -->
+    <button class="btn btn-default offcanvas-toggle d-lg-none ms-auto me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas" aria-controls="mobileOffcanvas">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
 </nav>
+
+<!-- Mobile Offcanvas Menu -->
+<!-- Mobile Offcanvas Menu (right side) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="mobileOffcanvas" aria-labelledby="mobileOffcanvasLabel">
+  <div class="offcanvas-header justify-content-between">
+    <h5 class="offcanvas-title" id="mobileOffcanvasLabel">Menü</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
+  </div>
+  <div class="offcanvas-body d-flex flex-column">
+    <a href="/controllers/startpage.php" class="nav-btn-primary mb-2 <?= $current_page==='startpage'?'current':'' ?>">Startseite</a>
+    <a href="/views/appointmentManagement.php" class="nav-btn-primary mb-2 <?= $current_page==='appointmentManagement'?'current':'' ?>">Termine</a>
+    <a href="/views/forum.php" class="nav-btn-primary mb-2 <?= $current_page==='forum'?'current':'' ?>">Forum</a>
+    <?php if ($_SESSION['role'] === 'Admin'): ?>
+      <a href="/views/adminPage.php" class="nav-btn-primary mb-2 <?= $current_page==='adminPage'?'current':'' ?>">Benutzerverwaltung</a>
+      <a href="/views/adminJobs.php" class="nav-btn-primary mb-2 <?= $current_page==='adminJobs'?'current':'' ?>">Berufsbereiche</a>
+    <a href="/controllers/profile.php" class="nav-btn-primary mb-2 <?= $current_page==='profile'?'current':'' ?>">Account</a>
+
+    <?php endif; ?>
+    
+    <!-- Spacer so account/logout are at bottom -->
+    <div class="mt-auto mobile_logout">
+      <form method="post" action="/controllers/login.php">
+          <?php echo getCsrfTokenInput(); ?>
+          <button type="submit" name="logout" class="btn nav-logout-btn w-100">Abmelden</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <?php endif; ?>
 
 <main class="main-container align-items-center">
-
-
-
-
-
-
-
