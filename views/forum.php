@@ -91,6 +91,11 @@ if ($selectedTopicId) {
                         <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentTopicName) ?></li>
                     </ol>
                 </nav>
+                <form class="d-flex" method="GET" action="">
+                    <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
+                    <input class="form-control form-control-sm me-2" type="search" name="search" placeholder="Suche..." aria-label="Search">
+                    <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                </form>
             </div>
             <div class="card-body bg-light flex-grow-1">
                 <?php if (empty($posts)): ?>
@@ -110,7 +115,7 @@ if ($selectedTopicId) {
                 $downColor = ($userVote === 'down') ? 'forum-vote-down' : 'forum-vote-neutral';
                 ?>
 
-                <div class="card mb-3 border-0 shadow-sm">
+                <div class="card mb-3 border-0 shadow-sm" id="post-<?= $post['postId'] ?>">
                     <div class="card-body m-2">
                         <div class="d-flex justify-content-between mb-2">
                             <span class="fw-bold text-primary d-flex align-items-center gap-2">
@@ -208,6 +213,24 @@ if ($selectedTopicId) {
                                                         <?= htmlspecialchars($topic['name']) ?>
                                                     </h6>
                                                 </a>
+                                                <?php if (!empty($searchTerm) && (!empty($topic['matching_posts']) || !empty($topic['matching_comments']))): ?>
+                                                    <div class="mt-2 small text-muted">
+                                                        <?php foreach ($topic['matching_posts'] as $match): ?>
+                                                            <div class="mb-1 border-start ps-2">
+                                                                <i class="bi bi-chat-text small text-secondary" title="Beitrag"></i>
+                                                                &hellip;<?= htmlspecialchars($match['content_snippet']) ?>&hellip;
+                                                                <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>#post-<?= $match['postId'] ?>" class="text-decoration-none ms-1">Ansehen</a>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                        <?php foreach ($topic['matching_comments'] as $match): ?>
+                                                            <div class="mb-1 border-start ps-2">
+                                                                <i class="bi bi-reply small text-secondary" title="Kommentar"></i>
+                                                                &hellip;<?= htmlspecialchars($match['content_snippet']) ?>&hellip;
+                                                                <a href="/views/post_details.php?postId=<?= $match['postId'] ?>&topicId=<?= $topic['topicId'] ?>&jobId=<?= $selectedJobId ?>" class="text-decoration-none ms-1">Ansehen</a>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
                                                                     
                                             <!-- COLUMN 2: Pin Button -->
@@ -248,38 +271,6 @@ if ($selectedTopicId) {
                             </div>
                         <?php endif; ?>
                     </div>
-
-        <?php elseif ($selectedJobId): ?>
-            <!-- Threads View (Topics) -->
-            <div class="card-header d-flex justify-content-between align-items-center bg-light">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentJobName) ?></li>
-                    </ol>
-                </nav>
-                <button class="btn btn-sm btn-form-sub" data-bs-toggle="modal" data-bs-target="#createTopicModal">
-                    <i class="bi bi-plus-circle me-1"></i> Neues Thema
-                </button>
-            </div>
-            <div class="card-body p-0 flex-grow-1">
-                <?php if (empty($topics)): ?>
-                    <div class="p-5 text-center text-muted">Noch keine Themen in diesem Bereich. Seien Sie der Erste!</div>
-                <?php else: ?>
-                    <div class="list-group list-group-flush">
-                        <?php foreach ($topics as $topic): ?>
-                            <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>" class="list-group-item list-group-item-action py-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-1 fw-bold"><i class="bi bi-chat-left-text me-2 text-primary"></i><?= htmlspecialchars($topic['name']) ?></h6>
-                                    <div class="d-flex align-items-center">
-                                        <small class="text-muted me-3">Erstellt von: <?= htmlspecialchars($topic['userName'] ?? 'Unbekannt') ?></small>
-                                        <i class="bi bi-arrow-right text-muted"></i>
-                                    </div>
-                                </div>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
 
         <?php else: ?>
             <!-- Default View -->

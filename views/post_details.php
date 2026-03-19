@@ -137,6 +137,11 @@ $topicName = $topicModel->getName();
                             <li class="breadcrumb-item active" aria-current="page">Beitrag</li>
                         </ol>
                     </nav>
+                    <form class="d-flex" method="GET" action="/views/forum.php">
+                        <input type="hidden" name="jobId" value="<?= $jobId ?>">
+                        <input class="form-control form-control-sm me-2" type="search" name="search" placeholder="Suche..." aria-label="Search">
+                        <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                    </form>
                 </div>
 
                 <div class="card-body bg-light flex-grow-1">
