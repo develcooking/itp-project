@@ -53,6 +53,19 @@ if ($selectedTopicId) {
 ?>
     <link href="../resources/css/quill.snow.css" rel="stylesheet" />
     <script src="../resources/js/quill.js"></script>
+    <style>
+        /* Styles for rendered Quill content in the forum */
+        .post-content blockquote {
+            border-left: 4px solid #ccc;
+            margin-bottom: 5px;
+            margin-top: 5px;
+            padding-left: 16px;
+            font-style: italic;
+        }
+        .post-content h1 { font-size: 2em; font-weight: bold; }
+        .post-content h2 { font-size: 1.5em; font-weight: bold; }
+        .post-content h3 { font-size: 1.17em; font-weight: bold; }
+    </style>
 
 <div class="container-fluid mt-4 forum-container">
     <div class="row">
@@ -120,9 +133,17 @@ if ($selectedTopicId) {
                                                 <?php endif; ?>
                                                 <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
                                             </span>
-                                            <small class="text-muted"><?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?></small>
+                                            <div>
+                                                <?php if ($post['userId'] == $_SESSION['userId']): ?>
+                                                    <i class="bi bi-pencil text-muted edit-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Bearbeiten"></i>
+                                                    <i class="bi bi-trash3 text-muted delete-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Löschen"></i>
+                                                <?php elseif ($isAdmin): ?>
+                                                    <i class="bi bi-trash3 text-muted delete-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Löschen"></i>
+                                                <?php endif; ?>
+                                                <small class="text-muted"><?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?></small>
+                                            </div>
                                         </div>
-                                        <div class="post-content">
+                                        <div class="post-content" id="post-content-<?= $post['postId'] ?>">
                                             <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
                                         </div>
                                         <div class="d-flex gap-2 mt-3">
