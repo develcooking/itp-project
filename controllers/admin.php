@@ -120,6 +120,15 @@ switch ($action) {
         $userId = intval($_POST['userId'] ?? 0);
         $role = trim($_POST['role'] ?? '');
 
+        if ($userId === (int)$currentUserId) {
+            http_response_code(403);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Die eigene Rolle kann nicht geändert werden.'
+            ], JSON_UNESCAPED_UNICODE);
+            break;
+        }
+
         if ($userId > 0 && !empty($role)) {
             $user = new User($conn);
             if ($user->updateRole($userId, $role)) {
