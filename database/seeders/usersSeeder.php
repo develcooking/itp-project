@@ -15,8 +15,16 @@ class UsersSeeder
 
     public function run()
     {
-        $this->conn->query("DELETE FROM Users");
-        $this->conn->query("ALTER TABLE Users AUTO_INCREMENT = 1");
+        $this->conn->query("SET FOREIGN_KEY_CHECKS = 0");
+            $this->conn->query("DELETE FROM Posts");
+            $this->conn->query("DELETE FROM Topics");
+            $this->conn->query("DELETE FROM Appointments");
+            $this->conn->query("DELETE FROM users_jobs");
+            $this->conn->query("DELETE FROM Jobs");
+            $this->conn->query("DELETE FROM Users");
+            $this->conn->query("SET FOREIGN_KEY_CHECKS = 1");
+
+            $this->conn->query("ALTER TABLE Users AUTO_INCREMENT = 1");
 
         $fixedUsers = [
             [

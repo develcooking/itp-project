@@ -25,12 +25,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveProfile'])) {
     $email = htmlspecialchars(trim($_POST['email'] ?? ''));
     $schoolCompany = htmlspecialchars(trim($_POST['school_company'] ?? ''));
     $sendNotification = isset($_POST['sendNotification']) && $_POST['sendNotification'] === '1';
+    $removeProfileImage = isset($_POST['removeProfileImage']) && $_POST['removeProfileImage'] === '1';
     $profileImageData = null;
     $profileImageMime = null;
 
+    if ($removeProfileImage && !$user->canStoreProfileImage()) {
+        $errors['profileImage'] = 'Profilbild konnte nicht gelöscht werden.';
+    }
+
     if (isset($_FILES['profileImage']) && ($_FILES['profileImage']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
         if (!$user->canStoreProfileImage()) {
-            $errors['profileImage'] = 'Profilbilder sind noch nicht verfügbar. Bitte führen Sie zuerst die neue Datenbank-Migration aus.';
+            $errors['profileImage'] = 'Profilbild konnte nicht gespeichert werden.';
         }
 
         $uploadError = $_FILES['profileImage']['error'];
@@ -105,6 +110,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveProfile'])) {
 
         if ($profileImageData !== null && $profileImageMime !== null) {
             $user->setProfileImage($profileImageData, $profileImageMime);
+        } elseif ($removeProfileImage) {
+            $user->setProfileImage(null, null);
         }
 
         if ($user->updateProfile()) {

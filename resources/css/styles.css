@@ -227,6 +227,17 @@ select {
   object-fit: cover;
 }
 
+.profile-image-placeholder-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  font-size: 120px;
+  line-height: 120px;
+  color: #6c757d;
+}
+
 /* ===================== FOOTER ===================== */
 .footer {
   background-color: var(--accentColor);

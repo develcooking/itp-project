@@ -74,7 +74,7 @@ class LoginTest extends TestCase
         );
 
         $this->assertEquals(302, $response['code'], 'Should redirect after successful login');
-        $this->assertStringContainsString('Location: /views/startpage.php', $response['headers']);
+        $this->assertStringContainsString('Location: /controllers/startpage.php', $response['headers']);
     }
 
     public function test_It_Should_Fail_Login_With_Wrong_Password_Via_HTTP(): void
@@ -219,7 +219,7 @@ class LoginTest extends TestCase
             );
 
             $this->assertEquals(302, $response['code'], "Should login user with role: $role");
-            $this->assertStringContainsString('Location: /views/startpage.php', $response['headers']);
+            $this->assertStringContainsString('Location: /controllers/startpage.php', $response['headers']);
         }
     }
 
@@ -251,7 +251,7 @@ class LoginTest extends TestCase
         );
 
         $this->assertEquals(302, $response['code']);
-        $this->assertStringContainsString('Location: /views/startpage.php', $response['headers']);
+        $this->assertStringContainsString('Location: /controllers/startpage.php', $response['headers']);
     }
 
     public function test_It_Should_Sanitize_Email_Input_Via_HTTP(): void
@@ -301,7 +301,7 @@ class LoginTest extends TestCase
         );
 
         $this->assertEquals(302, $response['code']);
-        $this->assertStringContainsString('Location: /views/startpage.php', $response['headers']);
+        $this->assertStringContainsString('Location: /controllers/startpage.php', $response['headers']);
     }
 
     public function test_It_Should_Logout_User_Via_HTTP(): void

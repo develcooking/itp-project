@@ -47,19 +47,25 @@ $profileStats = array_merge([
 
                     <form method="post" action="/controllers/profile.php" enctype="multipart/form-data">
                         <?php echo getCsrfTokenInput(); ?>
+                        <input type="hidden" name="removeProfileImage" id="removeProfileImage" value="0">
 
                         <div class="mb-3">
-                            <?php if ($user->hasProfileImage()): ?>
-                                <img
-                                    src="/controllers/profileImage.php"
-                                    alt="Aktuelles Profilbild"
-                                    class="rounded-circle border profile-image-preview">
-                            <?php else: ?>
-                                <img
-                                    src="/resources/imgs/icon.png"
-                                    alt="Standard Profilbild"
-                                    class="rounded-circle border profile-image-preview">
-                            <?php endif; ?>
+                            <?php $hasProfileImage = $user->hasProfileImage(); ?>
+                            <img
+                                id="profileImagePreview"
+                                src="<?= $hasProfileImage ? '/controllers/profileImage.php?v=' . time() : '' ?>"
+                                alt="Aktuelles Profilbild"
+                                class="rounded-circle border profile-image-preview <?= $hasProfileImage ? '' : 'd-none' ?>">
+                            <svg
+                                id="profileImagePlaceholder"
+                                class="profile-image-placeholder-icon <?= $hasProfileImage ? 'd-none' : '' ?>"
+                                viewBox="0 0 16 16"
+                                fill="currentColor"
+                                role="img"
+                                aria-label="Standard Profilbild">
+                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"></path>
+                                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"></path>
+                            </svg>
                         </div>
 
                         <div class="mb-3 text-start">
@@ -69,10 +75,17 @@ $profileStats = array_merge([
                                 id="profileImage"
                                 class="d-none"
                                 accept="image/jpeg,image/png,image/webp">
-                            <label for="profileImage" class="form-control d-flex align-items-center justify-content-start gap-2">
-                                <span class="btn btn-outline-primary btn-sm">Datei auswahlen</span>
-                                <span id="profileImageFileName" class="text-muted">Profilbild hochladen (JPG, PNG, WEBP, max. 2 MB)</span>
-                            </label>
+                            <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch">
+                                <label for="profileImage" class="form-control d-flex align-items-center justify-content-start gap-2 flex-grow-1 mb-0">
+                                    <span class="btn btn-outline-primary btn-sm">Datei auswahlen</span>
+                                    <span id="profileImageFileName" class="text-muted">Profilbild hochladen (JPG, PNG, WEBP, max. 2 MB)</span>
+                                </label>
+                                <?php if ($hasProfileImage): ?>
+                                    <button class="btn btn-outline-danger" type="button" id="removeProfileImageButton">
+                                        Profilbild löschen
+                                    </button>
+                                <?php endif; ?>
+                            </div>
                             <?php if (!empty($errors['profileImage'])): ?>
                                 <div class="invalidUserName mt-1">
                                     <?= htmlspecialchars($errors['profileImage']) ?>
@@ -200,8 +213,8 @@ $profileStats = array_merge([
 
             <div class="col-12 col-lg-4">
                 <div class="card bg-light shadow h-100 p-4">
-                    <h3 class="fw-bold mb-2">Deine Statistik</h3>
-                    <p class="text-muted mb-4">Übersicht deiner Aktivitat im Forum.</p>
+                    <h3 class="fw-bold mb-2">Statistik</h3>
+                    <p class="text-muted mb-4">Übersicht Ihrer Aktivitat im Forum.</p>
 
                     <div class="d-flex flex-column gap-3">
                         <div class="border rounded-3 p-3 bg-white">
@@ -235,19 +248,58 @@ $profileStats = array_merge([
 document.addEventListener('DOMContentLoaded', function () {
     const profileImageInput = document.getElementById('profileImage');
     const profileImageFileName = document.getElementById('profileImageFileName');
+    const profileImagePreview = document.getElementById('profileImagePreview');
+    const profileImagePlaceholder = document.getElementById('profileImagePlaceholder');
+    const removeProfileImageInput = document.getElementById('removeProfileImage');
+    const removeProfileImageButton = document.getElementById('removeProfileImageButton');
+    let currentPreviewObjectUrl = null;
 
-    if (!profileImageInput || !profileImageFileName) {
+    if (!profileImageInput || !profileImageFileName || !profileImagePreview || !profileImagePlaceholder || !removeProfileImageInput) {
         return;
     }
 
     profileImageInput.addEventListener('change', function () {
         if (profileImageInput.files && profileImageInput.files.length > 0) {
-            profileImageFileName.textContent = profileImageInput.files[0].name;
+            const selectedFile = profileImageInput.files[0];
+            removeProfileImageInput.value = '0';
+
+            profileImageFileName.textContent = selectedFile.name;
             profileImageFileName.classList.remove('text-muted');
+
+            if (currentPreviewObjectUrl) {
+                URL.revokeObjectURL(currentPreviewObjectUrl);
+            }
+
+            currentPreviewObjectUrl = URL.createObjectURL(selectedFile);
+            profileImagePreview.src = currentPreviewObjectUrl;
+            profileImagePreview.classList.remove('d-none');
+            profileImagePlaceholder.classList.add('d-none');
         } else {
             profileImageFileName.textContent = 'Profilbild hochladen (JPG, PNG, WEBP, max. 2 MB)';
             profileImageFileName.classList.add('text-muted');
+
+            if (currentPreviewObjectUrl) {
+                URL.revokeObjectURL(currentPreviewObjectUrl);
+                currentPreviewObjectUrl = null;
+            }
         }
     });
+
+    if (removeProfileImageButton) {
+        removeProfileImageButton.addEventListener('click', function () {
+            removeProfileImageInput.value = '1';
+            profileImageInput.value = '';
+
+            if (currentPreviewObjectUrl) {
+                URL.revokeObjectURL(currentPreviewObjectUrl);
+                currentPreviewObjectUrl = null;
+            }
+
+            profileImagePreview.classList.add('d-none');
+            profileImagePlaceholder.classList.remove('d-none');
+            profileImageFileName.textContent = 'Profilbild wird beim Speichern gelöscht';
+            profileImageFileName.classList.remove('text-muted');
+        });
+    }
 });
 </script>
