@@ -97,21 +97,16 @@ class Post
                 u.userName
                 {$selectProfileImageState},
 
-                SUM(CASE WHEN ur.voteType = 'up' THEN 1 ELSE 0 END) AS reaction_positive,
-                SUM(CASE WHEN ur.voteType = 'down' THEN 1 ELSE 0 END) AS reaction_negative,
-
-                MAX(CASE WHEN ur.userId = ? THEN ur.voteType ELSE NULL END) AS voteType,
-
-                COUNT(c.commentId) AS comment_count
+                (SELECT COUNT(*) FROM user_reactions ur WHERE ur.postId = p.postId AND ur.voteType = 'up') AS reaction_positive,
+                (SELECT COUNT(*) FROM user_reactions ur WHERE ur.postId = p.postId AND ur.voteType = 'down') AS reaction_negative,
+                (SELECT ur.voteType FROM user_reactions ur WHERE ur.postId = p.postId AND ur.userId = ?) AS voteType,
+                (SELECT COUNT(*) FROM Comments c WHERE c.postId = p.postId) AS comment_count
 
             FROM Posts p
             JOIN Users u ON p.userId = u.userId
-            LEFT JOIN user_reactions ur ON p.postId = ur.postId
-            LEFT JOIN Comments c ON p.postId = c.postId
 
             WHERE p.topicId = ?
 
-            GROUP BY p.postId
             ORDER BY p.createdAt ASC
             ";        
         $stmt = $this->conn->prepare($query);
