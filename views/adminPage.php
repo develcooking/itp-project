@@ -34,7 +34,7 @@ include './header.php';
                     <td><?= htmlspecialchars($user['lastName'] ?? '') ?></td>
                     <td><?= htmlspecialchars($user['email'] ?? '') ?></td>
                     <td>
-                        <select class="role-dropdown" data-user-id="<?= $user['userId'] ?>">
+                        <select class="role-dropdown" data-user-id="<?= $user['userId'] ?>" <?= ((int)($user['userId'] ?? 0) === (int)$currentUserId) ? 'disabled title="Eigene Rolle kann nicht geändert werden"' : '' ?>>
                             <option value="Lehrer" <?= ($user['role'] ?? '') === 'Lehrer' ? 'selected' : '' ?>>Lehrkraft</option>
                             <option value="Ausbilder" <?= ($user['role'] ?? '') === 'Ausbilder' ? 'selected' : '' ?>>Ausbilder</option>
                             <option value="Admin" <?= ($user['role'] ?? '') === 'Admin' ? 'selected' : '' ?>>Admin</option>
@@ -77,7 +77,7 @@ include './header.php';
                     <td><?= htmlspecialchars($user['lastName'] ?? '') ?></td>
                     <td><?= htmlspecialchars($user['email'] ?? '') ?></td>
                     <td>
-                        <select class="role-dropdown" data-user-id="<?= $user['userId'] ?>">
+                        <select class="role-dropdown" data-user-id="<?= $user['userId'] ?>" <?= ((int)($user['userId'] ?? 0) === (int)$currentUserId) ? 'disabled title="Eigene Rolle kann nicht geändert werden"' : '' ?>>
                             <option value="Lehrer" <?= ($user['role'] ?? '') === 'Lehrer' ? 'selected' : '' ?>>Lehrkraft</option>
                             <option value="Ausbilder" <?= ($user['role'] ?? '') === 'Ausbilder' ? 'selected' : '' ?>>Ausbilder</option>
                             <option value="Admin" <?= ($user['role'] ?? '') === 'Admin' ? 'selected' : '' ?>>Admin</option>
