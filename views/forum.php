@@ -53,19 +53,7 @@ if ($selectedTopicId) {
 ?>
     <link href="../resources/css/quill.snow.css" rel="stylesheet" />
     <script src="../resources/js/quill.js"></script>
-    <style>
-        /* Styles for rendered Quill content in the forum */
-        .post-content blockquote {
-            border-left: 4px solid #ccc;
-            margin-bottom: 5px;
-            margin-top: 5px;
-            padding-left: 16px;
-            font-style: italic;
-        }
-        .post-content h1 { font-size: 2em; font-weight: bold; }
-        .post-content h2 { font-size: 1.5em; font-weight: bold; }
-        .post-content h3 { font-size: 1.17em; font-weight: bold; }
-    </style>
+
 <div class="container-fluid mt-4 forum-container">
     <div class="row">
         <!-- Sidebar: Berufsbereiche -->
