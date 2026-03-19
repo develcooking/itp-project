@@ -103,6 +103,11 @@ if ($selectedTopicId) {
                                 <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentTopicName) ?></li>
                             </ol>
                         </nav>
+                        <form class="d-flex" method="GET" action="">
+                            <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
+                            <input class="form-control form-control-sm me-2" type="search" name="search" placeholder="Suche..." aria-label="Search" value="<?= htmlspecialchars($searchTerm ?? '') ?>">
+                            <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                        </form>
                     </div>
                     <div class="card-body bg-light flex-grow-1">
                         <?php if (empty($posts)): ?>

@@ -72,7 +72,7 @@ class Forum {
     }
 
     public function getTopicsByBereich(int $bereich_id, ?string $search = null): array {
-        // Modified query to include searching in post content
+        // Modified query to include searching in post and comment content
         $query = "
             SELECT DISTINCT t.*, u.userName 
             FROM Topics t 

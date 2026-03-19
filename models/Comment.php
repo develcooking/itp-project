@@ -87,7 +87,7 @@ class Comment
     /**
      * Get all comments for a post
      */
-    public function getByPostId($postId): array
+    public function getByPostId($postId, ?string $search = null): array
     {
         $selectProfileImageState = $this->hasProfileImageColumns()
             ? ", (u.profileImage IS NOT NULL) AS hasProfileImage"
@@ -101,11 +101,23 @@ class Comment
             FROM " . $this->table . " c
             JOIN Users u ON c.userId = u.userId
             WHERE c.postId = ?
-            ORDER BY c.createdAt ASC
         ";
 
+        if (!empty($search)) {
+            $query .= " AND c.content LIKE ? ";
+        }
+
+        $query .= " ORDER BY c.createdAt ASC";
+
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $postId);
+
+        if (!empty($search)) {
+            $searchTerm = "%" . $search . "%";
+            $stmt->bind_param("is", $postId, $searchTerm);
+        } else {
+            $stmt->bind_param("i", $postId);
+        }
+
         $stmt->execute();
         $result = $stmt->get_result();
 

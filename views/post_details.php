@@ -15,6 +15,7 @@ if (!isset($_SESSION['userId'])) {
 $postId = isset($_GET['postId']) ? intval($_GET['postId']) : null;
 $topicId = isset($_GET['topicId']) ? intval($_GET['topicId']) : null;
 $jobId = isset($_GET['jobId']) ? intval($_GET['jobId']) : null;
+$searchTerm = isset($_GET['search']) ? trim($_GET['search']) : null;
 
 if (!$postId || !$topicId || !$jobId) {
     header("Location: /views/forum.php?error=invalid_params");
@@ -68,7 +69,7 @@ if ($topicModel->getJobId() != $jobId) {
 }
 
 // Get comments
-$comments = $commentModel->getByPostId($postId);
+$comments = $commentModel->getByPostId($postId, $searchTerm);
 
 // Get post with vote counts
 $postsWithVotes = $postModel->getByTopicId($topicId, $_SESSION['userId']);
@@ -137,10 +138,15 @@ $topicName = $topicModel->getName();
                             <li class="breadcrumb-item active" aria-current="page">Beitrag</li>
                         </ol>
                     </nav>
-                    <form class="d-flex" method="GET" action="/views/forum.php">
+                    <form class="d-flex" method="GET" action="">
                         <input type="hidden" name="jobId" value="<?= $jobId ?>">
-                        <input class="form-control form-control-sm me-2" type="search" name="search" placeholder="Suche..." aria-label="Search">
+                        <input type="hidden" name="topicId" value="<?= $topicId ?>">
+                        <input type="hidden" name="postId" value="<?= $postId ?>">
+                        <input class="form-control form-control-sm me-2" type="search" name="search" placeholder="Beiträge durchsuchen..." aria-label="Search" value="<?= htmlspecialchars($searchTerm ?? '') ?>">
                         <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                        <?php if ($searchTerm): ?>
+                            <a href="?jobId=<?= $jobId ?>&topicId=<?= $topicId ?>&postId=<?= $postId ?>" class="btn btn-sm btn-outline-danger ms-2" title="Suche zurücksetzen"><i class="bi bi-x-circle"></i></a>
+                        <?php endif; ?>
                     </form>
                 </div>
 
@@ -230,11 +236,24 @@ $topicName = $topicModel->getName();
                     </div>
 
                     <!-- Comments Section -->
-                    <h5 class="m-3 px-2">Kommentare (<?= count($comments) ?>)</h5>
+                    <div class="d-flex justify-content-between align-items-center m-3 px-2">
+                        <h5>Kommentare (<?= count($comments) ?>)</h5>
+                        <?php if ($searchTerm): ?>
+                            <span class="badge bg-info text-dark">
+                                Filter: "<?= htmlspecialchars($searchTerm) ?>"
+                            </span>
+                        <?php endif; ?>
+                    </div>
 
                     <?php if (empty($comments)): ?>
                         <div class="alert alert-light border shadow-sm mx-2" role="alert">
-                            <i class="bi bi-info-circle me-2 text-primary"></i>Noch keine Kommentare. Seien Sie der Erste!
+                            <i class="bi bi-info-circle me-2 text-primary"></i>
+                            <?php if ($searchTerm): ?>
+                                Keine Kommentare gefunden, die "<?= htmlspecialchars($searchTerm) ?>" enthalten.
+                                <a href="?jobId=<?= $jobId ?>&topicId=<?= $topicId ?>&postId=<?= $postId ?>" class="alert-link ms-2">Suche zurücksetzen</a>
+                            <?php else: ?>
+                                Noch keine Kommentare. Seien Sie der Erste!
+                            <?php endif; ?>
                         </div>
                     <?php else: ?>
                         <?php foreach ($comments as $comment): ?>
