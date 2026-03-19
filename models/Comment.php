@@ -12,9 +12,24 @@ class Comment
     private string $userName = '';
     private string $createdAt = '';
 
+    private ?bool $profileImageColumnsAvailable = null;
+
     public function __construct($db)
     {
         $this->conn = $db;
+    }
+
+    private function hasProfileImageColumns(): bool
+    {
+        if ($this->profileImageColumnsAvailable !== null) {
+            return $this->profileImageColumnsAvailable;
+        }
+
+        $query = "SHOW COLUMNS FROM Users LIKE 'profileImage'";
+        $result = $this->conn->query($query);
+        $this->profileImageColumnsAvailable = $result && $result->num_rows > 0;
+
+        return $this->profileImageColumnsAvailable;
     }
 
     /* #### Set functions #### */
@@ -74,10 +89,15 @@ class Comment
      */
     public function getByPostId($postId): array
     {
+        $selectProfileImageState = $this->hasProfileImageColumns()
+            ? ", (u.profileImage IS NOT NULL) AS hasProfileImage"
+            : ", 0 AS hasProfileImage";
+
         $query = "
             SELECT 
                 c.*,
                 u.userName
+                {$selectProfileImageState}
             FROM " . $this->table . " c
             JOIN Users u ON c.userId = u.userId
             WHERE c.postId = ?
@@ -97,6 +117,7 @@ class Comment
                     'postId' => $row['postId'],
                     'userId' => $row['userId'],
                     'userName' => $row['userName'],
+                    'hasProfileImage' => ((int)($row['hasProfileImage'] ?? 0)) === 1,
                     'content' => $row['content'],
                     'createdAt' => $row['createdAt'],
                     'modifiedAt' => $row['modifiedAt']

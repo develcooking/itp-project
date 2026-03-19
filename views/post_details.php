@@ -28,6 +28,13 @@ $commentModel = new Comment($conn);
 
 $isAdmin = isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin';
 
+// Sidebar data
+if ($isAdmin) {
+    $bereiche = $forumModel->getallBereiche();
+} else {
+    $bereiche = $forumModel->getBereiche();
+}
+
 // Check access
 if (!$isAdmin) {
     if (!$forumModel->hasAccess($_SESSION['userId'], $jobId)) {
@@ -75,150 +82,207 @@ if (!empty($postsWithVotes)) {
     }
 }
 
-// Sicherstellen dass wir den Post gefunden haben
+// Ensure post found
 if (!$post) {
     header("Location: /views/forum.php?error=post_not_found");
     exit();
 }
 
+$currentJobName = "Berufsbereich";
+foreach ($bereiche as $b) {
+    if ($b['jobId'] == $jobId) {
+        $currentJobName = $b['name'];
+        break;
+    }
+}
 $topicName = $topicModel->getName();
 ?>
 
 <link href="../resources/css/quill.snow.css" rel="stylesheet" />
 <script src="../resources/js/quill.js"></script>
 
-<style>
-    .post-content blockquote {
-        border-left: 4px solid #ccc;
-        margin-bottom: 5px;
-        margin-top: 5px;
-        padding-left: 16px;
-        font-style: italic;
-    }
-    .post-content h1 { font-size: 2em; font-weight: bold; }
-    .post-content h2 { font-size: 1.5em; font-weight: bold; }
-    .post-content h3 { font-size: 1.17em; font-weight: bold; }
-</style>
-
-<div class="container-fluid mt-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb" class="mb-3">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/views/forum.php" class="text-decoration-none">Forum</a></li>
-                    <li class="breadcrumb-item"><a href="/views/forum.php?jobId=<?= $jobId ?>" class="text-decoration-none">Bereich</a></li>
-                    <li class="breadcrumb-item"><a href="/views/forum.php?jobId=<?= $jobId ?>&topicId=<?= $topicId ?>" class="text-decoration-none"><?= htmlspecialchars($topicName) ?></a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Beitrag</li>
-                </ol>
-            </nav>
-
-            <!-- Main Post Card -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0"><?= htmlspecialchars($topicName) ?></h5>
+<div class="container-fluid mt-4 forum-container">
+    <div class="row">
+        <!-- Sidebar: Berufsbereiche -->
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-header text-white" style="background-color: var(--accentColor);">
+                    <h5 class="mb-0">Berufsbereiche</h5>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="fw-bold text-primary">
-                            <i class="bi bi-person-circle me-1"></i>
-                            <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
-                        </span>
-                        <small class="text-muted">
-                            <?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?>
-                        </small>
-                    </div>
+                <div class="list-group list-group-flush">
+                    <?php if (empty($bereiche)): ?>
+                        <div class="p-3 text-center text-muted">Keine Bereiche verfügbar.</div>
+                    <?php else: ?>
+                        <?php foreach ($bereiche as $bereich): ?>
+                            <a href="/views/forum.php?jobId=<?= $bereich['jobId'] ?>" 
+                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center <?= $jobId == $bereich['jobId'] ? 'active' : '' ?>"
+                               <?= $jobId == $bereich['jobId'] ? 'style="background-color: var(--orangeLight); border-color: var(--accentColor);"' : '' ?>>
+                                <?= htmlspecialchars($bereich['name']) ?>
+                                <i class="bi bi-chevron-right small <?= $jobId == $bereich['jobId'] ? '' : 'text-muted' ?>"></i>
+                            </a>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
 
-                    <div class="post-content p-3 bg-light rounded mb-3">
-                        <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
-                    </div>
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="card shadow-sm min-vh-75 d-flex flex-column">
+                <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="/views/forum.php?jobId=<?= $jobId ?>" class="text-decoration-none"><?= htmlspecialchars($currentJobName) ?></a></li>
+                            <li class="breadcrumb-item"><a href="/views/forum.php?jobId=<?= $jobId ?>&topicId=<?= $topicId ?>" class="text-decoration-none"><?= htmlspecialchars($topicName) ?></a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Beitrag</li>
+                        </ol>
+                    </nav>
+                </div>
 
-                    <!-- Voting Buttons -->
+                <div class="card-body bg-light flex-grow-1">
+                    <!-- Main Post -->
                     <?php
                     $userVote = $post['voteType'] ?? 'noreaction';
                     $upIcon = ($userVote === 'up') ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up';
                     $downIcon = ($userVote === 'down') ? 'bi-hand-thumbs-down-fill' : 'bi-hand-thumbs-down';
-                    $upColor = ($userVote === 'up') ? 'green' : '#6c757d';
-                    $downColor = ($userVote === 'down') ? 'red' : '#6c757d';
+                    $upColor = ($userVote === 'up') ? 'forum-vote-up' : 'forum-vote-neutral';
+                    $downColor = ($userVote === 'down') ? 'forum-vote-down' : 'forum-vote-neutral';
                     ?>
 
-                    <div class="d-flex gap-2">
-                        <form method="POST" action="/controllers/forum_actions.php">
-                            <input type="hidden" name="action" value="voteUp">
-                            <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
-                            <input type="hidden" name="redirectTo" value="/views/post_details.php?postId=<?= $postId ?>&topicId=<?= $topicId ?>&jobId=<?= $jobId ?>">
-                            <button class="btn btn-sm btn-light">
-                                <i class="bi <?= $upIcon ?>" style="color: <?= $upColor ?>; font-size:18px;"></i>
-                                <span><?= $post['reaction_positive'] ?></span>
-                            </button>
-                        </form>
-
-                        <form method="POST" action="/controllers/forum_actions.php">
-                            <input type="hidden" name="action" value="voteDown">
-                            <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
-                            <input type="hidden" name="redirectTo" value="/views/post_details.php?postId=<?= $postId ?>&topicId=<?= $topicId ?>&jobId=<?= $jobId ?>">
-                            <button class="btn btn-sm btn-light">
-                                <i class="bi <?= $downIcon ?>" style="color: <?= $downColor ?>; font-size:18px;"></i>
-                                <span><?= $post['reaction_negative'] ?></span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Comments Section -->
-            <h5 class="mb-3">Kommentare (<?= count($comments) ?>)</h5>
-
-            <!-- Comments List -->
-            <?php if (empty($comments)): ?>
-                <div class="alert alert-info" role="alert">
-                    <i class="bi bi-info-circle me-2"></i>Noch keine Kommentare. Seien Sie der Erste!
-                </div>
-            <?php else: ?>
-                <?php foreach ($comments as $comment): ?>
-                    <div class="card shadow-sm mb-3">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="fw-bold text-primary">
-                                    <i class="bi bi-person-circle me-1"></i>
-                                    <?= htmlspecialchars($comment['userName'] ?? 'Unbekannt') ?>
+                    <div class="card mb-4 border-0 shadow-sm forum-post-card">
+                        <div class="row g-0">
+                            <!-- Sidebar: User Info -->
+                            <div class="col-md-2 border-end bg-light d-flex flex-column align-items-center p-3 text-center d-none d-md-flex">
+                                <div class="mb-2">
+                                    <?php if (!empty($post['hasProfileImage'])): ?>
+                                        <img
+                                            src="/controllers/profileImage.php?userId=<?= (int)$post['userId'] ?>"
+                                            alt="Profilbild von <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>"
+                                            class="rounded-circle border shadow-sm"
+                                            style="width: 64px; height: 64px; object-fit: cover;"
+                                            onerror="this.onerror=null;this.src='/resources/imgs/icon.png';">
+                                    <?php else: ?>
+                                        <i class="bi bi-person-circle text-muted" style="font-size: 64px;"></i>
+                                    <?php endif; ?>
+                                </div>
+                                <span class="fw-bold text-primary small text-break">
+                                    <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
                                 </span>
-                                <small class="text-muted">
-                                    <?= date('d.m.Y H:i', strtotime($comment['createdAt'])) ?>
-                                </small>
                             </div>
-                            <div class="ps-3">
-                                <?= strip_tags($comment['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
+
+                            <!-- Main Content -->
+                            <div class="col-md-10">
+                                <div class="card-body h-100 d-flex flex-column">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div class="d-md-none fw-bold text-primary mb-1">
+                                             <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
+                                        </div>
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock me-1"></i><?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?>
+                                        </small>
+                                    </div>
+                                    <div class="post-content flex-grow-1">
+                                        <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                        <div class="d-flex gap-2">
+                                            <form method="POST" action="/controllers/forum_actions.php">
+                                                <input type="hidden" name="action" value="voteUp">
+                                                <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+                                                <input type="hidden" name="redirectTo" value="/views/post_details.php?postId=<?= $postId ?>&topicId=<?= $topicId ?>&jobId=<?= $jobId ?>">
+                                                <button class="btn btn-sm btn-light border">
+                                                    <i class="bi <?= $upIcon ?> forum-vote-icon <?= $upColor ?>"></i>
+                                                    <span class="ms-1"><?= $post['reaction_positive'] ?></span>
+                                                </button>
+                                            </form>
+
+                                            <form method="POST" action="/controllers/forum_actions.php">
+                                                <input type="hidden" name="action" value="voteDown">
+                                                <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+                                                <input type="hidden" name="redirectTo" value="/views/post_details.php?postId=<?= $postId ?>&topicId=<?= $topicId ?>&jobId=<?= $jobId ?>">
+                                                <button class="btn btn-sm btn-light border">
+                                                    <i class="bi <?= $downIcon ?> forum-vote-icon <?= $downColor ?>"></i>
+                                                    <span class="ms-1"><?= $post['reaction_negative'] ?></span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
 
-            <!-- Add Comment Form -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Kommentar hinzufügen</h6>
-                </div>
-                <div class="card-body">
-                    <form id="createCommentForm" action="/controllers/forum_actions.php" method="POST">
-                        <?php echo getCsrfTokenInput(); ?>
-                        <input type="hidden" name="action" value="createComment">
-                        <input type="hidden" name="postId" value="<?= $postId ?>">
-                        <input type="hidden" name="topicId" value="<?= $topicId ?>">
-                        <input type="hidden" name="jobId" value="<?= $jobId ?>">
-                        <input type="hidden" name="commentContent" id="commentContentHidden">
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Ihr Kommentar</label>
-                            <div id="quillEditorComment" style="height: 150px; background: white;"></div>
+                    <!-- Comments Section -->
+                    <h5 class="mb-3 px-2">Kommentare (<?= count($comments) ?>)</h5>
+
+                    <?php if (empty($comments)): ?>
+                        <div class="alert alert-light border shadow-sm mx-2" role="alert">
+                            <i class="bi bi-info-circle me-2 text-primary"></i>Noch keine Kommentare. Seien Sie der Erste!
                         </div>
-                        
-                        <div class="text-end">
-                            <a href="/views/forum.php?jobId=<?= $jobId ?>&topicId=<?= $topicId ?>" class="btn btn-secondary">Zurück</a>
-                            <button type="submit" class="btn text-white" style="background-color: var(--accentColor);">Kommentar absenden</button>
+                    <?php else: ?>
+                        <?php foreach ($comments as $comment): ?>
+                            <div class="card mb-3 border-0 shadow-sm mx-2">
+                                <div class="row g-0">
+                                    <div class="col-md-1 border-end bg-light d-flex flex-column align-items-center p-2 text-center d-none d-md-flex">
+                                        <?php if (!empty($comment['hasProfileImage'])): ?>
+                                            <img
+                                                src="/controllers/profileImage.php?userId=<?= (int)$comment['userId'] ?>"
+                                                alt="Profilbild"
+                                                class="rounded-circle border"
+                                                style="width: 40px; height: 40px; object-fit: cover;"
+                                                onerror="this.onerror=null;this.src='/resources/imgs/icon.png';">
+                                        <?php else: ?>
+                                            <i class="bi bi-person-circle text-muted" style="font-size: 40px;"></i>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-11">
+                                        <div class="card-body py-2">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span class="fw-bold text-primary small">
+                                                    <?= htmlspecialchars($comment['userName'] ?? 'Unbekannt') ?>
+                                                </span>
+                                                <small class="text-muted" style="font-size: 0.75rem;">
+                                                    <?= date('d.m.Y H:i', strtotime($comment['createdAt'])) ?>
+                                                </small>
+                                            </div>
+                                            <div class="comment-content small">
+                                                <?= strip_tags($comment['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+
+                    <!-- Add Comment Form -->
+                    <div class="card shadow-sm border-0 mt-4 mx-2">
+                        <div class="card-header bg-white border-bottom fw-bold">
+                            <i class="bi bi-reply me-2"></i>Kommentar hinzufügen
                         </div>
-                    </form>
+                        <div class="card-body">
+                            <form id="createCommentForm" action="/controllers/forum_actions.php" method="POST">
+                                <?php echo getCsrfTokenInput(); ?>
+                                <input type="hidden" name="action" value="createComment">
+                                <input type="hidden" name="postId" value="<?= $postId ?>">
+                                <input type="hidden" name="topicId" value="<?= $topicId ?>">
+                                <input type="hidden" name="jobId" value="<?= $jobId ?>">
+                                <input type="hidden" name="commentContent" id="commentContentHidden">
+                                
+                                <div class="mb-3">
+                                    <div id="quillEditorComment" style="height: 150px; background: white;"></div>
+                                </div>
+                                
+                                <div class="text-end">
+                                    <a href="/views/forum.php?jobId=<?= $jobId ?>&topicId=<?= $topicId ?>" class="btn btn-secondary shadow-sm">Zurück</a>
+                                    <button type="submit" class="btn btn-form-sub shadow-sm">
+                                        <i class="bi bi-send me-1"></i> Kommentar absenden
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -246,7 +310,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         var content = quillEditorComment.root.innerHTML;
         
-        if (quillEditorComment.getText().trim().length === 0) {
+        // Basic validation: check if there's actual text content
+        var text = quillEditorComment.getText().trim();
+        if (text.length === 0) {
             alert('Bitte geben Sie einen Kommentar ein.');
             return false;
         }
