@@ -66,6 +66,7 @@ if ($selectedTopicId) {
         .post-content h2 { font-size: 1.5em; font-weight: bold; }
         .post-content h3 { font-size: 1.17em; font-weight: bold; }
     </style>
+
 <div class="container-fluid mt-4 forum-container">
     <div class="row">
         <!-- Sidebar: Berufsbereiche -->
@@ -102,6 +103,11 @@ if ($selectedTopicId) {
                                 <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentTopicName) ?></li>
                             </ol>
                         </nav>
+                        <form class="d-flex" method="GET" action="">
+                            <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
+                            <input class="form-control form-control-sm me-2" type="search" name="search" placeholder="Suche..." aria-label="Search" value="<?= htmlspecialchars($searchTerm ?? '') ?>">
+                            <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                        </form>
                     </div>
                     <div class="card-body bg-light flex-grow-1">
                         <?php if (empty($posts)): ?>
@@ -134,10 +140,10 @@ if ($selectedTopicId) {
                                             </span>
                                             <div>
                                                 <?php if ($post['userId'] == $_SESSION['userId']): ?>
-                                                    <i class="bi bi-pencil gray-600 edit-post-btn me-1" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>"></i>
-                                                    <i class="bi bi-trash3 gray-600 delete-post-btn me-1" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>"></i>
-                                                <?php elseif ($post['userId'] != $_SESSION['userId'] && $isAdmin): ?>
-                                                    <i class="bi bi-trash3 gray-600 delete-post-btn me-1" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>"></i>
+                                                    <i class="bi bi-pencil text-muted edit-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Bearbeiten"></i>
+                                                    <i class="bi bi-trash3 text-muted delete-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Löschen"></i>
+                                                <?php elseif ($isAdmin): ?>
+                                                    <i class="bi bi-trash3 text-muted delete-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Löschen"></i>
                                                 <?php endif; ?>
                                                 <small class="text-muted"><?= date('d.m.Y H:i', strtotime($post['createdAt'])) ?></small>
                                             </div>
@@ -146,49 +152,55 @@ if ($selectedTopicId) {
                                             <?= $post['content'] ?>
                                         </div>
                                         <?php
-// Load attachments for this post
-$stmt = $conn->prepare("SELECT attachmentId, fileName, fileType FROM postAttachments WHERE postId = ?");
-$stmt->bind_param("i", $post['postId']);
-$stmt->execute();
-$resultFiles = $stmt->get_result();
+                                            // Load attachments for this post
+                                            $stmt = $conn->prepare("SELECT attachmentId, fileName, fileType FROM postAttachments WHERE postId = ?");
+                                            $stmt->bind_param("i", $post['postId']);
+                                            $stmt->execute();
+                                            $resultFiles = $stmt->get_result();
 
-while ($file = $resultFiles->fetch_assoc()) {
+                                            while ($file = $resultFiles->fetch_assoc()) {
 
-    $isImage = strpos($file['fileType'], 'image/') === 0;
+                                                $isImage = strpos($file['fileType'], 'image/') === 0;
 
-    echo '<div class="mt-2">';
+                                                echo '<div class="mt-2">';
 
-    // 🖼️ IMAGE PREVIEW
-    if ($isImage) {
-        echo '<img src="/controllers/download.php?id='.$file['attachmentId'].'" 
-                    style="max-width:200px; border-radius:8px; display:block; margin-bottom:5px;">';
-    }
+                                                // 🖼️ IMAGE PREVIEW
+                                                if ($isImage) {
+                                                    echo '<img src="/controllers/download.php?id='.$file['attachmentId'].'" 
+                                                    style="max-width:200px; border-radius:8px; display:block; margin-bottom:5px;">';
+                                                }
 
-    // 📎 FILE LINK
-    echo '<a href="/controllers/download.php?id='.$file['attachmentId'].'" target="_blank">';
-    echo '📎 ' . htmlspecialchars($file['fileName']);
-    echo '</a>';
+                                                // 📎 FILE LINK
+                                                echo '<a href="/controllers/download.php?id='.$file['attachmentId'].'" target="_blank">';
+                                                echo '📎 ' . htmlspecialchars($file['fileName']);
+                                                echo '</a>';
 
-    echo '</div>';
-}
-?>
-                                        <div class="d-flex gap-2 mt-3">
-                                            <form method="POST" action="/controllers/forum_actions.php">
-                                                <input type="hidden" name="action" value="voteUp">
-                                                <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
-                                                <button class="btn btn-sm btn-light" type="submit">
-                                                    <i class="bi <?= $upIcon ?> forum-vote-icon <?= $upVoteClass ?>"></i>
-                                                    <span><?= $post['reaction_positive'] ?></span>
-                                                </button>
-                                            </form>
-                                            <form method="POST" action="/controllers/forum_actions.php">
-                                                <input type="hidden" name="action" value="voteDown">
-                                                <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
-                                                <button class="btn btn-sm btn-light" type="submit">
-                                                    <i class="bi <?= $downIcon ?> forum-vote-icon <?= $downVoteClass ?>"></i>
-                                                    <span><?= $post['reaction_negative'] ?></span>
-                                                </button>
-                                            </form>
+                                                echo '</div>';
+                                            }
+                                        ?>
+                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                            <div class="d-flex gap-2">
+                                                <form method="POST" action="/controllers/forum_actions.php">
+                                                    <input type="hidden" name="action" value="voteUp">
+                                                    <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+                                                    <button class="btn btn-sm btn-light" type="submit">
+                                                        <i class="bi <?= $upIcon ?> forum-vote-icon <?= $upVoteClass ?>"></i>
+                                                        <span><?= $post['reaction_positive'] ?></span>
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="/controllers/forum_actions.php">
+                                                    <input type="hidden" name="action" value="voteDown">
+                                                    <input type="hidden" name="postId" value="<?= $post['postId'] ?>">
+                                                    <button class="btn btn-sm btn-light" type="submit">
+                                                        <i class="bi <?= $downIcon ?> forum-vote-icon <?= $downVoteClass ?>"></i>
+                                                        <span><?= $post['reaction_negative'] ?></span>
+                                                    </button>
+                                                </form>
+                                            </div>
+
+                                            <a href="/views/post_details.php?postId=<?= $post['postId'] ?>&topicId=<?= $selectedTopicId ?>&jobId=<?= $selectedJobId ?>" class="btn btn-sm btn-form-sub">
+                                                <i class="bi bi-chat-dots me-1"></i> Kommentare (<?= $post['comment_count'] ?>)
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -201,12 +213,14 @@ while ($file = $resultFiles->fetch_assoc()) {
                         </button>
                     </div>
                 <?php elseif ($selectedJobId): ?>
+                    <!-- Threads View (Topics) -->
                     <div class="card-header d-flex justify-content-between align-items-center bg-light">
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb mb-0">
                                 <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($currentJobName) ?></li>
                             </ol>
                         </nav>
+                        <?php // search field ?>
                         <div class="d-flex align-items-center">
                             <form class="d-flex me-3" method="GET" action="">
                                 <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
@@ -220,68 +234,89 @@ while ($file = $resultFiles->fetch_assoc()) {
                     </div>
                     <div class="card-body p-0">
                         <?php if (empty($topics)): ?>
-                            <div class="p-5 text-center text-muted">Noch keine Themen in diesem Bereich. Seien Sie der Erste!</div>
+                            <div class="p-5 text-center text-muted">Noch keine Themen in diesem Bereich. Seien Sie der/die Erste!</div>
                         <?php else: ?>
                             <div class="list-group list-group-flush">
                                 <?php foreach ($topics as $topic): ?>
-                                    <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>" class="list-group-item list-group-item-action p-3">
-                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div class="list-group-item p-3">
+                                        <div class="row align-items-center">
 
-                                            <h6 class="mb-1 fw-bold d-flex align-items-center gap-2">
-                                                <i class="bi bi-chat-left-text-fill me-2"></i>
-                                                <?= htmlspecialchars($topic['name']) ?>
-
-                                                <?php if (!empty($topic['pinned'])): ?>
-                                                    <span title="Angepinnt">📌</span>
+                                            <!-- COLUMN 1: Topic Name -->
+                                            <div class="col-md-9">
+                                                <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>" class="text-decoration-none">
+                                                    <h6 class="mb-1 fw-bold">
+                                                        <i class="bi bi-chat-left-text me-2 text-primary"></i>
+                                                        <?= htmlspecialchars($topic['name']) ?>
+                                                    </h6>
+                                                </a>
+                                                <?php if (!empty($searchTerm) && (!empty($topic['matching_posts']) || !empty($topic['matching_comments']))): ?>
+                                                    <div class="mt-2 small text-muted">
+                                                        <?php foreach ($topic['matching_posts'] as $match): ?>
+                                                            <div class="mb-1 border-start ps-2">
+                                                                <i class="bi bi-chat-text small text-secondary" title="Beitrag"></i>
+                                                                &hellip;<?= htmlspecialchars($match['content_snippet']) ?>&hellip;
+                                                                <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>#post-<?= $match['postId'] ?>" class="text-decoration-none ms-1">Ansehen</a>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                        <?php foreach ($topic['matching_comments'] as $match): ?>
+                                                            <div class="mb-1 border-start ps-2">
+                                                                <i class="bi bi-reply small text-secondary" title="Kommentar"></i>
+                                                                &hellip;<?= htmlspecialchars($match['content_snippet']) ?>&hellip;
+                                                                <a href="/views/post_details.php?postId=<?= $match['postId'] ?>&topicId=<?= $topic['topicId'] ?>&jobId=<?= $selectedJobId ?>" class="text-decoration-none ms-1">Ansehen</a>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
                                                 <?php endif; ?>
-                                            </h6>
+                                            </div>
 
-                                            <div class="d-flex align-items-center gap-2">
-
-                                                <small class="text-muted">
-                                                    Erstellt von: <?= htmlspecialchars($topic['userName'] ?? 'Unbekannt') ?>
-                                                </small>
-
+                                            <!-- COLUMN 2: Pin Button -->
+                                            <div class="col-md-1 text-center">
                                                 <?php if ($isAdmin): ?>
-                                                    <form method="POST" action="/controllers/forum_actions.php" class="ms-2">
+                                                    <form method="POST" action="/controllers/forum_actions.php">
                                                         <?php echo getCsrfTokenInput(); ?>
                                                         <input type="hidden" name="action" value="togglePin">
                                                         <input type="hidden" name="topicId" value="<?= $topic['topicId'] ?>">
 
-                                                        <button class="btn btn-sm btn-outline-warning" onclick="event.stopPropagation();">
+                                                        <button class="btn btn-sm btn-warning">
                                                             <?= !empty($topic['pinned']) ? 'Unpin' : '📌 Pin' ?>
                                                         </button>
                                                     </form>
                                                 <?php endif; ?>
+                                            </div>
 
-                                                <i class="bi bi-arrow-right text-muted"></i>
+                                            <!-- COLUMN 3: Meta Infos -->
+                                            <div class="col-md-2 d-flex justify-content-end align-items-center gap-2">
+
+                                                <?php if (!empty($topic['pinned'])): ?>
+                                                    <span>📌</span>
+                                                <?php endif; ?>
+
+                                                <small class="text-muted">
+                                                    <?= htmlspecialchars($topic['userName'] ?? 'Unbekannt') ?>
+                                                </small>
+
+                                                <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>">
+                                                    <i class="bi bi-arrow-right text-muted"></i>
+                                                </a>
 
                                             </div>
                                         </div>
-                                        <?php if (isset($topic['matching_posts']) && !empty($topic['matching_posts'])): ?>
-                                            <div class="mt-2 ps-3 border-start border-3 forum-search-match-border">
-                                                <small class="text-muted d-block mb-1"><i class="bi bi-search me-1"></i>Gefunden in Beiträgen:</small>
-                                                <?php foreach ($topic['matching_posts'] as $match): ?>
-                                                    <div class="mb-1 small text-dark-emphasis fst-italic">
-                                                        "&hellip;<?= htmlspecialchars($match['content_snippet']) ?>&hellip;"
-                                                    </div>
-                                                <?php endforeach; ?>
-                                            </div>
-                                        <?php endif; ?>
-                                    </a>
+                                    </div>
                                 <?php endforeach; ?>
                             </div>
                         <?php endif; ?>
                     </div>
-                <?php else: ?>
-                    <div class="card-body text-center d-flex flex-column justify-content-center flex-grow-1">
-                        <i class="bi bi-chat-dots forum-empty-icon"></i>
-                        <h4 class="mt-3">Willkommen im Forum</h4>
-                        <p class="text-muted">Bitte wählen Sie einen Berufsbereich aus der Liste links aus, um die Threads zu sehen.</p>
-                    </div>
-                <?php endif; ?>
+
+        <?php else: ?>
+            <!-- Default View -->
+            <div class="card-body text-center d-flex flex-column justify-content-center flex-grow-1">
+                <i class="bi bi-chat-dots forum-empty-icon"></i>
+                <h4 class="mt-3">Willkommen im Forum</h4>
+                <p class="text-muted">Bitte wählen Sie einen Berufsbereich aus der Liste links aus, um die Threads zu sehen.</p>
             </div>
-        </div>
+        <?php endif; ?>
+    </div>
+</div>
     </div>
 </div>
 
@@ -294,7 +329,7 @@ while ($file = $resultFiles->fetch_assoc()) {
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                    <form id="createTopicForm" action="/controllers/forum_actions.php" method="POST" enctype="multipart/form-data">                    
+                    <form id="createTopicForm" action="/controllers/forum_actions.php" method="POST" enctype="multipart/form-data">
                         <?php echo getCsrfTokenInput(); ?>
                     <input type="hidden" name="action" value="createTopic">
                     <input type="hidden" name="jobId" value="<?= $selectedJobId ?>">
@@ -303,8 +338,8 @@ while ($file = $resultFiles->fetch_assoc()) {
                         <input type="text" class="form-control" name="topicName" id="topicName" placeholder="Titel eingeben" required>
                     </div>
                     <!-- Modal for creating initial Post -->
-                        <input type="hidden" name="postContent" id="postContentHiddenInitial">                    
-                        <div class="mb-3">
+                    <input type="hidden" name="postContent" id="postContentHiddenInitial">
+                    <div class="mb-3">
                         <label class="form-label">Ihre Nachricht</label>
                         <div id="quillEditorInitial" style="height: 200px; background: white;"></div>
                         <div class="mb-3">
@@ -330,7 +365,7 @@ while ($file = $resultFiles->fetch_assoc()) {
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                    <form id="createPostForm" action="/controllers/forum_actions.php" method="POST" enctype="multipart/form-data">                    
+                    <form id="createPostForm" action="/controllers/forum_actions.php" method="POST" enctype="multipart/form-data">
                     <?php echo getCsrfTokenInput(); ?>
                     <input type="hidden" name="action" value="createPost">
                     <input type="hidden" name="topicId" value="<?= $selectedTopicId ?>">
