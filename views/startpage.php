@@ -2,7 +2,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 ?>
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 mb-5 mt-2">
     <div class="row">
         <div class="col-lg-4 mb-4">
             <div class="card shadow-sm mb-4">
