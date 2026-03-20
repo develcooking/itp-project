@@ -137,7 +137,10 @@ if ($selectedTopicId) {
                                                     <?php endif; ?>
                                                 </span>
                                             </span>
-                                            <div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <?php if (!empty($post['edited'])): ?>
+                                                    <span class="text-muted small" style="opacity:0.7;">Beitrag bearbeitet</span>
+                                                <?php endif; ?>
                                                 <?php if ($post['userId'] == $_SESSION['userId']): ?>
                                                     <i class="bi bi-pencil gray-600 edit-post-btn me-1" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>"></i>
                                                     <i class="bi bi-trash3 gray-600 delete-post-btn me-1" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>"></i>

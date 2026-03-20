@@ -11,6 +11,7 @@ class Post
     private int $userId;
     private string $content;
     private string $description;
+    private int $edited = 0;
     private int $reaction_negative;
     private int $reaction_positive;
     private int $createdBy;
@@ -129,6 +130,7 @@ class Post
                     'hasProfileImage' => ((int)($row['hasProfileImage'] ?? 0)) === 1,
                     'content' => $row['content'],
                     'description' => $row['description'],
+                    'edited' => (int)($row['edited'] ?? 0),
                     'reaction_negative' => $row['reaction_negative'],
                     'reaction_positive' => $row['reaction_positive'],
                     'createdAt' => $row['createdAt'],
@@ -223,7 +225,7 @@ class Post
     public function update($postId)
     {
         $query = " UPDATE " . $this->table . " 
-        SET content = ?, description = ?, reaction_negative = ?, reaction_positive = ? WHERE postId = ?";
+        SET content = ?, description = ?, reaction_negative = ?, reaction_positive = ?, edited = 1 WHERE postId = ?";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
@@ -265,6 +267,7 @@ class Post
         $this->userId = $row['userId'];
         $this->content = $row['content'];
         $this->description = $row['description'];
+        $this->edited = (int)($row['edited'] ?? 0);
         $this->reaction_negative = $row['reaction_negative'];
         $this->reaction_positive = $row['reaction_positive'];
         $this->createdBy = $row['createdBy'];
