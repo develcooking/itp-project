@@ -10,7 +10,9 @@ class Comment
     private int $userId;
     private string $content;
     private string $userName = '';
+    private string $school_company = '';
     private string $createdAt = '';
+    private string $modifiedAt = '';
 
     private ?bool $profileImageColumnsAvailable = null;
 
@@ -79,9 +81,19 @@ class Comment
         return $this->userName;
     }
 
+    public function getSchoolCompany(): string
+    {
+        return $this->school_company;
+    }
+
     public function getCreatedAt(): string
     {
         return $this->createdAt;
+    }
+
+    public function getModifiedAt(): string
+    {
+        return $this->modifiedAt;
     }
 
     /**
@@ -96,7 +108,8 @@ class Comment
         $query = "
             SELECT 
                 c.*,
-                u.userName
+                u.userName,
+                u.school_company
                 {$selectProfileImageState}
             FROM " . $this->table . " c
             JOIN Users u ON c.userId = u.userId
@@ -129,6 +142,7 @@ class Comment
                     'postId' => $row['postId'],
                     'userId' => $row['userId'],
                     'userName' => $row['userName'],
+                    'school_company' => $row['school_company'] ?? '',
                     'hasProfileImage' => ((int)($row['hasProfileImage'] ?? 0)) === 1,
                     'content' => $row['content'],
                     'createdAt' => $row['createdAt'],
@@ -205,7 +219,7 @@ class Comment
      */
     public function getById($commentId): bool
     {
-        $query = "SELECT c.*, u.userName FROM " . $this->table . " c JOIN Users u ON c.userId = u.userId WHERE c.commentId = ?";
+        $query = "SELECT c.*, u.userName, u.school_company FROM " . $this->table . " c JOIN Users u ON c.userId = u.userId WHERE c.commentId = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $commentId);
         $stmt->execute();
@@ -229,6 +243,8 @@ class Comment
         $this->userId = $row['userId'];
         $this->content = $row['content'];
         $this->userName = $row['userName'] ?? '';
+        $this->school_company = $row['school_company'] ?? '';
         $this->createdAt = $row['createdAt'] ?? '';
+        $this->modifiedAt = $row['modifiedAt'] ?? '';
     }
 }

@@ -128,7 +128,7 @@ if ($selectedTopicId) {
                                 <div class="card mb-3 border-0 shadow-sm" id="post-<?= $post['postId'] ?>">
                                     <div class="card-body m-2">
                                         <div class="d-flex justify-content-between mb-2">
-                                            <span class="fw-bold text-primary d-flex align-items-center gap-2">
+                                            <span class="fw-bold d-flex align-items-center gap-2">
                                                 <?php if (!empty($post['hasProfileImage'])): ?>
                                                     <img
                                                         src="/controllers/profileImage.php?userId=<?= (int)$post['userId'] ?>"
@@ -185,7 +185,7 @@ if ($selectedTopicId) {
                                                 echo '</div>';
                                             }
                                         ?>
-                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
                                             <div class="d-flex gap-2">
                                                 <form method="POST" action="/controllers/forum_actions.php">
                                                     <input type="hidden" name="action" value="voteUp">

@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     // XSS protection on input
-                    $content = strip_tags($content, '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+                    $content = HtmlSanitizer::sanitize($content);
 
                     $comment = new Comment($conn);
                     $comment->setPostId($postId);
