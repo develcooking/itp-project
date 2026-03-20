@@ -171,8 +171,6 @@ $(document).ready(function() {
 
         if (total > 0) {
             toggleAll.prop('checked', total === checked);
-            // Indeterminate state if some but not all are checked
-            toggleAll.prop('indeterminate', checked > 0 && checked < total);
         }
     }
 
