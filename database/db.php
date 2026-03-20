@@ -16,6 +16,9 @@ $conn = null;
 if (!isset($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME'])) {
     die("ENV-NotSet: Database credentials not configured in .env file");
 }
+if (!isset($_ENV['MAIL_HOST'], $_ENV['MAIL_PORT'], $_ENV['MAIL_ENCRYPTION'], $_ENV['MAIL_USERNAME'], $_ENV['MAIL_FROM_ADDRESS'], $_ENV['MAIL_FROM_NAME'], $_ENV['APP_URL'])) {
+    die("ENV-NotSet: Mailing credentials not configured in .env file");
+}
 try {
     $conn = new mysqli(
         $_ENV['DB_HOST'],
