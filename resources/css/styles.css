@@ -233,7 +233,6 @@ select {
   justify-content: center;
   width: 120px;
   height: 120px;
-  /* font-size entfernt, damit SVG exakt wie Bild skaliert */
   line-height: 120px;
   color: #6c757d;
 }
