@@ -82,7 +82,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
                     <h5 class="mb-0">
                         <i class="bi bi-chat-left-text me-2"></i>Neue Beiträge aus Ihren Berufsbereichen
                     </h5>
-                    <a href="/views/forum_start.php" class="btn btn-sm btn-outline-primary">
+                    <a href="/views/forum.php" class="btn btn-sm btn-outline-primary">
                         Zum Forum
                     </a>
                 </div>
