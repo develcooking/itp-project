@@ -128,7 +128,7 @@ if ($selectedTopicId) {
                                 <div class="card mb-3 border-0 shadow-sm" id="post-<?= $post['postId'] ?>">
                                     <div class="card-body m-2">
                                         <div class="d-flex justify-content-between mb-2">
-                                            <span class="fw-bold text-primary d-flex align-items-center gap-2">
+                                            <span class="fw-bold d-flex align-items-center gap-2">
                                                 <?php if (!empty($post['hasProfileImage'])): ?>
                                                     <img
                                                         src="/controllers/profileImage.php?userId=<?= (int)$post['userId'] ?>"
@@ -252,7 +252,7 @@ if ($selectedTopicId) {
                                             <div class="col-md-9">
                                                 <a href="?jobId=<?= $selectedJobId ?>&topicId=<?= $topic['topicId'] ?>" class="text-decoration-none">
                                                     <h6 class="mb-1 fw-bold">
-                                                        <i class="bi bi-chat-left-text me-2 text-primary"></i>
+                                                        <i class="bi bi-chat-left-text me-2"></i>
                                                         <?= htmlspecialchars($topic['name']) ?>
                                                     </h6>
                                                 </a>
