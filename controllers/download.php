@@ -1,14 +1,11 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/models/PostAttachment.php";
 
 $id = intval($_GET['id'] ?? 0);
 
-$stmt = $conn->prepare("SELECT fileName, fileType, fileSize, fileData FROM postAttachments WHERE attachmentId = ?");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-
-$result = $stmt->get_result();
-$file = $result->fetch_assoc();
+$attachmentModel = new PostAttachment($conn);
+$file = $attachmentModel->getById($id);
 
 if (!$file) {
     die("File not found");
