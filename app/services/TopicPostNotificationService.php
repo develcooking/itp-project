@@ -26,10 +26,6 @@ class TopicPostNotificationService
             return;
         }
 
-        if (!$this->isNotifiableRole($recipientRole)) {
-            return;
-        }
-
         if (!$sendNotification) {
             return;
         }
@@ -124,14 +120,6 @@ class TopicPostNotificationService
         $stmt->close();
 
         return $data;
-    }
-
-    private function isNotifiableRole(string $role): bool
-    {
-        $normalizedRole = strtolower(trim($role));
-        $allowedRoles = ['1', '2', 'lehrer', 'lehrkraft', 'ausbilder'];
-
-        return in_array($normalizedRole, $allowedRoles, true);
     }
 
     private function buildTopicUrl(int $topicId): string
