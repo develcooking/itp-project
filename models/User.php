@@ -472,14 +472,26 @@ class User
 
     public function emailExists(string $email): bool
     {
-    $query = "SELECT COUNT(email) AS email_count FROM " . $this->table . " WHERE email = ?";
-    $stmt = $this->conn->prepare($query);
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-    $stmt->close();
-    return $row['email_count'] > 0;
+        $query = "SELECT COUNT(email) AS email_count FROM " . $this->table . " WHERE email = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        return $row['email_count'] > 0;
+    }
+
+    /**
+     * Prüft, ob die Domain der E-Mail-Adresse einen MX-Record besitzt (kann E-Mails empfangen)
+     */
+    public static function isEmailDomainValid(string $email): bool
+    {
+        $domain = substr(strrchr($email, "@"), 1);
+        if (!$domain) {
+            return false;
+        }
+        return checkdnsrr($domain, "MX");
     }
 
     public function updateProfile(): bool
