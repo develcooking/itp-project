@@ -216,7 +216,7 @@ if ($selectedTopicId) {
                     </div>
                     <div class="card-footer bg-light d-flex justify-content-end align-items-center gap-2">
                         <button class="btn btn-form-sub" data-bs-toggle="modal" data-bs-target="#createPostModal">
-                            <i class="bi bi-reply me-1"></i> Antworten
+                            <i class="bi bi-reply me-1"></i> Beitrag erstellen
                         </button>
                     </div>
                 <?php elseif ($selectedJobId): ?>
@@ -332,7 +332,7 @@ if ($selectedTopicId) {
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header text-white" style="background-color: var(--accentColor);">
-                <h5 class="modal-title">Neues Thema und initiales Beitrag erstellen</h5>
+                <h5 class="modal-title">Neues Thema und initialen Beitrag erstellen</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
