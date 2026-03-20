@@ -429,6 +429,14 @@ select {
   color: var(--accentColor)
 }
 
+.btn-outline-primary:active,
+.btn-outline-primary:focus,
+.btn-outline-primary:focus:active {
+  background-color:var(--btn-Color);
+  border-color: var(--btn-Color);
+  color: var(--accentColor);
+}
+
 a {
   color: var(--accentColor);
   text-decoration: none;
