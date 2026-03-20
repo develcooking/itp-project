@@ -136,9 +136,17 @@ if ($selectedTopicId) {
                                                 <?php else: ?>
                                                     <i class="bi bi-person-circle forum-post-avatar-icon" aria-label="Standard Profilbild"></i>
                                                 <?php endif; ?>
-                                                <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
+                                                <span>
+                                                    <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
+                                                    <?php if (!empty($post['school_company'])): ?>
+                                                        <span class="text-muted fw-normal ms-1" style="opacity: 0.6;">- <?= htmlspecialchars($post['school_company']) ?></span>
+                                                    <?php endif; ?>
+                                                </span>
                                             </span>
-                                            <div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <?php if (!empty($post['edited'])): ?>
+                                                    <span class="text-muted small" style="opacity:0.7;">Beitrag bearbeitet</span>
+                                                <?php endif; ?>
                                                 <?php if ($post['userId'] == $_SESSION['userId']): ?>
                                                     <i class="bi bi-pencil text-muted edit-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Bearbeiten"></i>
                                                     <i class="bi bi-trash3 text-muted delete-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Löschen"></i>

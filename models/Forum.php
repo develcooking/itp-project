@@ -74,7 +74,7 @@ class Forum {
     public function getTopicsByBereich(int $bereich_id, ?string $search = null): array {
         // Modified query to include searching in post and comment content
         $query = "
-            SELECT DISTINCT t.*, u.userName 
+            SELECT DISTINCT t.*, u.userName, u.school_company 
             FROM Topics t 
             LEFT JOIN Users u ON t.userId = u.userId 
         ";
