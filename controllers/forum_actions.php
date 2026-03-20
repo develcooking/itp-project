@@ -5,7 +5,9 @@ include_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Forum.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Topic.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Post.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Comment.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/app/services/TopicPostNotificationService.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/HtmlSanitizer.php";
 
 if (!isset($_SESSION['userId'])) {
     header("Location: /views/loginsite.php");
@@ -45,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($topic->post()) {
 
                         // Basic XSS protection on input (optional, but good practice)
-                        $content = strip_tags($content, '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+                        $content = HtmlSanitizer::sanitize($content);
                         $topicId = $topic->getTopicId();
 
                         $post = new Post($conn);
@@ -58,14 +60,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $post->setCreatedBy($userId);
                         $post->setModifiedBy($userId);
 
-                        if ($post->post()) {
-                            header("Location: /views/forum.php?jobId=$jobId&topicId=$topicId");
-                            exit();
-                        }
+                    if ($post->post()) {
+
+                        $postId = $post->getPostId();
+
+                        handleAttachments($conn, $postId);
+
+                        header("Location: /views/forum.php?jobId=$jobId&topicId=$topicId");
+                        exit();
                     }
                 }
-                header("Location: /views/forum.php?jobId=$jobId&error=topic_failed");
-                break;
+            }
+            header("Location: /views/forum.php?jobId=$jobId&error=topic_failed");
+            exit();
 
             case 'createPost':
                 $content = trim($_POST['postContent'] ?? '');
@@ -88,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     // XSS protection on input
-                    $content = strip_tags($content, '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+                    $content = HtmlSanitizer::sanitize($content);
 
                     $post = new Post($conn);
                     $post->setTopicID($topicId);
@@ -100,9 +107,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $post->setCreatedBy($userId);
                     $post->setModifiedBy($userId);
 
-                    if ($post->post()) {
+                if ($post->post()) {
+                        $postId = $post->getPostId();
+
+                        handleAttachments($conn, $postId);
+
                         $notificationService = new TopicPostNotificationService($conn);
-                        $notificationService->notifyTopicOwnerAboutNewPost($topicId, $post->getPostId(), $userId);
+                        $notificationService->notifyTopicOwnerAboutNewPost($topicId, $postId, $userId);
 
                         header("Location: /views/forum.php?jobId=$jobId&topicId=$topicId");
                         exit();
@@ -110,6 +121,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 header("Location: /views/forum.php?jobId=$jobId&topicId=$topicId&error=post_failed");
                 break;
+
+            case 'createComment':
+                $content = trim($_POST['commentContent'] ?? '');
+                $postId = intval($_POST['postId'] ?? 0);
+                $topicId = intval($_POST['topicId'] ?? 0);
+                $jobId = intval($_POST['jobId'] ?? 0);
+
+                if (!empty($content) && $postId > 0) {
+                    if (!$isAdmin) {
+                        // Check access to jobId
+                        if (!$forumModel->hasAccess($userId, $jobId)) {
+                            header("Location: /views/post_details.php?postId=$postId&topicId=$topicId&jobId=$jobId&error=no_access");
+                            exit();
+                        }
+                    }
+
+                    // Ensure post is in this topic
+                    $postModel = new Post($conn);
+                    if (!$postModel->getById($postId) || $postModel->getTopicId() != $topicId) {
+                        header("Location: /views/post_details.php?postId=$postId&topicId=$topicId&jobId=$jobId&error=invalid_post");
+                        exit();
+                    }
+
+                    // XSS protection on input
+                    $content = strip_tags($content, '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+
+                    $comment = new Comment($conn);
+                    $comment->setPostId($postId);
+                    $comment->setUserId($userId);
+                    $comment->setContent($content);
+
+                    if ($comment->create()) {
+                        header("Location: /views/post_details.php?postId=$postId&topicId=$topicId&jobId=$jobId");
+                        exit();
+                    }
+                }
+                header("Location: /views/post_details.php?postId=$postId&topicId=$topicId&jobId=$jobId&error=comment_failed");
+                break;
+
             case 'voteUp':
                 $postId = intval($_POST['postId'] ?? 0);
                 if ($postId > 0) {
@@ -144,9 +194,114 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 break;
+
+            case 'editPost':
+                $postId = intval($_POST['postId'] ?? 0);
+                $content = trim($_POST['postContent'] ?? '');
+                if ($postId > 0 && !empty($content)) {
+                    $post = new Post($conn);
+                    if ($post->getById($postId)) {
+                        if ($post->getUserId() == $userId || $isAdmin) {
+                            $content = HtmlSanitizer::sanitize($content);
+                            $post->setContent($content);
+                            $post->setModifiedBy($userId);
+                            if ($post->update($postId)) {
+                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                exit();
+                            }
+                        }
+                    }
+                }
+                header("Location: /views/forum.php?error=edit_failed");
+                break;
+
+            case 'deletePost':
+                $postId = intval($_POST['postId'] ?? 0);
+                if ($postId > 0) {
+                    $post = new Post($conn);
+                    if ($post->getById($postId)) {
+                        if ($post->getUserId() == $userId || $isAdmin) {
+                            if ($post->delete($postId)) {
+                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                exit();
+                            }
+                        }
+                    }
+                }
+                header("Location: /views/forum.php?error=delete_failed");
+                break;
+
+            case 'editComment':
+                $commentId = intval($_POST['commentId'] ?? 0);
+                $content = trim($_POST['commentContent'] ?? '');
+                if ($commentId > 0 && !empty($content)) {
+                    $comment = new Comment($conn);
+                    if ($comment->getById($commentId)) {
+                            $content = HtmlSanitizer::sanitize($content);
+                            $comment->setUserId($userId); // Für modifiedBy im Model
+                            if ($comment->update($commentId, $content)) {
+                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                exit();
+                            }
+                    }
+                }
+                header("Location: " . $_SERVER['HTTP_REFERER'] . "&error=edit_comment_failed");
+                break;
+
+            case 'deleteComment':
+                $commentId = intval($_POST['commentId'] ?? 0);
+                if ($commentId > 0) {
+                    $comment = new Comment($conn);
+                    if ($comment->getById($commentId)) {
+                            if ($comment->delete($commentId)) {
+                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                exit();
+                            }
+                    }
+                }
+                header("Location: " . $_SERVER['HTTP_REFERER'] . "&error=delete_comment_failed");
+                break;
         }
     }
 }
 
 header("Location: /views/forum.php");
 exit();
+
+
+// =========================
+// HANDLE ATTACHMENTS (CLEAN)
+// =========================
+function handleAttachments($conn, $postId)
+{
+    if (!isset($_FILES['attachments'])) return;
+
+    $allowed = ['jpg','jpeg','png','gif','pdf','txt','doc','docx'];
+
+    foreach ($_FILES['attachments']['tmp_name'] as $key => $tmpName) {
+
+        if ($_FILES['attachments']['error'][$key] !== 0) continue;
+
+        $fileName = $_FILES['attachments']['name'][$key];
+        $fileType = $_FILES['attachments']['type'][$key];
+        $fileSize = $_FILES['attachments']['size'][$key];
+
+        // Limit size (5MB)
+        if ($fileSize > 5 * 1024 * 1024) continue;
+
+        // Validate extension
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        if (!in_array($ext, $allowed)) continue;
+
+        $fileData = file_get_contents($tmpName);
+
+        $stmt = $conn->prepare("
+            INSERT INTO postAttachments
+            (postId, fileName, fileType, fileSize, fileData)
+            VALUES (?, ?, ?, ?, ?)
+        ");
+
+        $stmt->bind_param("issis", $postId, $fileName, $fileType, $fileSize, $fileData);
+        $stmt->execute();
+    }
+}
