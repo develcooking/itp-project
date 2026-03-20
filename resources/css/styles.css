@@ -87,6 +87,13 @@ main.main-startpage .container-fluid {
     color: var(--accentColor);
 }
 
+.btn-primary:active,
+.btn-primary:focus,
+.btn-primary:focus:active {
+  background-color:var(--btn-Color);
+  border-color: var(--btn-Color);
+  color: var(--accentColor);
+}
 .current{
   background-color: var(--orangeLight);
   text-decoration: underline;
