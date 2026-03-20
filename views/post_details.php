@@ -4,6 +4,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Forum.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Topic.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Post.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Comment.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/models/PostAttachment.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 
 // Check if user is logged in
@@ -26,6 +27,7 @@ $forumModel = new Forum($conn);
 $topicModel = new Topic($conn);
 $postModel = new Post($conn);
 $commentModel = new Comment($conn);
+$attachmentModel = new PostAttachment($conn);
 
 $isAdmin = isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin';
 
@@ -190,6 +192,24 @@ $topicName = $topicModel->getName();
                             <div class="post-content p-2" id="post-content-<?= $post['postId'] ?>">
                                 <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
                             </div>
+
+                            <?php
+                                // Load attachments for this post
+                                $attachments = $attachmentModel->getByPostId($post['postId']);
+
+                                foreach ($attachments as $file) {
+                                    $isImage = strpos($file['fileType'], 'image/') === 0;
+                                    echo '<div class="mt-2">';
+                                    if ($isImage) {
+                                        echo '<img src="/controllers/download.php?id='.$file['attachmentId'].'" 
+                                        style="max-width:200px; border-radius:8px; display:block; margin-bottom:5px;">';
+                                    }
+                                    echo '<a href="/controllers/download.php?id='.$file['attachmentId'].'" target="_blank">';
+                                    echo '📎 ' . htmlspecialchars($file['fileName']);
+                                    echo '</a>';
+                                    echo '</div>';
+                                }
+                            ?>
 
                             <div class="d-flex gap-2 mt-3 pt-2 border-top">
                                 <form method="POST" action="/controllers/forum_actions.php">

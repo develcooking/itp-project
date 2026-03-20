@@ -3,11 +3,13 @@ include_once $_SERVER['DOCUMENT_ROOT'] . "/database/db.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Forum.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Topic.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Post.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/models/PostAttachment.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 
 $forumModel = new Forum($conn);
 $topicModel = new Topic($conn);
 $postModel = new Post($conn);
+$attachmentModel = new PostAttachment($conn);
 
 $selectedJobId = isset($_GET['jobId']) ? intval($_GET['jobId']) : null;
 $selectedTopicId = isset($_GET['topicId']) ? intval($_GET['topicId']) : null;
@@ -161,12 +163,9 @@ if ($selectedTopicId) {
                                         </div>
                                         <?php
                                             // Load attachments for this post
-                                            $stmt = $conn->prepare("SELECT attachmentId, fileName, fileType FROM postAttachments WHERE postId = ?");
-                                            $stmt->bind_param("i", $post['postId']);
-                                            $stmt->execute();
-                                            $resultFiles = $stmt->get_result();
+                                            $attachments = $attachmentModel->getByPostId($post['postId']);
 
-                                            while ($file = $resultFiles->fetch_assoc()) {
+                                            foreach ($attachments as $file) {
 
                                                 $isImage = strpos($file['fileType'], 'image/') === 0;
 
@@ -382,6 +381,10 @@ if ($selectedTopicId) {
                     <div class="mb-3">
                         <label class="form-label">Ihre Nachricht</label>
                         <div id="quillEditor" style="height: 200px; background: white;"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Dateien anhängen</label>
+                        <input type="file" name="attachments[]" multiple class="form-control">
                     </div>
                     <div class="text-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>

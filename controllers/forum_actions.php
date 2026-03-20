@@ -6,6 +6,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Forum.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Topic.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Post.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Comment.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/models/PostAttachment.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/app/services/TopicPostNotificationService.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/HtmlSanitizer.php";
 
@@ -277,6 +278,7 @@ function handleAttachments($conn, $postId)
     if (!isset($_FILES['attachments'])) return;
 
     $allowed = ['jpg','jpeg','png','gif','pdf','txt','doc','docx'];
+    $attachmentModel = new PostAttachment($conn);
 
     foreach ($_FILES['attachments']['tmp_name'] as $key => $tmpName) {
 
@@ -294,14 +296,6 @@ function handleAttachments($conn, $postId)
         if (!in_array($ext, $allowed)) continue;
 
         $fileData = file_get_contents($tmpName);
-
-        $stmt = $conn->prepare("
-            INSERT INTO postAttachments
-            (postId, fileName, fileType, fileSize, fileData)
-            VALUES (?, ?, ?, ?, ?)
-        ");
-
-        $stmt->bind_param("issis", $postId, $fileName, $fileType, $fileSize, $fileData);
-        $stmt->execute();
+        $attachmentModel->create($postId, $fileName, $fileType, $fileSize, $fileData);
     }
 }
