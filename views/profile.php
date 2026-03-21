@@ -24,7 +24,7 @@ $profileStats = array_merge([
     'reactionNegativeCount' => 0
 ], $profileStats);
 ?>
-
+<script src="../resources/js/profile.js"></script>
     <div class="container min-vh-100 d-flex justify-content-center align-items-center my-4">
         <div class="row w-100 justify-content-center align-items-stretch g-4">
             <div class="col-12 col-lg-8">
@@ -240,110 +240,50 @@ $profileStats = array_merge([
                 </div>
             </div>
 
-            <div class="col-12 col-lg-4"">
+            <div class="col-12 col-lg-12">
                 <div class="card bg-light shadow mt-4 p-4">
-                    <h3 class="fw-bold mb-2">API-Zugriff</h3>
-                    <p class="text-muted mb-4">Verwalten Sie Ihren API-Token für externen Zugriff.</p>
+                    <div class="d-flex justify-content-between align-items-center" role="button" data-bs-toggle="collapse" data-bs-target="#apiCollapse" aria-expanded="false" aria-controls="apiCollapse">
+                        <h3 class="fw-bold mb-0">API-Zugriff</h3>
+                        <i class="bi bi-chevron-down text-muted"></i>
+                    </div>
 
-                    <form method="post" action="/controllers/profile.php">
-                        <?php echo getCsrfTokenInput(); ?>
-                        <?php if ($user->getApiToken()): ?>
-                            <div class="mb-3 text-start">
-                                <label class="form-label small text-muted">Ihr aktueller API-Token:</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control font-monospace" value="<?= htmlspecialchars($user->getApiToken()) ?>" readonly id="apiTokenInput">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="copyApiToken()" title="Kopieren">
-                                        <i class="bi bi-clipboard"></i>
+                    <div class="collapse" id="apiCollapse">
+                        <div class="pt-3">
+                            <p class="text-muted mb-4">Verwalten Sie Ihren API-Token für externen Zugriff.</p>
+
+                            <form method="post" action="/controllers/profile.php">
+                                <?php echo getCsrfTokenInput(); ?>
+                                <?php if ($user->getApiToken()): ?>
+                                    <div class="mb-3 text-start">
+                                        <label class="form-label small text-muted">Ihr aktueller API-Token:</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control font-monospace" value="<?= htmlspecialchars($user->getApiToken()) ?>" readonly id="apiTokenInput">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyApiToken()" title="Kopieren">
+                                                <i class="bi bi-clipboard"></i>
+                                            </button>
+                                        </div>
+                                        <div class="form-text text-danger">Geben Sie diesen Token niemals an Dritte weiter!</div>
+                                    </div>
+                                    <button type="submit" name="generateApiToken" class="btn btn-warning w-100 mb-2">
+                                        Neuen Token generieren
                                     </button>
-                                </div>
-                                <div class="form-text text-danger">Geben Sie diesen Token niemals an Dritte weiter!</div>
-                            </div>
-                            <button type="submit" name="generateApiToken" class="btn btn-outline-warning w-100 mb-2">
-                                Neuen Token generieren
-                            </button>
-                            <button type="submit" name="revokeApiToken" class="btn btn-outline-danger w-100" onclick="return confirm('Möchten Sie den API-Token wirklich widerrufen?')">
-                                Token widerrufen
-                            </button>
-                        <?php else: ?>
-                            <div class="alert alert-info py-2 small">
-                                Aktuell ist kein API-Token aktiv.
-                            </div>
-                            <button type="submit" name="generateApiToken" class="btn btn-outline-primary w-100">
-                                API-Token aktivieren
-                            </button>
-                        <?php endif; ?>
-                    </form>
+                                    <button type="submit" name="revokeApiToken" class="btn btn-outline-danger w-100" onclick="return confirm('Möchten Sie den API-Token wirklich widerrufen?')">
+                                        Token widerrufen
+                                    </button>
+                                <?php else: ?>
+                                    <div class="alert alert-info py-2 small">
+                                        Aktuell ist kein API-Token aktiv.
+                                    </div>
+                                    <button type="submit" name="generateApiToken" class="btn btn-outline-primary w-100">
+                                        API-Token aktivieren
+                                    </button>
+                                <?php endif; ?>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+<?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>
 
-<?php include $homepath . "/views/footer.php"; ?>
-
-<script>
-function copyApiToken() {
-    const copyText = document.getElementById("apiTokenInput");
-    copyText.select();
-    copyText.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(copyText.value);
-    alert("Token in die Zwischenablage kopiert!");
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    const profileImageInput = document.getElementById('profileImage');
-    const profileImageFileName = document.getElementById('profileImageFileName');
-    const profileImagePreview = document.getElementById('profileImagePreview');
-    const profileImagePlaceholder = document.getElementById('profileImagePlaceholder');
-    const removeProfileImageInput = document.getElementById('removeProfileImage');
-    const removeProfileImageButton = document.getElementById('removeProfileImageButton');
-    let currentPreviewObjectUrl = null;
-
-    if (!profileImageInput || !profileImageFileName || !profileImagePreview || !profileImagePlaceholder || !removeProfileImageInput) {
-        return;
-    }
-
-    profileImageInput.addEventListener('change', function () {
-        if (profileImageInput.files && profileImageInput.files.length > 0) {
-            const selectedFile = profileImageInput.files[0];
-            removeProfileImageInput.value = '0';
-
-            profileImageFileName.textContent = selectedFile.name;
-            profileImageFileName.classList.remove('text-muted');
-
-            if (currentPreviewObjectUrl) {
-                URL.revokeObjectURL(currentPreviewObjectUrl);
-            }
-
-            currentPreviewObjectUrl = URL.createObjectURL(selectedFile);
-            profileImagePreview.src = currentPreviewObjectUrl;
-            profileImagePreview.classList.remove('d-none');
-            profileImagePlaceholder.classList.add('d-none');
-        } else {
-            profileImageFileName.textContent = 'Profilbild hochladen (JPG, PNG, WEBP, max. 2 MB)';
-            profileImageFileName.classList.add('text-muted');
-
-            if (currentPreviewObjectUrl) {
-                URL.revokeObjectURL(currentPreviewObjectUrl);
-                currentPreviewObjectUrl = null;
-            }
-        }
-    });
-
-    if (removeProfileImageButton) {
-        removeProfileImageButton.addEventListener('click', function () {
-            removeProfileImageInput.value = '1';
-            profileImageInput.value = '';
-
-            if (currentPreviewObjectUrl) {
-                URL.revokeObjectURL(currentPreviewObjectUrl);
-                currentPreviewObjectUrl = null;
-            }
-
-            profileImagePreview.classList.add('d-none');
-            profileImagePlaceholder.classList.remove('d-none');
-            profileImageFileName.textContent = 'Profilbild wird beim Speichern gelöscht';
-            profileImageFileName.classList.remove('text-muted');
-        });
-    }
-});
-</script>

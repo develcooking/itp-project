@@ -25,12 +25,12 @@ if (!function_exists('getallheaders')) {
 
 /**
  * Attempts to authenticate via X-API-Token header.
- * Populates $_SESSION if successful.
+ * REPLACES existing session data for the API context.
  */
 function tryTokenAuth() {
-    if (isset($_SESSION['userId'])) {
-        return;
-    }
+    // Clear any existing session data that might have been loaded via cookies.
+    // We want the API to be "Token Only".
+    $_SESSION = [];
 
     $headers = getallheaders();
     $token = $headers['X-API-Token'] ?? $headers['x-api-token'] ?? null;
@@ -41,7 +41,7 @@ function tryTokenAuth() {
         if ($user->getByApiToken($token)) {
             // Check if user is activated and not blocked
             if ($user->getActivated() && !$user->getIsBlocked()) {
-                // Temporarily populate session for this request context
+                // Populate session locally for this request context only
                 $_SESSION['userId'] = $user->getUserId();
                 $_SESSION['role'] = $user->getRole();
                 $_SESSION['userName'] = $user->getUserName();
@@ -50,7 +50,7 @@ function tryTokenAuth() {
     }
 }
 
-// Automatically try token auth on every include of this helper
+// Automatically enforce token auth on every include of this helper
 tryTokenAuth();
 
 function sendResponse($success, $data = null, $message = null, $code = 200) {
@@ -79,7 +79,7 @@ function checkAdmin() : bool {
 
 function checkLoggedIn() {
     if (!isset($_SESSION['userId'])) {
-        sendResponse(false, null, 'Forbidden: Login required', 403);
+        sendResponse(false, null, 'Unauthorized: Valid API Token required', 401);
     }
 }
 
@@ -89,7 +89,7 @@ function hasAccessToJob($jobId) : bool {
         sendResponse(false, null, 'Bitte füllen Sie alle Felder aus!', 400);
     }
     // Authorization check: Is the user assigned to this job?
-    if (strtolower($_SESSION['role']) != 'admin'){
+    if (strtolower($_SESSION['role'] ?? '') != 'admin'){
         global $conn;
         $userJobs = new UserJobs($conn);
         $allowedJobs = $userJobs->getJobsForUserByID($_SESSION['userId']);
@@ -97,7 +97,7 @@ function hasAccessToJob($jobId) : bool {
             sendResponse(false, null, 'Forbidden: Permission denied', 403);
         }
     }
-    if (strtolower($_SESSION['role']) == 'ausbilder'){
+    if (strtolower($_SESSION['role'] ?? '') == 'ausbilder'){
         sendResponse(false, null, 'Forbidden: Permission denied', 403);
     }
     return true;
