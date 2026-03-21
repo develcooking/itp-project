@@ -24,6 +24,7 @@ class User
     private ?int $modifiedBy = null;
     private bool $isBlocked = false;
     private ?string $blockedUntil = null;
+    private ?string $apiToken = null;
 
     public function __construct($db)
     {
@@ -125,6 +126,11 @@ class User
         return $this->blockedUntil;
     }
 
+    public function getApiToken(): ?string
+    {
+        return $this->apiToken;
+    }
+
     public function setUserName(string $userName): self
     {
         $this->userName = $userName;
@@ -218,6 +224,59 @@ class User
         return $this;
     }
 
+    public function setApiToken(?string $apiToken): self
+    {
+        $this->apiToken = $apiToken;
+        return $this;
+    }
+
+    public function generateApiToken(): ?string
+    {
+        $token = bin2hex(random_bytes(32));
+        $query = "UPDATE " . $this->table . " SET apiToken = ? WHERE userId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("si", $token, $this->userId);
+        if ($stmt->execute()) {
+            $this->apiToken = $token;
+            $stmt->close();
+            return $token;
+        }
+        $stmt->close();
+        return null;
+    }
+
+    public function revokeApiToken(): bool
+    {
+        $query = "UPDATE " . $this->table . " SET apiToken = NULL WHERE userId = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $this->userId);
+        $ok = $stmt->execute();
+        $this->apiToken = null;
+        $stmt->close();
+        return $ok;
+    }
+
+    public function getByApiToken(string $token): bool
+    {
+        $query = $this->hasProfileImageColumns()
+            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL AND OCTET_LENGTH(profileImage) > 0 AND profileImageMime IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy, isBlocked, blockedUntil, apiToken FROM " . $this->table . " WHERE apiToken = ?"
+            : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy, isBlocked, blockedUntil, apiToken FROM " . $this->table . " WHERE apiToken = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("s", $token);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $this->mapData($row);
+            $stmt->close();
+            return true;
+        }
+
+        $stmt->close();
+        return false;
+    }
+
     public function getAll(): array
     {
         $query = "SELECT * FROM " . $this->table;
@@ -245,7 +304,8 @@ class User
                     'createdBy' => $row['createdBy'],
                     'modifiedBy' => $row['modifiedBy'],
                     'isBlocked' => (bool)($row['isBlocked'] ?? false),
-                    'blockedUntil' => $row['blockedUntil'] ?? null
+                    'blockedUntil' => $row['blockedUntil'] ?? null,
+                    'apiToken' => $row['apiToken'] ?? null
                 ];
             }
         }
@@ -302,8 +362,8 @@ class User
     public function getById($userId)
     {
         $query = $this->hasProfileImageColumns()
-            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL AND OCTET_LENGTH(profileImage) > 0 AND profileImageMime IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE userid = ?"
-            : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE userid = ?";
+            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL AND OCTET_LENGTH(profileImage) > 0 AND profileImageMime IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy, isBlocked, blockedUntil, apiToken FROM " . $this->table . " WHERE userid = ?"
+            : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy, isBlocked, blockedUntil, apiToken FROM " . $this->table . " WHERE userid = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $userId);
         $stmt->execute();
@@ -419,6 +479,7 @@ class User
         $this->profileImage = $row['profileImage'] ?? null;
         $this->isBlocked = (bool)($row['isBlocked'] ?? false);
         $this->blockedUntil = $row['blockedUntil'] ?? null;
+        $this->apiToken = $row['apiToken'] ?? null;
     }
 
     public function toArray(): array
@@ -439,8 +500,8 @@ class User
     public function getByEmail($email)
     {
         $query = $this->hasProfileImageColumns()
-            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL AND OCTET_LENGTH(profileImage) > 0 AND profileImageMime IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE email = ?"
-            : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy, isBlocked, blockedUntil FROM " . $this->table . " WHERE email = ?";
+            ? "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, profileImageMime, (profileImage IS NOT NULL AND OCTET_LENGTH(profileImage) > 0 AND profileImageMime IS NOT NULL) AS hasProfileImage, createdBy, modifiedBy, isBlocked, blockedUntil, apiToken FROM " . $this->table . " WHERE email = ?"
+            : "SELECT userId, userName, firstName, lastName, email, password, role, securityAnswer, activated, school_company, sendNotification, createdBy, modifiedBy, isBlocked, blockedUntil, apiToken FROM " . $this->table . " WHERE email = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("s", $email);
         $stmt->execute();

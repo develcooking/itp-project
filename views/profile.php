@@ -239,12 +239,56 @@ $profileStats = array_merge([
                     </div>
                 </div>
             </div>
+
+            <div class="col-12 col-lg-4"">
+                <div class="card bg-light shadow mt-4 p-4">
+                    <h3 class="fw-bold mb-2">API-Zugriff</h3>
+                    <p class="text-muted mb-4">Verwalten Sie Ihren API-Token für externen Zugriff.</p>
+
+                    <form method="post" action="/controllers/profile.php">
+                        <?php echo getCsrfTokenInput(); ?>
+                        <?php if ($user->getApiToken()): ?>
+                            <div class="mb-3 text-start">
+                                <label class="form-label small text-muted">Ihr aktueller API-Token:</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control font-monospace" value="<?= htmlspecialchars($user->getApiToken()) ?>" readonly id="apiTokenInput">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="copyApiToken()" title="Kopieren">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text text-danger">Geben Sie diesen Token niemals an Dritte weiter!</div>
+                            </div>
+                            <button type="submit" name="generateApiToken" class="btn btn-outline-warning w-100 mb-2">
+                                Neuen Token generieren
+                            </button>
+                            <button type="submit" name="revokeApiToken" class="btn btn-outline-danger w-100" onclick="return confirm('Möchten Sie den API-Token wirklich widerrufen?')">
+                                Token widerrufen
+                            </button>
+                        <?php else: ?>
+                            <div class="alert alert-info py-2 small">
+                                Aktuell ist kein API-Token aktiv.
+                            </div>
+                            <button type="submit" name="generateApiToken" class="btn btn-outline-primary w-100">
+                                API-Token aktivieren
+                            </button>
+                        <?php endif; ?>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
 <?php include $homepath . "/views/footer.php"; ?>
 
 <script>
+function copyApiToken() {
+    const copyText = document.getElementById("apiTokenInput");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(copyText.value);
+    alert("Token in die Zwischenablage kopiert!");
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const profileImageInput = document.getElementById('profileImage');
     const profileImageFileName = document.getElementById('profileImageFileName');
