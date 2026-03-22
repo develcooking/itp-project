@@ -4,6 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/startSession.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/controllers/login.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Appointment.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/models/UserJobs.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/HtmlSanitizer.php";
 
 if (!isset($_SESSION['userId'])) {
     http_response_code(401);
@@ -13,21 +14,16 @@ if (!isset($_SESSION['userId'])) {
 $errorMessages = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // create Termin
-
-    $title = htmlspecialchars($_POST['changetitle']);
+    // Get form values
+    $title = $_POST['changetitle'] ?? '';
     $userId = $_SESSION['userId'];
-    $startdate = htmlspecialchars($_POST['changestartdate']);
-    $starttime = htmlspecialchars($_POST['changestarttime']);
-    $enddate = htmlspecialchars($_POST['changeenddate']);
-    $endtime = htmlspecialchars($_POST['changeendtime']);
-    $appointmentId = htmlspecialchars($_POST['changeappointmentId']);
-    if (isset($_POST["changedescription"])) {
-        $description = htmlspecialchars($_POST["changedescription"]);
-    } else {
-        $description = '';
-    }
-    $jobId = htmlspecialchars($_POST['changejobselection']);
+    $startdate = $_POST['changestartdate'] ?? '';
+    $starttime = $_POST['changestarttime'] ?? '';
+    $enddate = $_POST['changeenddate'] ?? '';
+    $endtime = $_POST['changeendtime'] ?? '';
+    $appointmentId = $_POST['changeappointmentId'] ?? '';
+    $description = $_POST["changedescription"] ?? '';
+    $jobId = $_POST['changejobselection'] ?? '';
     $recurrenceType = $_POST['changerecurrence_type'] ?? 'none';
     $recurrenceInterval = $_POST['changerecurrence_interval'] ?? 1;
     $recurrenceUntil = $_POST['changerecurrence_until'] ?? null;
@@ -70,13 +66,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (strtolower($_SESSION['role']) != 'admin'){
-        // Only the creator can change it, exapt admin
+        // Only the creator can change it, except admin
         if ($appointmentmodel->getCreatedBy() !== $userId) {
             http_response_code(403);
             die("You are not authorized to change this event. Only the creator can modify it.");
         }
 
-        // Is  user assigned to job
+        // Is user assigned to job
         $userJobs = new UserJobs($conn);
         $allowedJobs = $userJobs->getJobsForUserByID($userId);
         if (!in_array($jobId, $allowedJobs)) {
@@ -85,12 +81,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    $startDateTime = $startdate . ' ' . $starttime . ':00'; // Ergebnis: "2023-10-27 14:30:00"
+    $startDateTime = $startdate . ' ' . $starttime . ':00';
     $endDateTime = $enddate . ' ' . $endtime . ':00';
+    
     if (strtotime($startDateTime) < strtotime($endDateTime)) {
-
-
-        if (empty($title) || empty($userId) || empty($startDateTime) || empty($endDateTime)) {
+        if (empty($title) || empty($userId) || empty($startdate) || empty($starttime) || empty($enddate) || empty($endtime)) {
             http_response_code(400);
             array_push($errorMessages, "Bitte füllen Sie alle Felder aus!");
         } else {
@@ -98,20 +93,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $appointmentmodel->setJobId($jobId);
             $appointmentmodel->setStart($startDateTime);
             $appointmentmodel->setEnd($endDateTime);
-            $appointmentmodel->setDescription($description);
+            // Sanitize description
+            $appointmentmodel->setDescription(HtmlSanitizer::sanitize($description));
             $appointmentmodel->setModifiedBy($userId);
             $appointmentmodel->setRecurrenceType($recurrenceType);
             $appointmentmodel->setRecurrenceInterval((int)$recurrenceInterval);
             $appointmentmodel->setRecurrenceUntil($recurrenceUntil);
 
             if ($appointmentmodel->update($appointmentId)) {
-                #echo "Termin erfolgreich erstellt!";
-                header("Location: " . "../views/appointmentManagement.php");
+                header("Location: ../views/appointmentManagement.php");
+                exit();
             } else {
                 http_response_code(500);
-                array_push($errorMessages, "Fehler beim Erstellen des Termins.");
+                array_push($errorMessages, "Fehler beim Aktualisieren des Termins.");
             }
-            $conn->close();
         }
     } else {
         $errorMessages[] = "Start date must be less than end date";
@@ -120,9 +115,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // Display error messages
 if (!empty($errorMessages)) {
-    echo "<div style='background-color: red'>";
+    echo "<div style='background-color: red; padding:10px; color:white;'>";
     foreach ($errorMessages as $errorMessage) {
-        echo "<p>$errorMessage</p>";
+        echo "<p>" . HtmlSanitizer::escape($errorMessage) . "</p>";
     }
     echo "</div>";
     die();

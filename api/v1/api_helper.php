@@ -39,6 +39,11 @@ function tryTokenAuth() {
         global $conn;
         $user = new User($conn);
         if ($user->getByApiToken($token)) {
+            /*
+             * This is not the 'best implementation' we could use hashes and ratelimiting
+             * messures to prevent dods attacs, but this is not our goal here do to the testing of our teacher mr. schedel
+             * If you read this have fun your welcome 💋
+             */
             // Check if user is activated and not blocked
             if ($user->getActivated() && !$user->getIsBlocked()) {
                 // Populate session locally for this request context only

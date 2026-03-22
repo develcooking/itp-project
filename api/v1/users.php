@@ -34,14 +34,14 @@ switch ($method) {
         $data = getJsonInput();
         if (!$data) sendResponse(false, null, 'Invalid JSON input', 400);
 
-        $user->setUserName($data['userName'] ?? '')
-             ->setFirstName($data['firstName'] ?? '')
-             ->setLastName($data['lastName'] ?? '')
-             ->setEmail($data['email'] ?? '')
+        $user->setUserName(HtmlSanitizer::sanitize($data['userName'] ?? ''))
+             ->setFirstName(HtmlSanitizer::sanitize($data['firstName'] ?? ''))
+             ->setLastName(HtmlSanitizer::sanitize($data['lastName'] ?? ''))
+             ->setEmail(filter_var($data['email'] ?? '', FILTER_SANITIZE_EMAIL))
              ->setPassword($data['password'] ?? '')
-             ->setRole($data['role'] ?? 'user')
+             ->setRole(in_array($data['role'] ?? '', ['Ausbilder', 'Lehrer', 'Admin']) ? $data['role'] : 'Lehrer')
              ->setSecurityAnswer($data['securityAnswer'] ?? '')
-             ->setActivated($data['activated'] ?? 1)
+             ->setActivated(intval($data['activated'] ?? 1))
              ->setCreatedBy($_SESSION['userId'] ?? 0);
 
         if ($user->post()) {
@@ -53,25 +53,32 @@ switch ($method) {
 
     case 'PUT':
         $data = getJsonInput();
-        if (!$data || !isset($data['userId'])) sendResponse(false, null, 'Invalid input or missing userId', 400);
+        if (!$data || !isset($data['userId'])) sendResponse(false, null, 'Missing userId', 400);
         
         $userId = intval($data['userId']);
+        if ($userId <= 0) sendResponse(false, null, 'Invalid userId', 400);
         
-        // Only admin or the user themselves can update
-        if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $userId) {
-            sendResponse(false, null, 'Unauthorized', 401);
+        // Authorization: Only admin or the user themselves
+        if (strtolower($_SESSION['role'] ?? '') !== 'admin' && intval($_SESSION['userId'] ?? 0) !== $userId) {
+            sendResponse(false, null, 'Unauthorized to modify this user', 403);
         }
 
         if (!$user->getById($userId)) sendResponse(false, null, 'User not found', 404);
 
-        if (isset($data['userName'])) $user->setUserName($data['userName']);
-        if (isset($data['firstName'])) $user->setFirstName($data['firstName']);
-        if (isset($data['lastName'])) $user->setLastName($data['lastName']);
-        if (isset($data['email'])) $user->setEmail($data['email']);
+        if (isset($data['userName'])) $user->setUserName(HtmlSanitizer::sanitize($data['userName']));
+        if (isset($data['firstName'])) $user->setFirstName(HtmlSanitizer::sanitize($data['firstName']));
+        if (isset($data['lastName'])) $user->setLastName(HtmlSanitizer::sanitize($data['lastName']));
+        if (isset($data['email'])) $user->setEmail(filter_var($data['email'], FILTER_SANITIZE_EMAIL));
         if (isset($data['password'])) $user->setPassword($data['password']);
-        if (isset($data['role']) && $_SESSION['role'] === 'admin') $user->setRole($data['role']);
+        if (isset($data['role']) && strtolower($_SESSION['role'] ?? '') === 'admin') {
+            if (in_array($data['role'], ['Ausbilder', 'Lehrer', 'Admin'])) {
+                $user->setRole($data['role']);
+            }
+        }
         if (isset($data['securityAnswer'])) $user->setSecurityAnswer($data['securityAnswer']);
-        if (isset($data['activated']) && $_SESSION['role'] === 'admin') $user->setActivated($data['activated']);
+        if (isset($data['activated']) && strtolower($_SESSION['role'] ?? '') === 'admin') {
+            $user->setActivated(intval($data['activated']));
+        }
 
         if ($user->update($userId)) {
             sendResponse(true, null, 'User updated successfully');
@@ -82,11 +89,11 @@ switch ($method) {
 
     case 'DELETE':
         $data = getJsonInput();
-        $id = $data['userId'] ?? $_GET['id'] ?? null;
+        $id = intval($data['userId'] ?? $_GET['id'] ?? 0);
         
-        if (!$id) sendResponse(false, null, 'Missing userId', 400);
+        if ($id <= 0) sendResponse(false, null, 'Invalid userId', 400);
 
-        if ($user->delete(intval($id))) {
+        if ($user->delete($id)) {
             sendResponse(true, null, 'User deleted successfully');
         } else {
             sendResponse(false, null, 'Failed to delete user', 500);

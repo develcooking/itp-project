@@ -21,6 +21,7 @@ $userId = $_SESSION['userId'] ?? 0;
 
 switch ($method) {
     case 'GET':
+        checkLoggedIn();
         if (isset($_GET['id'])) {
             if ($appointment->getById(intval($_GET['id']))) {
                 // Check access
@@ -59,20 +60,43 @@ switch ($method) {
     case 'POST':
         checkLoggedIn();
         $data = getJsonInput();
+        
+        // 1. Basic Presence Validation
         if (!$data || !isset($data['title']) || !isset($data['jobId'])) {
-            sendResponse(false, null, 'Invalid input or missing title/jobId', 400);
+            sendResponse(false, null, 'Missing required fields: title, jobId', 400);
         }
-        hasAccessToJob($data['jobId']);
 
-        $appointment->setTitle($data['title'])
-                    ->setJobId(intval($data['jobId']))
+        // 2. Type & Value Validation
+        $jobId = intval($data['jobId']);
+        if ($jobId <= 0) {
+            sendResponse(false, null, 'Invalid jobId', 400);
+        }
+
+        // 3. Authorization
+        hasAccessToJob($jobId);
+
+        // 4. Sanitize Strings (Against XSS)
+        $title = HtmlSanitizer::sanitize($data['title'] ?? '');
+        $description = HtmlSanitizer::sanitize($data['description'] ?? '');
+        
+        // 5. Whitelist Enum values (Against malicious logic)
+        $recurrenceType = $data['recurrenceType'] ?? 'none';
+        if (!in_array($recurrenceType, ['none', 'weekly', 'monthly'])) {
+            $recurrenceType = 'none';
+        }
+
+        $interval = intval($data['recurrenceInterval'] ?? 1);
+        if ($interval < 1 || $interval > 24) $interval = 1;
+
+        $appointment->setTitle($title)
+                    ->setJobId($jobId)
                     ->setStart($data['start'] ?? date('Y-m-d H:i:s'))
                     ->setEnd($data['end'] ?? date('Y-m-d H:i:s'))
-                    ->setDescription(HtmlSanitizer::sanitize($data['description'] ?? ''))
+                    ->setDescription($description)
                     ->setCreatedBy($_SESSION['userId'])
                     ->setModifiedBy($_SESSION['userId'])
-                    ->setRecurrenceType($data['recurrenceType'] ?? 'none')
-                    ->setRecurrenceInterval(intval($data['recurrenceInterval'] ?? 1))
+                    ->setRecurrenceType($recurrenceType)
+                    ->setRecurrenceInterval($interval)
                     ->setRecurrenceUntil($data['recurrenceUntil'] ?? null);
 
         if ($appointment->post()) {
@@ -86,37 +110,47 @@ switch ($method) {
         checkLoggedIn();
         $data = getJsonInput();
         if (!$data || !isset($data['appointmentId'])) {
-            sendResponse(false, null, 'Invalid input or missing appointmentId', 400);
+            sendResponse(false, null, 'Missing appointmentId', 400);
         }
 
         $id = intval($data['appointmentId']);
-        if (!$appointment->getById($id)) {
+        if ($id <= 0 || !$appointment->getById($id)) {
             sendResponse(false, null, 'Appointment not found', 404);
         }
 
-        // JobId might not be in PUT data if only title changed
-        $jobId = $data['jobId'] ?? $appointment->getJobId();
-        hasAccessToJob($jobId);
-
-        if (empty($_SESSION['userId'])) {
-            sendResponse(false, null, 'Unauthorized: Login required', 401);
-        }
-        // Only admin or creator can update
-        if ($_SESSION['role'] !== 'admin' && $_SESSION['userId'] !== $appointment->getCreatedBy()) {
-            sendResponse(false, null, 'Unauthorized', 403);
+        // Authorization: Only admin or creator
+        if (strtolower($_SESSION['role']) !== 'admin' && $_SESSION['userId'] !== $appointment->getCreatedBy()) {
+            sendResponse(false, null, 'Unauthorized to modify this appointment', 403);
         }
 
-        if (isset($data['title'])) $appointment->setTitle($data['title']);
+        if (isset($data['jobId'])) {
+            $jobId = intval($data['jobId']);
+            if ($jobId > 0) {
+                hasAccessToJob($jobId);
+                $appointment->setJobId($jobId);
+            }
+        }
+
+        if (isset($data['title'])) $appointment->setTitle(HtmlSanitizer::sanitize($data['title']));
+        if (isset($data['description'])) $appointment->setDescription(HtmlSanitizer::sanitize($data['description']));
         if (isset($data['start'])) $appointment->setStart($data['start']);
         if (isset($data['end'])) $appointment->setEnd($data['end']);
-        if (isset($data['description'])) $appointment->setDescription(HtmlSanitizer::sanitize($data['description']));
-        if (isset($data['jobId'])) $appointment->setJobId(intval($data['jobId']));
-        if (isset($data['recurrenceType'])) $appointment->setRecurrenceType($data['recurrenceType']);
-        if (isset($data['recurrenceInterval'])) $appointment->setRecurrenceInterval(intval($data['recurrenceInterval']));
+        
+        if (isset($data['recurrenceType'])) {
+            if (in_array($data['recurrenceType'], ['none', 'weekly', 'monthly'])) {
+                $appointment->setRecurrenceType($data['recurrenceType']);
+            }
+        }
+        if (isset($data['recurrenceInterval'])) {
+            $interval = intval($data['recurrenceInterval']);
+            if ($interval >= 1 && $interval <= 24) {
+                $appointment->setRecurrenceInterval($interval);
+            }
+        }
         if (isset($data['recurrenceUntil'])) $appointment->setRecurrenceUntil($data['recurrenceUntil']);
 
         if ($appointment->update($id)) {
-            sendResponse(true, null, 'Appointment updated successfully', 204);
+            sendResponse(true, null, 'Appointment updated successfully');
         } else {
             sendResponse(false, null, 'Failed to update appointment', 500);
         }

@@ -15,11 +15,9 @@ require_once __DIR__ . "/api_helper.php";
 $method = $_SERVER['REQUEST_METHOD'];
 $job = new Job($conn);
 
-if (!is_numeric($_GET['id'])) {
-    sendResponse(false, null, 'JobId is not numeric!', 400);
-}
 switch ($method) {
     case 'GET':
+        checkLoggedIn();
         if (isset($_GET['id'])) {
             if (hasAccessToJob($_GET['id'])) {
                 if ($job->getById(intval($_GET['id']))) {
@@ -45,9 +43,9 @@ switch ($method) {
     case 'POST':
         checkAdmin();
         $data = getJsonInput();
-        if (!$data || !isset($data['name'])) sendResponse(false, null, 'Invalid input or missing name', 400);
+        if (!$data || empty($data['name'])) sendResponse(false, null, 'Missing name', 400);
 
-        $job->setJobName($data['name']);
+        $job->setJobName(HtmlSanitizer::sanitize($data['name']));
         $job->setCreateBy($_SESSION['userId'] ?? 0);
         $job->setModifiedBy($_SESSION['userId'] ?? 0);
 
@@ -61,12 +59,15 @@ switch ($method) {
     case 'PUT':
         checkAdmin();
         $data = getJsonInput();
-        if (!$data || !isset($data['jobId']) || !isset($data['name'])) {
-            sendResponse(false, null, 'Invalid input or missing jobId/name', 400);
+        if (!$data || !isset($data['jobId']) || empty($data['name'])) {
+            sendResponse(false, null, 'Missing jobId or name', 400);
         }
 
-        if ($job->update(intval($data['jobId']), $data['name'])) {
-            sendResponse(true, null, 'Job updated successfully', 204);
+        $jobId = intval($data['jobId']);
+        if ($jobId <= 0) sendResponse(false, null, 'Invalid jobId', 400);
+
+        if ($job->update($jobId, HtmlSanitizer::sanitize($data['name']))) {
+            sendResponse(true, null, 'Job updated successfully');
         } else {
             sendResponse(false, null, 'Failed to update job', 500);
         }
@@ -75,12 +76,12 @@ switch ($method) {
     case 'DELETE':
         checkAdmin();
         $data = getJsonInput();
-        $id = $data['jobId'] ?? $_GET['id'] ?? null;
+        $id = intval($data['jobId'] ?? $_GET['id'] ?? 0);
         
-        if (!$id) sendResponse(false, null, 'Missing jobId', 400);
+        if ($id <= 0) sendResponse(false, null, 'Invalid jobId', 400);
 
-        if ($job->delete(intval($id))) {
-            sendResponse(true, null, 'Job deleted successfully', 204);
+        if ($job->delete($id)) {
+            sendResponse(true, null, 'Job deleted successfully');
         } else {
             sendResponse(false, null, 'Failed to delete job', 500);
         }
