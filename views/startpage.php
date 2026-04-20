@@ -46,6 +46,9 @@ require_once $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
                                         <div class="flex-grow-1">
                                             <h6 class="mb-1 fw-bold">
                                                 <?= htmlspecialchars($appointment['title']) ?>
+                                                <?php if (isset($appointment['isRecurring']) && $appointment['isRecurring']): ?>
+                                                    <i class="bi bi-repeat small text-primary ms-1" title="Wiederkehrend"></i>
+                                                <?php endif; ?>
                                             </h6>
                                             <p class="mb-1 small text-muted">
                                                 <i class="bi bi-briefcase me-1"></i>
