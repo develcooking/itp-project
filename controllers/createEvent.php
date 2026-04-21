@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             array_push($errorMessages, "Bitte füllen Sie alle Felder aus!");
         } else {
             $appointmentmodel = new Appointment($conn);
-            $appointmentmodel->setTitle($title);
+            $appointmentmodel->setTitle(HtmlSanitizer::sanitize($title));
             $appointmentmodel->setJobId($jobId);
             $appointmentmodel->setStart($startDateTime);
             $appointmentmodel->setEnd($endDateTime);
