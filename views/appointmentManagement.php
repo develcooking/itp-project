@@ -151,7 +151,7 @@ if ($isAdmin) {
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input type="number" name="recurrence_interval" class="form-control" id="recurrence_interval" value="1" min="1">
+                                <input type="number" name="recurrence_interval" class="form-control" id="recurrence_interval" value="1" min="1" max="24">
                                 <label for="recurrence_interval">Alle X Wochen/Monate</label>
                             </div>
                         </div>
@@ -258,7 +258,7 @@ if ($isAdmin) {
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input type="number" name="changerecurrence_interval" class="form-control" id="changerecurrence_interval" value="1" min="1">
+                                <input type="number" name="changerecurrence_interval" class="form-control" id="changerecurrence_interval" value="1" min="1" max="24">
                                 <label for="changerecurrence_interval">Alle X Wochen/Monate</label>
                             </div>
                         </div>

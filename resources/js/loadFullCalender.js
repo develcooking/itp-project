@@ -14,16 +14,32 @@ function changeSubBtnStatus(status) {
         modal_submit_btn.setAttribute("aria-disabled", "true");
     }
 }
+function validateXEntys() {
+    const recurrence_interval = document.getElementById('recurrence_interval');
+    if (recurrence_interval) {
+        recurrence_interval.addEventListener("change", validateForm);
+        recurrence_interval.addEventListener("input", validateForm);
+    }
+}
 
 function validateDateTime() {
-    const startdate = document.getElementById('startdate').value;
+    validateForm();
+}
+
+function validateForm() {
+    const startdateEl = document.getElementById('startdate');
+    if (!startdateEl) return;
+
+    const startdate = startdateEl.value;
     const starttime = document.getElementById('starttime').value;
     const enddate = document.getElementById('enddate').value;
     const endtime = document.getElementById('endtime').value;
+    const recurrence_interval = document.getElementById('recurrence_interval');
     const errorBox = document.getElementById("dateError");
 
+    if (errorBox) errorBox.classList.add("d-none");
+
     if (!startdate || !starttime || !enddate || !endtime) {
-        if (errorBox) errorBox.classList.add("d-none");
         changeSubBtnStatus(false);
         return;
     }
@@ -37,10 +53,22 @@ function validateDateTime() {
             errorBox.classList.remove("d-none");
         }
         changeSubBtnStatus(false);
-    } else {
-        if (errorBox) errorBox.classList.add("d-none");
-        changeSubBtnStatus(true);
+        return;
     }
+
+    if (recurrence_interval) {
+        const val = parseInt(recurrence_interval.value);
+        if (val > 24) {
+            if (errorBox) {
+                errorBox.innerText = "Alle X Wochen/ Monate darf nicht höher als 24 sein!";
+                errorBox.classList.remove("d-none");
+            }
+            changeSubBtnStatus(false);
+            return;
+        }
+    }
+
+    changeSubBtnStatus(true);
 }
 function splitdateForChangeModle(datetimestring) {
     const date = new Date(datetimestring);
@@ -232,6 +260,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var calendar = new FullCalendar.Calendar(calendarEl, calendarOptions);
     calendar.render();
+    validateXEntys();
 
     // Filter listeners
     const filterJob = document.getElementById('filterJob');

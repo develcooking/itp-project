@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if ($recurrenceType !== 'none') {
-        if (!is_numeric($recurrenceInterval) || (int)$recurrenceInterval < 1) {
+        if (!is_numeric($recurrenceInterval) || (int)$recurrenceInterval < 1 || $recurrenceInterval >= 24) {
             http_response_code(400);
             die("Invalid recurrence Interval.");
         }
