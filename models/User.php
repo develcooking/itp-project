@@ -233,11 +233,12 @@ class User
     public function generateApiToken(): ?string
     {
         $token = bin2hex(random_bytes(32));
+        $hashedToken = hash('sha256', $token);
         $query = "UPDATE " . $this->table . " SET apiToken = ? WHERE userId = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("si", $token, $this->userId);
+        $stmt->bind_param("si", $hashedToken, $this->userId);
         if ($stmt->execute()) {
-            $this->apiToken = $token;
+            $this->apiToken = $token; // Store raw token in object to return to user ONCE
             $stmt->close();
             return $token;
         }

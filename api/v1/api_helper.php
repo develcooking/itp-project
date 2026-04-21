@@ -28,17 +28,19 @@ if (!function_exists('getallheaders')) {
  * REPLACES existing session data for the API context.
  */
 function tryTokenAuth() {
-    // Clear any existing session data that might have been loaded via cookies.
-    // We want the API to be "Token Only".
-    $_SESSION = [];
-
     $headers = getallheaders();
     $token = $headers['X-API-Token'] ?? $headers['x-api-token'] ?? null;
 
     if ($token) {
+        // Clear any existing session data only if a token is provided.
+        // This ensures the request context is strictly defined by the token.
+        $_SESSION = [];
+        
         global $conn;
         $user = new User($conn);
-        if ($user->getByApiToken($token)) {
+        // Use a hash of the token for comparison (for security)
+        $hashedToken = hash('sha256', $token);
+        if ($user->getByApiToken($hashedToken)) {
             /*
              * This is not the 'best implementation' we could use hashes and ratelimiting
              * messures to prevent dods attacs, but this is not our goal here do to the testing of our teacher mr. schedel

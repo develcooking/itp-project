@@ -21,8 +21,10 @@ $profileStats = $user->getProfileStats();
 // Handle API Token actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['generateApiToken'])) {
-        if ($user->generateApiToken()) {
-            $success = 'API-Token erfolgreich generiert!';
+        $rawToken = $user->generateApiToken();
+        if ($rawToken) {
+            $_SESSION['new_api_token'] = $rawToken;
+            $success = 'API-Token erfolgreich generiert! Bitte kopieren Sie ihn jetzt, er wird nicht erneut angezeigt.';
         } else {
             $errors['general'] = 'Fehler beim Generieren des API-Tokens.';
         }

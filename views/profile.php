@@ -253,17 +253,32 @@ $profileStats = array_merge([
 
                             <form method="post" action="/controllers/profile.php">
                                 <?php echo getCsrfTokenInput(); ?>
-                                <?php if ($user->getApiToken()): ?>
+                                <?php if (isset($_SESSION['new_api_token'])): ?>
+                                    <div class="alert alert-warning border-warning">
+                                        <strong>WICHTIG:</strong> Dies ist Ihr neuer API-Token. Kopieren Sie ihn jetzt! 
+                                        Er wird aus Sicherheitsgründen <strong>nie wieder</strong> angezeigt.
+                                    </div>
                                     <div class="mb-3 text-start">
-                                        <label class="form-label small text-muted">Ihr aktueller API-Token:</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control font-monospace" value="<?= htmlspecialchars($user->getApiToken()) ?>" readonly id="apiTokenInput">
+                                            <input type="text" class="form-control font-monospace is-valid" value="<?= htmlspecialchars($_SESSION['new_api_token']) ?>" readonly id="apiTokenInput">
                                             <button class="btn btn-outline-secondary" type="button" onclick="copyApiToken()" title="Kopieren">
                                                 <i class="bi bi-clipboard"></i>
                                             </button>
                                         </div>
-                                        <div class="form-text text-danger">Geben Sie diesen Token niemals an Dritte weiter!</div>
                                     </div>
+                                    <?php unset($_SESSION['new_api_token']); ?>
+                                <?php elseif ($user->getApiToken()): ?>
+                                    <div class="mb-3 text-start">
+                                        <label class="form-label small text-muted">API-Token Status:</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control font-monospace" value="******************************** (Gespeichert als Hash)" readonly>
+                                            <span class="input-group-text text-success"><i class="bi bi-check-circle-fill"></i> Aktiv</span>
+                                        </div>
+                                        <div class="form-text">Aus Sicherheitsgründen wird der Token nur bei der Generierung angezeigt.</div>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if ($user->getApiToken() || isset($_SESSION['new_api_token'])): ?>
                                     <button type="submit" name="generateApiToken" class="btn btn-warning w-100 mb-2">
                                         Neuen Token generieren
                                     </button>
