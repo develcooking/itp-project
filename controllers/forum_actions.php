@@ -163,24 +163,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             case 'voteUp':
                 $postId = intval($_POST['postId'] ?? 0);
+                $redirectTo = $_POST['redirectTo'] ?? '/views/forum.php';
                 if ($postId > 0) {
                     $post = new Post($conn);
                     $post->vote($postId, $_SESSION['userId'], 'up');
                 }
-                header("Location: " . $_SERVER['HTTP_REFERER']);
+                header("Location: " . $redirectTo);
                 exit();
 
             case 'voteDown':
                 $postId = intval($_POST['postId'] ?? 0);
+                $redirectTo = $_POST['redirectTo'] ?? '/views/forum.php';
                 if ($postId > 0) {
                     $post = new Post($conn);
                     $post->vote($postId, $_SESSION['userId'], 'down');
                 }
-                header("Location: " . $_SERVER['HTTP_REFERER']);
+                header("Location: " . $redirectTo);
                 exit();
 
             case 'togglePin':
-
+                $redirectTo = $_POST['redirectTo'] ?? '/views/forum.php';
                 if (!$isAdmin) {
                     header("Location: /views/forum.php?error=no_permission");
                     exit();
@@ -190,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $topic = new Topic($conn);
                 if ($topic->togglePin($topicId)) {
-                    header("Location: " . $_SERVER['HTTP_REFERER']);
+                    header("Location: " . $redirectTo);
                     exit();
                 }
 
@@ -199,6 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'editPost':
                 $postId = intval($_POST['postId'] ?? 0);
                 $content = trim($_POST['postContent'] ?? '');
+                $redirectTo = $_POST['redirectTo'] ?? '/views/forum.php';
                 if ($postId > 0 && !empty($content)) {
                     $post = new Post($conn);
                     if ($post->getById($postId)) {
@@ -207,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $post->setContent($content);
                             $post->setModifiedBy($userId);
                             if ($post->update($postId)) {
-                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                header("Location: " . $redirectTo);
                                 exit();
                             }
                         }
@@ -218,12 +221,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             case 'deletePost':
                 $postId = intval($_POST['postId'] ?? 0);
+                $redirectTo = $_POST['redirectTo'] ?? '/views/forum.php';
                 if ($postId > 0) {
                     $post = new Post($conn);
                     if ($post->getById($postId)) {
                         if ($post->getUserId() == $userId || $isAdmin) {
                             if ($post->delete($postId)) {
-                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                header("Location: " . $redirectTo);
                                 exit();
                             }
                         }
@@ -235,32 +239,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'editComment':
                 $commentId = intval($_POST['commentId'] ?? 0);
                 $content = trim($_POST['commentContent'] ?? '');
+                $redirectTo = $_POST['redirectTo'] ?? '/views/forum.php';
                 if ($commentId > 0 && !empty($content)) {
                     $comment = new Comment($conn);
                     if ($comment->getById($commentId)) {
+                        if ($comment->getUserId() == $userId || $isAdmin) {
                             $content = HtmlSanitizer::sanitize($content);
                             $comment->setUserId($userId); // Für modifiedBy im Model
                             if ($comment->update($commentId, $content)) {
-                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                header("Location: " . $redirectTo);
                                 exit();
                             }
+                        }
                     }
                 }
-                header("Location: " . $_SERVER['HTTP_REFERER'] . "&error=edit_comment_failed");
+                header("Location: " . $redirectTo . (strpos($redirectTo, '?') === false ? '?' : '&') . "error=edit_comment_failed");
                 break;
 
             case 'deleteComment':
                 $commentId = intval($_POST['commentId'] ?? 0);
+                $redirectTo = $_POST['redirectTo'] ?? '/views/forum.php';
                 if ($commentId > 0) {
                     $comment = new Comment($conn);
                     if ($comment->getById($commentId)) {
+                        if ($comment->getUserId() == $userId || $isAdmin) {
                             if ($comment->delete($commentId)) {
-                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                header("Location: " . $redirectTo);
                                 exit();
                             }
+                        }
                     }
                 }
-                header("Location: " . $_SERVER['HTTP_REFERER'] . "&error=delete_comment_failed");
+                header("Location: " . $redirectTo . (strpos($redirectTo, '?') === false ? '?' : '&') . "error=delete_comment_failed");
                 break;
         }
     }

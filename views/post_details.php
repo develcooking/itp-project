@@ -198,7 +198,7 @@ $topicName = $topicModel->getName();
                                 </div>
                             </div>
                             <div class="post-content" id="post-content-<?= $post['postId'] ?>">
-                                <?= $post['content'] ?>
+                                <?= HtmlSanitizer::sanitize($post['content'] ?? '') ?>
                             </div>
 
                             <?php
@@ -336,7 +336,7 @@ $topicName = $topicModel->getName();
                                         </div>
                                     </div>
                                     <div class="post-content" id="comment-content-<?= $comment['commentId'] ?>">
-                                        <?= $comment['content'] ?>
+                                        <?= HtmlSanitizer::sanitize($comment['content'] ?? '') ?>
                                     </div>
                                 </div>
                             </div>
