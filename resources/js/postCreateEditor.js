@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     
-    // --- 1. Initialer Editor (nur wenn vorhanden) ---
+    // --- 1. Initialer Editor (Topic Creation) ---
     const elInitial = document.getElementById('quillEditorInitial');
     if (elInitial) {
         const quillInitial = new Quill('#quillEditorInitial', {
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // --- 2. Standard Post Editor (nur wenn vorhanden) ---
+    // --- 2. Standard Post Editor (Post Creation) ---
     const elPost = document.getElementById('quillEditor');
     if (elPost) {
         const quill = new Quill('#quillEditor', {
@@ -33,9 +33,25 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // --- 3. Edit post editor ---
+    // --- 3. Comment Editor (Comment Creation) ---
+    const elComment = document.getElementById('quillEditorComment');
+    if (elComment) {
+        const quillComment = new Quill('#quillEditorComment', {
+            theme: 'snow',
+            modules: { toolbar: [['bold', 'italic', 'underline', 'strike'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['blockquote'], ['link']] }
+        });
+        const createCommentForm = document.getElementById('createCommentForm');
+        if (createCommentForm) {
+            createCommentForm.onsubmit = function() {
+                document.getElementById('commentContentHidden').value = quillComment.root.innerHTML;
+                if (quillComment.getText().trim().length === 0) { alert('Bitte Kommentar eingeben.'); return false; }
+            };
+        }
+    }
+
+    // --- 4. Edit post editor ---
     const elEdit = document.getElementById('quillEditorEdit');
-    let quillEdit; // Globaler im Scope definieren
+    let quillEdit;
     if (elEdit) {
         quillEdit = new Quill('#quillEditorEdit', {
             theme: 'snow',
@@ -43,27 +59,21 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Bearbeiten-Button Click Handler
+    const editPostModalElem = document.getElementById('editPostModal');
+    const editPostModal = editPostModalElem ? new bootstrap.Modal(editPostModalElem) : null;
+
     document.querySelectorAll('.edit-post-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const postId = this.getAttribute('data-post-id');
             const contentDiv = document.getElementById('post-content-' + postId);
-            const editModalElem = document.getElementById('editPostModal');
-            
-            if (contentDiv && quillEdit && editModalElem) {
-                // Inhalt in den Editor laden
-                quillEdit.root.innerHTML = contentDiv.innerHTML;
-                // ID ins versteckte Feld
+            if (contentDiv && quillEdit) {
+                quillEdit.root.innerHTML = contentDiv.innerHTML.trim();
                 document.getElementById('editPostId').value = postId;
-                
-                // Modal öffnen (Bootstrap 5)
-                const modal = new bootstrap.Modal(editModalElem);
-                modal.show();
+                if (editPostModal) editPostModal.show();
             }
         });
     });
 
-    // Formular-Submit für Edit
     const editPostForm = document.getElementById('editPostForm');
     if (editPostForm && quillEdit) {
         editPostForm.onsubmit = function() {
@@ -72,93 +82,94 @@ document.addEventListener("DOMContentLoaded", function() {
         };
     }
 
-    // --- 4. Löschen & Votes ---
-    document.querySelectorAll('.delete-post-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('Sind Sie sicher?')) {
-                document.getElementById('deletePostId').value = this.getAttribute('data-post-id');
-                document.getElementById('deletePostForm').submit();
-            }
-        });
-    });
-
-    document.querySelectorAll('.vote-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); // prevent page reload
-
-            const button = this.querySelector('.vote-btn');
-            const icon = button.querySelector('.thumb-icon');
-            const countSpan = button.querySelector('.vote-count');
-
-            const formData = new FormData(this);
-            const postId = formData.get('postId');
-            const action = formData.get('action'); // voteUp or voteDown
-
-            // Immediate visual feedback
-            icon.style.color = (action === 'voteUp') ? 'green' : 'red';
-
-            // Send AJAX request
-            fetch(this.action, {
-                method: 'POST',
-                body: formData
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.success){
-                        // Update counts
-                        if(action === 'voteUp') countSpan.textContent = data.newCountUp;
-                        if(action === 'voteDown') countSpan.textContent = data.newCountDown;
-                    } else {
-                        alert('Fehler beim Abstimmen!');
-                        // Reset color if failed
-                        icon.style.color = '';
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    icon.style.color = '';
-                });
-        });
-    });
-    // 1. Editor für Kommentar-Bearbeitung initialisieren
+    // --- 5. Edit comment editor ---
     const elCommentEdit = document.getElementById('quillEditorCommentEdit');
     let quillCommentEdit;
     if (elCommentEdit) {
         quillCommentEdit = new Quill('#quillEditorCommentEdit', {
             theme: 'snow',
-            modules: { toolbar: [['bold', 'italic', 'underline'], ['link', 'clean']] }
+            modules: { toolbar: [['bold', 'italic', 'underline', 'strike'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['blockquote'], ['link']] }
         });
     }
 
-    // 2. Edit Button Handler
+    const editCommentModalElem = document.getElementById('editCommentModal');
+    const editCommentModal = editCommentModalElem ? new bootstrap.Modal(editCommentModalElem) : null;
+
     document.querySelectorAll('.edit-comment-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const commentId = this.getAttribute('data-comment-id');
             const contentDiv = document.getElementById('comment-content-' + commentId);
-
             if (contentDiv && quillCommentEdit) {
-                quillCommentEdit.root.innerHTML = contentDiv.innerHTML;
+                quillCommentEdit.root.innerHTML = contentDiv.innerHTML.trim();
                 document.getElementById('editCommentId').value = commentId;
-                new bootstrap.Modal(document.getElementById('editCommentModal')).show();
+                if (editCommentModal) editCommentModal.show();
             }
         });
     });
 
-    // 3. Submit Handler
     const editCommentForm = document.getElementById('editCommentForm');
     if (editCommentForm && quillCommentEdit) {
         editCommentForm.onsubmit = function() {
             document.getElementById('editCommentContentHidden').value = quillCommentEdit.root.innerHTML;
+            if (quillCommentEdit.getText().trim().length === 0) { alert('Inhalt darf nicht leer sein.'); return false; }
         };
     }
 
-    // 4. Delete Button Handler
+    // --- 6. Deletion ---
+    document.querySelectorAll('.delete-post-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (confirm('Beitrag wirklich löschen?')) {
+                const postId = this.getAttribute('data-post-id');
+                const form = document.getElementById('deletePostForm');
+                const input = document.getElementById('deletePostId');
+                if (form && input) {
+                    input.value = postId;
+                    form.submit();
+                }
+            }
+        });
+    });
+
     document.querySelectorAll('.delete-comment-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             if (confirm('Kommentar wirklich löschen?')) {
-                document.getElementById('deleteCommentId').value = this.getAttribute('data-comment-id');
-                document.getElementById('deleteCommentForm').submit();
+                const commentId = this.getAttribute('data-comment-id');
+                const form = document.getElementById('deleteCommentForm');
+                const input = document.getElementById('deleteCommentId');
+                if (form && input) {
+                    input.value = commentId;
+                    form.submit();
+                }
             }
+        });
+    });
+
+    // --- 7. Voting (AJAX) ---
+    document.querySelectorAll('.vote-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const button = this.querySelector('button');
+            const icon = button.querySelector('i');
+            const countSpan = button.querySelector('span');
+
+            const formData = new FormData(this);
+            
+            // Send AJAX request
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => {
+                // Since the controller currently just redirects, we might need to 
+                // either reload the page or update the controller for JSON response.
+                // For now, simple reload or manual update if possible.
+                window.location.reload(); 
+            })
+            .catch(err => console.error(err));
         });
     });
 });

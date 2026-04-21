@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     // XSS protection on input
-                    $content = strip_tags($content, '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>');
+                    $content = HtmlSanitizer::sanitize($content);
 
                     $comment = new Comment($conn);
                     $comment->setPostId($postId);
@@ -207,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $post->setContent($content);
                             $post->setModifiedBy($userId);
                             if ($post->update($postId)) {
-                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                header("Location: " . ($_POST['redirectTo'] ?? $_SERVER['HTTP_REFERER']));
                                 exit();
                             }
                         }
@@ -223,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($post->getById($postId)) {
                         if ($post->getUserId() == $userId || $isAdmin) {
                             if ($post->delete($postId)) {
-                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                header("Location: " . ($_POST['redirectTo'] ?? $_SERVER['HTTP_REFERER']));
                                 exit();
                             }
                         }
@@ -238,12 +238,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($commentId > 0 && !empty($content)) {
                     $comment = new Comment($conn);
                     if ($comment->getById($commentId)) {
+                        // Ownership check
+                        if ($comment->getUserId() == $userId || $isAdmin) {
                             $content = HtmlSanitizer::sanitize($content);
                             $comment->setUserId($userId); // Für modifiedBy im Model
                             if ($comment->update($commentId, $content)) {
-                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                header("Location: " . ($_POST['redirectTo'] ?? $_SERVER['HTTP_REFERER']));
                                 exit();
                             }
+                        } else {
+                            header("Location: /views/forum.php?error=no_permission");
+                            exit();
+                        }
                     }
                 }
                 header("Location: " . $_SERVER['HTTP_REFERER'] . "&error=edit_comment_failed");
@@ -254,10 +260,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($commentId > 0) {
                     $comment = new Comment($conn);
                     if ($comment->getById($commentId)) {
+                        // Ownership check
+                        if ($comment->getUserId() == $userId || $isAdmin) {
                             if ($comment->delete($commentId)) {
-                                header("Location: " . $_SERVER['HTTP_REFERER']);
+                                header("Location: " . ($_POST['redirectTo'] ?? $_SERVER['HTTP_REFERER']));
                                 exit();
                             }
+                        } else {
+                            header("Location: /views/forum.php?error=no_permission");
+                            exit();
+                        }
                     }
                 }
                 header("Location: " . $_SERVER['HTTP_REFERER'] . "&error=delete_comment_failed");

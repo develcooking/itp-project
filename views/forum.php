@@ -4,6 +4,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Forum.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Topic.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Post.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/PostAttachment.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/HtmlSanitizer.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 
 $forumModel = new Forum($conn);
@@ -159,7 +160,7 @@ if ($selectedTopicId) {
                                             </div>
                                         </div>
                                         <div class="post-content" id="post-content-<?= $post['postId'] ?>">
-                                            <?= $post['content'] ?>
+                                            <?= HtmlSanitizer::sanitize($post['content']) ?>
                                         </div>
                                         <?php
                                             // Load attachments for this post
