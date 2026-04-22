@@ -124,6 +124,12 @@ $(document).ready(function() {
                     if (response.jobs.length === 0) {
                         html += '<p>Keine Berufsbereiche vorhanden.</p>';
                     } else {
+                        // All/None Toggle
+                        html += '<div class="form-check form-switch mb-2 border-bottom pb-2">';
+                        html += '  <input class="form-check-input" type="checkbox" role="switch" id="toggleAllJobs" data-user-id="' + userId + '">';
+                        html += '  <label class="form-check-label fw-bold" for="toggleAllJobs">Alle auswählen / abwählen</label>';
+                        html += '</div>';
+
                         response.jobs.forEach(function(job) {
                             html += '<label class="d-flex align-items-center gap-2" role="button">';
                             html += '<input type="checkbox" class="job-checkbox" data-user-id="' + userId + '" data-job-id="' + job.jobId + '"' + (job.assigned ? ' checked' : '') + '>';
@@ -133,6 +139,7 @@ $(document).ready(function() {
                     }
                     html += '</div>';
                     modalBody.html(html);
+                    updateToggleAllState();
                 } else {
                     modalBody.html('<p>Fehler: ' + response.message + '</p>');
                 }
@@ -143,12 +150,39 @@ $(document).ready(function() {
         });
     });
 
+    // Toggle All Jobs
+    $(document).on('change', '#toggleAllJobs', function() {
+        const isChecked = $(this).is(':checked');
+        const userId = $(this).data('userId');
+        
+        // Loop through all checkboxes and trigger change if they differ from master toggle
+        $('.job-checkbox').each(function() {
+            if ($(this).is(':checked') !== isChecked) {
+                $(this).prop('checked', isChecked).trigger('change');
+            }
+        });
+    });
+
+    // Function to update the state of the "Toggle All" checkbox
+    function updateToggleAllState() {
+        const total = $('.job-checkbox').length;
+        const checked = $('.job-checkbox:checked').length;
+        const toggleAll = $('#toggleAllJobs');
+
+        if (total > 0) {
+            toggleAll.prop('checked', total === checked);
+        }
+    }
+
     // Toggle job checkbox
-    $(document).on('change', '.job-checkbox', function() {
+    $(document).on('change', '.job-checkbox', function(e, isBulk) {
         const checkbox = $(this);
         const userId = checkbox.data('userId');
         const jobId = checkbox.data('jobId');
         const assign = checkbox.is(':checked') ? 1 : 0;
+
+        // If not part of a bulk operation, we might want to update the master toggle
+        updateToggleAllState();
 
         $.ajax({
             url: '/controllers/admin.php',
@@ -159,11 +193,13 @@ $(document).ready(function() {
                 if (!response.success) {
                     alert('Fehler: ' + response.message);
                     checkbox.prop('checked', !checkbox.is(':checked'));
+                    updateToggleAllState();
                 }
             },
             error: function() {
                 alert('Fehler beim Speichern der Zuweisung.');
                 checkbox.prop('checked', !checkbox.is(':checked'));
+                updateToggleAllState();
             }
         });
     });
