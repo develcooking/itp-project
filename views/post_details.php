@@ -5,6 +5,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Topic.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Post.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/Comment.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/models/PostAttachment.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . "/middleware/HtmlSanitizer.php";
 include_once $_SERVER['DOCUMENT_ROOT'] . "/views/header.php";
 
 // Check if user is logged in
@@ -165,7 +166,7 @@ $topicName = $topicModel->getName();
                     <div class="card mb-4 border-0 shadow-sm">
                         <div class="card-body m-2">
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="fw-bold text-primary d-flex align-items-center gap-2">
+                                <span class="fw-bold d-flex align-items-center gap-2">
                                     <?php if (!empty($post['hasProfileImage'])): ?>
                                         <img
                                             src="/controllers/profileImage.php?userId=<?= (int)$post['userId'] ?>"
@@ -175,9 +176,17 @@ $topicName = $topicModel->getName();
                                     <?php else: ?>
                                         <i class="bi bi-person-circle forum-post-avatar-icon" aria-label="Standard Profilbild"></i>
                                     <?php endif; ?>
-                                    <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
+                                    <span>
+                                        <?= htmlspecialchars($post['userName'] ?? 'Unbekannt') ?>
+                                        <?php if (!empty($post['school_company'])): ?>
+                                            <span class="text-muted fw-normal ms-1" style="opacity: 0.6;">- <?= htmlspecialchars($post['school_company']) ?></span>
+                                        <?php endif; ?>
+                                    </span>
                                 </span>
-                                <div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <?php if (!empty($post['edited'])): ?>
+                                        <span class="text-muted small" style="opacity:0.7;">Beitrag bearbeitet</span>
+                                    <?php endif; ?>
                                     <?php if ($post['userId'] == $_SESSION['userId']): ?>
                                         <i class="bi bi-pencil text-muted edit-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Bearbeiten"></i>
                                         <i class="bi bi-trash3 text-muted delete-post-btn me-2" style="cursor: pointer;" data-post-id="<?= $post['postId'] ?>" title="Löschen"></i>
@@ -189,8 +198,8 @@ $topicName = $topicModel->getName();
                                     </small>
                                 </div>
                             </div>
-                            <div class="post-content p-2" id="post-content-<?= $post['postId'] ?>">
-                                <?= strip_tags($post['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
+                            <div class="post-content" id="post-content-<?= $post['postId'] ?>">
+                                <?= HtmlSanitizer::sanitize($post['content']) ?>
                             </div>
 
                             <?php
@@ -285,10 +294,14 @@ $topicName = $topicModel->getName();
                         </div>
                     <?php else: ?>
                         <?php foreach ($comments as $comment): ?>
-                            <div class="card mb-3 border-0 shadow-sm mx-2">
+                            <?php 
+                                // Check if edited (modifiedAt > createdAt + 5 seconds to avoid sync issues)
+                                $isEdited = strtotime($comment['modifiedAt']) > (strtotime($comment['createdAt']) + 5);
+                            ?>
+                            <div class="card mb-3 border-0 shadow-sm mx-2" id="comment-<?= $comment['commentId'] ?>">
                                 <div class="card-body m-2">
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span class="fw-bold text-primary d-flex align-items-center gap-2">
+                                        <span class="fw-bold d-flex align-items-center gap-2">
                                             <?php if (!empty($comment['hasProfileImage'])): ?>
                                                 <img
                                                     src="/controllers/profileImage.php?userId=<?= (int)$comment['userId'] ?>"
@@ -298,24 +311,29 @@ $topicName = $topicModel->getName();
                                             <?php else: ?>
                                                 <i class="bi bi-person-circle forum-post-avatar-icon" aria-label="Standard Profilbild"></i>
                                             <?php endif; ?>
-                                            <?= htmlspecialchars($comment['userName'] ?? 'Unbekannt') ?>
+                                            <span>
+                                                <?= htmlspecialchars($comment['userName'] ?? 'Unbekannt') ?>
+                                                <?php if (!empty($comment['school_company'])): ?>
+                                                    <span class="text-muted fw-normal ms-1" style="opacity: 0.6;">- <?= htmlspecialchars($comment['school_company']) ?></span>
+                                                <?php endif; ?>
+                                            </span>
                                         </span>
-                                        <div class="comment-actions">
-                                            <!-- Edit/Delete comment -->
-                                        <?php if ($comment['userId'] == $_SESSION['userId']): ?>
-                                        <i class="bi bi-pencil text-muted edit-comment-btn me-2" style="cursor: pointer;" data-comment-id="<?= $comment['commentId'] ?>" title="Bearbeiten"></i>
-                                        <i class="bi bi-trash3 text-muted delete-comment-btn me-2" style="cursor: pointer;" data-comment-id="<?= $comment['commentId'] ?>" title="Löschen"></i>
-                                        <?php elseif ($isAdmin): ?>
-                                        <i class="bi bi-trash3 text-muted delete-comment-btn me-2" style="cursor: pointer;" data-comment-id="<?= $comment['commentId'] ?>" title="Löschen"></i>
-                                        <?php endif; ?>
-                                        <small class="text-muted">
-                                            <?= date('d.m.Y H:i', strtotime($comment['createdAt'])) ?>
-                                        </small>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <?php if ($isEdited): ?>
+                                                <span class="text-muted small" style="opacity:0.7;">bearbeitet</span>
+                                            <?php endif; ?>
+                                            <?php if ($comment['userId'] == $_SESSION['userId']): ?>
+                                                <i class="bi bi-pencil text-muted edit-comment-btn me-2" style="cursor: pointer;" data-comment-id="<?= $comment['commentId'] ?>" title="Bearbeiten"></i>
+                                                <i class="bi bi-trash3 text-muted delete-comment-btn me-2" style="cursor: pointer;" data-comment-id="<?= $comment['commentId'] ?>" title="Löschen"></i>
+                                            <?php elseif ($isAdmin): ?>
+                                                <i class="bi bi-trash3 text-muted delete-comment-btn me-2" style="cursor: pointer;" data-comment-id="<?= $comment['commentId'] ?>" title="Löschen"></i>
+                                            <?php endif; ?>
+                                            <small class="text-muted">
+                                                <?= date('d.m.Y H:i', strtotime($comment['createdAt'])) ?>
+                                            </small>
                                         </div>
                                     </div>
-                                    <div class="post-content p-2" id="comment-content-<?= $comment['commentId'] ?>">
-                                        <?= strip_tags($comment['content'], '<h1><h2><h3><h4><h5><h6><p><br><strong><em><u><s><blockquote><pre><ol><ul><li><a>') ?>
-                                    </div>
+                                    <div class="post-content" id="comment-content-<?= $comment['commentId'] ?>"><?= HtmlSanitizer::sanitize($comment['content']) ?></div>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -340,6 +358,7 @@ $topicName = $topicModel->getName();
                     <input type="hidden" name="action" value="editPost">
                     <input type="hidden" name="postId" id="editPostId">
                     <input type="hidden" name="postContent" id="editPostContentHidden">
+                    <input type="hidden" name="redirectTo" value="/views/post_details.php?postId=<?= $postId ?>&topicId=<?= $topicId ?>&jobId=<?= $jobId ?>">
                     <div class="mb-3">
                         <label class="form-label">Ihre Nachricht</label>
                         <div id="quillEditorEdit" style="height: 200px; background: white;"></div>
@@ -359,24 +378,31 @@ $topicName = $topicModel->getName();
     <?php echo getCsrfTokenInput(); ?>
     <input type="hidden" name="action" value="deletePost">
     <input type="hidden" name="postId" id="deletePostId">
+    <input type="hidden" name="redirectTo" value="/views/forum.php?jobId=<?= $jobId ?>&topicId=<?= $topicId ?>">
     </form>
 
     <script src="/resources/js/postCreateEditor.js"></script>
-    
+
     <!-- Modal for editing comments -->
 <div class="modal fade" id="editCommentModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form id="editCommentForm" action="/controllers/forum_actions.php" method="POST">
-                <div class="modal-header"><h5>Kommentar bearbeiten</h5></div>
+                <?php echo getCsrfTokenInput(); ?>
+                <div class="modal-header text-white" style="background-color: var(--accentColor);">
+                    <h5 class="modal-title">Kommentar bearbeiten</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body">
                     <input type="hidden" name="action" value="editComment">
                     <input type="hidden" name="commentId" id="editCommentId">
                     <input type="hidden" name="commentContent" id="editCommentContentHidden">
-                    <div id="quillEditorCommentEdit" style="height: 200px;"></div>
+                    <input type="hidden" name="redirectTo" value="/views/post_details.php?postId=<?= $postId ?>&topicId=<?= $topicId ?>&jobId=<?= $jobId ?>">
+                    <div id="quillEditorCommentEdit" style="height: 200px; background: white;"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Speichern</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                    <button type="submit" class="btn text-white" style="background-color: var(--accentColor);">Speichern</button>
                 </div>
             </form>
         </div>
@@ -387,40 +413,7 @@ $topicName = $topicModel->getName();
     <?php echo getCsrfTokenInput(); ?>
     <input type="hidden" name="action" value="deleteComment">
     <input type="hidden" name="commentId" id="deleteCommentId">
+    <input type="hidden" name="redirectTo" value="/views/post_details.php?postId=<?= $postId ?>&topicId=<?= $topicId ?>&jobId=<?= $jobId ?>">
 </form>
-<script>
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Quill editor for comments
-    var quillEditorComment = new Quill('#quillEditorComment', {
-        theme: 'snow',
-        modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['blockquote'],
-                ['link']
-            ]
-        }
-    });
-
-    // Handle form submission
-    document.getElementById('createCommentForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        var content = quillEditorComment.root.innerHTML;
-        
-        // Basic validation: check if there's actual text content
-        var text = quillEditorComment.getText().trim();
-        if (text.length === 0) {
-            alert('Bitte geben Sie einen Kommentar ein.');
-            return false;
-        }
-        
-        document.getElementById('commentContentHidden').value = content;
-        this.submit();
-    });
-});
-</script>
 
 <?php include $_SERVER['DOCUMENT_ROOT'] . "/views/footer.php"; ?>
