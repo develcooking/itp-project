@@ -18,6 +18,25 @@ $user = new User($conn);
 $user->getById($_SESSION['userId']);
 $profileStats = $user->getProfileStats();
 
+// Handle API Token actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['generateApiToken'])) {
+        $rawToken = $user->generateApiToken();
+        if ($rawToken) {
+            $_SESSION['new_api_token'] = $rawToken;
+            $success = 'API-Token erfolgreich generiert! Bitte kopieren Sie ihn jetzt, er wird nicht erneut angezeigt.';
+        } else {
+            $errors['general'] = 'Fehler beim Generieren des API-Tokens.';
+        }
+    } elseif (isset($_POST['revokeApiToken'])) {
+        if ($user->revokeApiToken()) {
+            $success = 'API-Token erfolgreich widerrufen!';
+        } else {
+            $errors['general'] = 'Fehler beim Widerrufen des API-Tokens.';
+        }
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveProfile'])) {
     $userName = htmlspecialchars(trim($_POST['userName'] ?? ''));
     $firstName = htmlspecialchars(trim($_POST['firstName'] ?? ''));
