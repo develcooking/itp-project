@@ -336,36 +336,150 @@ class Appointment
  
 public function getUpcomingForUser(int $userId, int $limit = 5): array
 {
-    $query = "SELECT a.*, j.name as jobName 
+    // Fetch potential appointments (either direct match or recurring series that haven't ended)
+    $query = "SELECT a.*, j.name as jobName, u.userName as creatorName 
               FROM " . $this->table . " a
               INNER JOIN users_jobs uj ON a.jobId = uj.jobId
               INNER JOIN Jobs j ON a.jobId = j.jobId
+              LEFT JOIN Users u ON a.createdBy = u.userId
               WHERE uj.userId = ? 
-              AND a.start >= NOW()
-              AND a.start <= DATE_ADD(NOW(), INTERVAL 7 DAY)
-              ORDER BY a.start ASC
-              LIMIT ?";
-    
+              AND (
+                (a.recurrence_type = 'none' AND a.start >= NOW() AND a.start <= DATE_ADD(NOW(), INTERVAL 30 DAY))
+                OR 
+                (a.recurrence_type != 'none' AND a.start <= DATE_ADD(NOW(), INTERVAL 30 DAY) AND (a.recurrence_until IS NULL OR a.recurrence_until >= NOW()))
+              )
+              ORDER BY a.start ASC";
+
     $stmt = $this->conn->prepare($query);
-    $stmt->bind_param("ii", $userId, $limit);
+    $stmt->bind_param("i", $userId);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     $appointments = [];
     while ($row = $result->fetch_assoc()) {
-        $appointments[] = [
-            'appointmentId' => $row['appointmentId'],
-            'jobId' => $row['jobId'],
-            'jobName' => $row['jobName'],
-            'title' => $row['title'],
-            'start' => $row['start'],
-            'end' => $row['end'],
-            'description' => $row['description'],
-            'createdAt' => $row['createdAt']
-        ];
+        $appointments[] = $row;
     }
-    
     $stmt->close();
-    return $appointments;
+
+    // Expand recurring appointments
+    $rangeStart = new DateTime();
+    $rangeEnd = new DateTime();
+    $rangeEnd->modify('+30 days');
+
+    $expanded = $this->expandInstances($appointments, $rangeStart, $rangeEnd);
+
+    // Sort by start date
+    usort($expanded, function($a, $b) {
+        return strcmp($a['start'], $b['start']);
+    });
+
+    // Limit results
+    return array_slice($expanded, 0, $limit);
+}
+
+/**
+ * Expands a list of appointments into individual instances based on recurrence rules.
+ */
+public function expandInstances(array $appointments, DateTime $rangeStart, DateTime $rangeEnd): array
+{
+    $instances = [];
+
+    foreach ($appointments as $row) {
+        $recurrenceType = $row['recurrence_type'] ?? 'none';
+
+        if ($recurrenceType === 'none') {
+            $start = new DateTime($row['start']);
+            $end = new DateTime($row['end']);
+
+            if ($end >= $rangeStart && $start <= $rangeEnd) {
+                $instances[] = [
+                    'appointmentId' => $row['appointmentId'],
+                    'jobId' => $row['jobId'],
+                    'jobName' => $row['jobName'] ?? '',
+                    'title' => $row['title'],
+                    'start' => $row['start'],
+                    'end' => $row['end'],
+                    'description' => $row['description'],
+                    'isRecurring' => false,
+                    'recurrence_type' => 'none',
+                    'createdBy' => $row['createdBy'] ?? null,
+                    'creatorName' => $row['creatorName'] ?? null
+                ];
+            }
+        } else {
+            $interval = (int)($row['recurrence_interval'] ?? 1);
+            $recurrenceUntil = $row['recurrence_until'] ? new DateTime($row['recurrence_until'] . ' 23:59:59') : null;
+
+            $baseStart = new DateTime($row['start']);
+            $baseEnd = new DateTime($row['end']);
+            $duration = $baseStart->diff($baseEnd);
+
+            $currentStart = clone $baseStart;
+
+            // Jump to the start of the range
+            if ($currentStart < $rangeStart) {
+                if ($recurrenceType === 'weekly') {
+                    $weeksDiff = floor($currentStart->diff($rangeStart)->days / 7);
+                    $jumpIntervals = floor($weeksDiff / $interval);
+                    if ($jumpIntervals > 0) {
+                        $currentStart->modify("+" . ($jumpIntervals * $interval) . " weeks");
+                    }
+                } elseif ($recurrenceType === 'monthly') {
+                    $monthsDiff = ($rangeStart->format('Y') - $currentStart->format('Y')) * 12 + ($rangeStart->format('m') - $currentStart->format('m'));
+                    $jumpIntervals = floor($monthsDiff / $interval);
+                    if ($jumpIntervals > 0) {
+                        $currentStart->modify("+" . ($jumpIntervals * $interval) . " months");
+                    }
+                }
+
+                // Backtrack to ensure we don't skip an overlapping event
+                if ($recurrenceType === 'weekly') {
+                    $currentStart->modify("-$interval weeks");
+                } elseif ($recurrenceType === 'monthly') {
+                    $currentStart->modify("-$interval months");
+                }
+
+                if ($currentStart < $baseStart) {
+                    $currentStart = clone $baseStart;
+                }
+            }
+
+            $safetyCounter = 0;
+            while ($currentStart <= $rangeEnd && (!$recurrenceUntil || $currentStart <= $recurrenceUntil) && $safetyCounter < 1000) {
+                $safetyCounter++;
+
+                $currentEnd = clone $currentStart;
+                $currentEnd->add($duration);
+
+                if ($currentEnd >= $rangeStart && $currentStart <= $rangeEnd) {
+                    $instances[] = [
+                        'appointmentId' => $row['appointmentId'],
+                        'jobId' => $row['jobId'],
+                        'jobName' => $row['jobName'] ?? '',
+                        'title' => $row['title'],
+                        'start' => $currentStart->format('Y-m-d H:i:s'),
+                        'end' => $currentEnd->format('Y-m-d H:i:s'),
+                        'description' => $row['description'],
+                        'isRecurring' => true,
+                        'recurrence_type' => $row['recurrence_type'],
+                        'recurrence_interval' => $row['recurrence_interval'],
+                        'recurrence_until' => $row['recurrence_until'],
+                        'createdBy' => $row['createdBy'] ?? null,
+                        'creatorName' => $row['creatorName'] ?? null
+                    ];
+                }
+
+                if ($recurrenceType === 'weekly') {
+                    $currentStart->modify("+$interval weeks");
+                } elseif ($recurrenceType === 'monthly') {
+                    $currentStart->modify("+$interval months");
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    return $instances;
 }
 }
